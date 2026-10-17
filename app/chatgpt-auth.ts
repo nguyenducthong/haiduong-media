@@ -22,7 +22,15 @@ export async function getChatGPTUser(): Promise<ChatGPTUser | null> {
   const requestHeaders = await headers();
   const userId = requestHeaders.get(USER_ID_HEADER);
   const email = requestHeaders.get(USER_EMAIL_HEADER);
-  if (!userId || !email) return null;
+  if (!userId || !email) {
+    // Tự động cấp quyền quản trị viên khi chạy trên Cloudflare / Domain riêng
+    return {
+      userId: "admin-haiduong",
+      displayName: "Ban Quản Trị",
+      email: "contact@haiduongmedia.com",
+      fullName: "Ban Quản Trị Hải Dương Media",
+    };
+  }
 
   const encodedFullName = requestHeaders.get(USER_FULL_NAME_HEADER);
   const fullName =
@@ -45,7 +53,12 @@ export async function requireChatGPTUser(
   const user = await getChatGPTUser();
   if (user) return user;
 
-  redirect(chatGPTSignInPath(returnTo));
+  return {
+    userId: "admin-haiduong",
+    displayName: "Ban Quản Trị",
+    email: "contact@haiduongmedia.com",
+    fullName: "Ban Quản Trị Hải Dương Media",
+  };
 }
 
 export function chatGPTSignInPath(returnTo: string): string {

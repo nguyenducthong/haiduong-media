@@ -9,123 +9,171 @@ import {
   Palette,
   PenTool,
   Sparkles,
+  Tv,
 } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
+import { HeroBannerSlider } from "@/components/home-banner-slider";
+import { HomeVtvSection } from "@/components/home-vtv-section";
+import { HomeEventsSection } from "@/components/home-events-section";
+import { HomeNewsKnowledge } from "@/components/home-news-knowledge";
+import { HomePressBrands } from "@/components/home-press-brands";
 import { loadSiteContent } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
 
-const serviceIcons = [Megaphone, Clapperboard, Sparkles, ChartNoAxesCombined, Palette, PenTool];
+const serviceIcons = [Tv, Clapperboard, Megaphone, Sparkles, ChartNoAxesCombined, Palette];
 
 export default async function Home() {
   const content = await loadSiteContent();
+
+  const sectionRenderers: Record<string, () => React.ReactNode> = {
+    banner: () => <HeroBannerSlider key="banner" slides={content.bannerSlides} />,
+    trust: () => (
+      <section key="trust" className="trust-strip">
+        <div className="site-container trust-grid">
+          <strong>11+ Năm Kinh Nghiệm</strong>
+          <span>•</span>
+          <strong>3.000+ Thương Hiệu Đồng Hành</strong>
+          <span>•</span>
+          <strong>150+ TVC Phát Sóng VTV/HTV</strong>
+          <span>•</span>
+          <strong>200+ Đầu Báo Mạng Hàng Đầu</strong>
+        </div>
+      </section>
+    ),
+    vtv: () => <HomeVtvSection key="vtv" commercials={content.vtvCommercials} />,
+    events: () => <HomeEventsSection key="events" events={content.upcomingEvents} />,
+    services: () => (
+      <section key="services" className="section services-section" id="dich-vu-chinh">
+        <div className="site-container">
+          <div className="section-heading split-heading">
+            <div>
+              <span className="eyebrow" style={{ color: "#d42027" }}>GIẢI PHÁP ĐỒNG BỘ</span>
+              <h2>Dịch Vụ Của Chúng Tôi</h2>
+            </div>
+            <p>
+              Từ chiến lược thương hiệu, sản xuất phim quảng cáo TVC, booking báo chí đài truyền hình đến tổ chức sự kiện
+              và bảo trợ truyền thông toàn diện.
+            </p>
+          </div>
+          <div className="service-grid">
+            {content.services.map((service, index) => {
+              const Icon = serviceIcons[index] ?? Sparkles;
+              return (
+                <article className="service-card" key={`${service.title}-${index}`}>
+                  <span className="service-number">0{index + 1}</span>
+                  <div className="service-icon">
+                    <Icon size={26} />
+                  </div>
+                  <h3>{service.title}</h3>
+                  <p>{service.description}</p>
+                  <Link href="/lien-he" aria-label={`Tìm hiểu ${service.title}`}>
+                    Nhận tư vấn chi tiết <ArrowRight size={16} />
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    ),
+    news: () => <HomeNewsKnowledge key="news" news={content.news} knowledge={content.knowledge} />,
+    about: () => (
+      <section key="about" className="section story-section" id="gioi-thieu">
+        <div className="site-container story-grid">
+          <div className="story-visual">
+            <span>CHIẾN LƯỢC</span>
+            <strong>→</strong>
+            <span>HIỆU QUẢ</span>
+          </div>
+          <div className="story-copy">
+            <span className="eyebrow light">VỀ CHÚNG TÔI</span>
+            <h2>{content.aboutTitle}</h2>
+            <p>{content.aboutBody}</p>
+            <div className="story-stat">
+              <strong>11+</strong>
+              <span>Năm tâm huyết xây dựng và nâng tầm thương hiệu Việt vươn ra thị trường khu vực.</span>
+            </div>
+            <Link href="/gioi-thieu" className="text-link">
+              Tìm hiểu thêm về Hải Dương Media <ArrowRight size={17} />
+            </Link>
+          </div>
+        </div>
+      </section>
+    ),
+    press: () => (
+      <HomePressBrands
+        key="press"
+        press={content.press}
+        brands={content.brands}
+        partners={content.partners}
+        clients={content.clients}
+        testimonials={content.testimonials}
+      />
+    ),
+    process: () => (
+      <section key="process" className="section process-section">
+        <div className="site-container">
+          <div className="section-heading centered">
+            <span className="eyebrow" style={{ color: "#d42027" }}>
+              {content.processEyebrow || "QUY TRÌNH CHUẨN MỰC"}
+            </span>
+            <h2>{content.processTitle || "Đơn Giản, Minh Bạch & Đúng Tiến Độ Phát Sóng"}</h2>
+          </div>
+          <div className="process-grid">
+            {(content.processSteps || []).map((step, index) => (
+              <div className="process-step" key={step.title || index}>
+                <span>{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    ),
+    cta: () => (
+      <section key="cta" className="cta-section">
+        <div className="site-container cta-inner">
+          <div>
+            <span className="eyebrow light">
+              {content.ctaEyebrow || "BẮT ĐẦU CHIẾN DỊCH TRUYỀN THÔNG MỚI"}
+            </span>
+            <h2>
+              {content.ctaTitle ||
+                "Đưa thương hiệu của bạn tỏa sáng trên sóng truyền hình quốc gia và báo chí hàng đầu."}
+            </h2>
+          </div>
+          <Link href={content.ctaButtonHref || "/lien-he"} className="button button-light">
+            {content.ctaButtonText || "Liên hệ tư vấn ngay"} <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+    ),
+  };
+
+  const activeSections = content.homepageSections || [
+    { id: "banner", name: "Banner Slider nổi bật", enabled: true },
+    { id: "trust", name: "Chỉ số niềm tin & Thành tựu", enabled: true },
+    { id: "vtv", name: "Sản xuất phim quảng cáo trên VTV", enabled: true },
+    { id: "events", name: "Danh mục sự kiện sắp diễn ra", enabled: true },
+    { id: "services", name: "Dịch vụ & Sản phẩm chủ lực", enabled: true },
+    { id: "news", name: "Tin mới & Kiến thức", enabled: true },
+    { id: "about", name: "Về chúng tôi (Giới thiệu Hải Dương Media)", enabled: true },
+    { id: "press", name: "Báo chí, Thương hiệu & Đối tác", enabled: true },
+    { id: "process", name: "Quy trình triển khai 4 bước", enabled: true },
+    { id: "cta", name: "Khối kêu gọi hợp tác (CTA)", enabled: true },
+  ];
 
   return (
     <>
       <SiteHeader content={content} />
       <main>
-        <section className="hero-section">
-          <div className="site-container hero-grid">
-            <div className="hero-copy">
-              <span className="eyebrow">{content.heroEyebrow}</span>
-              <h1>{content.heroTitle}</h1>
-              <p>{content.heroDescription}</p>
-              <div className="hero-actions">
-                <Link href="/lien-he" className="button button-primary">
-                  {content.primaryCta} <ArrowRight size={18} />
-                </Link>
-                <Link href="/dich-vu" className="button button-ghost">
-                  {content.secondaryCta}
-                </Link>
-              </div>
-            </div>
-            <div className="hero-visual" aria-label="Minh họa chiến dịch truyền thông">
-              <div className="hero-orbit hero-orbit-one" />
-              <div className="hero-orbit hero-orbit-two" />
-              <div className="hero-card hero-card-main">
-                <span className="visual-label">BRAND GROWTH</span>
-                <strong>+128%</strong>
-                <small>Mức độ nhận diện</small>
-                <div className="chart-bars">
-                  {[36, 51, 45, 70, 64, 88].map((height) => (
-                    <i key={height} style={{ height: `${height}%` }} />
-                  ))}
-                </div>
-              </div>
-              <div className="hero-card hero-card-note">
-                <BadgeCheck size={22} />
-                <span><b>Chiến lược rõ ràng</b><small>Nội dung đúng điểm chạm</small></span>
-              </div>
-              <div className="hero-badge">MEDIA<br />STUDIO</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="trust-strip">
-          <div className="site-container trust-grid">
-            <strong>Chiến lược</strong><span>•</span><strong>Sáng tạo</strong><span>•</span>
-            <strong>Đa nền tảng</strong><span>•</span><strong>Đo lường</strong>
-          </div>
-        </section>
-
-        <section className="section services-section">
-          <div className="site-container">
-            <div className="section-heading split-heading">
-              <div><span className="eyebrow">Dịch vụ nổi bật</span><h2>Giải pháp truyền thông toàn diện</h2></div>
-              <p>Từ ý tưởng đến triển khai, mọi hạng mục được kết nối thành một trải nghiệm nhất quán cho khách hàng của bạn.</p>
-            </div>
-            <div className="service-grid">
-              {content.services.map((service, index) => {
-                const Icon = serviceIcons[index] ?? Sparkles;
-                return <article className="service-card" key={`${service.title}-${index}`}>
-                  <span className="service-number">0{index + 1}</span>
-                  <div className="service-icon"><Icon size={26} /></div>
-                  <h3>{service.title}</h3>
-                  <p>{service.description}</p>
-                  <Link href="/lien-he" aria-label={`Tìm hiểu ${service.title}`}>Tìm hiểu thêm <ArrowRight size={16} /></Link>
-                </article>;
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="section story-section">
-          <div className="site-container story-grid">
-            <div className="story-visual"><span>IDEA</span><strong>→</strong><span>IMPACT</span></div>
-            <div className="story-copy">
-              <span className="eyebrow light">Về chúng tôi</span>
-              <h2>{content.aboutTitle}</h2>
-              <p>{content.aboutBody}</p>
-              <div className="story-stat"><strong>01</strong><span>Đầu mối đồng hành xuyên suốt từ chiến lược đến thực thi.</span></div>
-              <Link href="/gioi-thieu" className="text-link">Tìm hiểu đội ngũ <ArrowRight size={17} /></Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="section process-section">
-          <div className="site-container">
-            <div className="section-heading centered"><span className="eyebrow">Quy trình triển khai</span><h2>Đơn giản, minh bạch và dễ theo dõi</h2></div>
-            <div className="process-grid">
-              {["Hiểu mục tiêu", "Xây chiến lược", "Sáng tạo & triển khai", "Đo lường & tối ưu"].map((step, index) => (
-                <div className="process-step" key={step}><span>{index + 1}</span><h3>{step}</h3><p>{["Lắng nghe bài toán, khách hàng và nguồn lực hiện có.", "Chọn thông điệp, kênh truyền thông và kế hoạch phù hợp.", "Sản xuất nội dung, thiết kế và vận hành chiến dịch.", "Theo dõi chỉ số, báo cáo và cải thiện hiệu quả."][index]}</p></div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="section news-section">
-          <div className="site-container">
-            <div className="section-heading split-heading"><div><span className="eyebrow">Góc chia sẻ</span><h2>Tin tức & kiến thức</h2></div><Link href="/tin-tuc" className="text-link dark">Xem tất cả <ArrowRight size={17} /></Link></div>
-            <div className="news-grid">
-              {content.news.map((item, index) => <article className="news-card" key={`${item.title}-${index}`}>
-                <div className={`news-cover cover-${index + 1}`}><span>{item.category}</span></div>
-                <div className="news-body"><small><CalendarDays size={14} /> 17.10.2026</small><h3>{item.title}</h3><p>{item.excerpt}</p><Link href="/tin-tuc">Đọc bài viết <ArrowRight size={15} /></Link></div>
-              </article>)}
-            </div>
-          </div>
-        </section>
-
-        <section className="cta-section"><div className="site-container cta-inner"><div><span className="eyebrow light">Bắt đầu một dự án mới</span><h2>Để thương hiệu của bạn tạo nên khác biệt.</h2></div><Link href="/lien-he" className="button button-light">Trao đổi ngay <ArrowRight size={18} /></Link></div></section>
+        {activeSections.map((sec) => {
+          if (!sec.enabled) return null;
+          const render = sectionRenderers[sec.id];
+          return render ? render() : null;
+        })}
       </main>
       <SiteFooter content={content} />
       <FloatingContact content={content} />

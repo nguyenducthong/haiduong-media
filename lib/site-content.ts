@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { siteContent } from "@/db/schema";
 
@@ -588,8 +588,25 @@ export const defaultSiteContent: SiteContent = {
   ctaButtonHref: "/lien-he",
 };
 
+let tableEnsured = false;
+async function ensureDbTable() {
+  if (tableEnsured) return;
+  try {
+    await getDb().run(sql`CREATE TABLE IF NOT EXISTS site_content (
+      key TEXT PRIMARY KEY,
+      data TEXT NOT NULL,
+      updated_by TEXT,
+      updated_at INTEGER NOT NULL
+    )`);
+    tableEnsured = true;
+  } catch {
+    // Continue if running offline or table already initialized
+  }
+}
+
 export async function loadSiteContent(): Promise<SiteContent> {
   try {
+    await ensureDbTable();
     const [row] = await getDb().select().from(siteContent).where(eq(siteContent.key, "main")).limit(1);
     return row ? normalizeContent(JSON.parse(row.data)) : defaultSiteContent;
   } catch {
@@ -608,6 +625,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
 }
 
 export async function saveSiteContent(content: SiteContent, updatedBy: string): Promise<SiteContent> {
+  await ensureDbTable();
   const normalized = normalizeContent(content);
   const values = { key: "main", data: JSON.stringify(normalized), updatedBy, updatedAt: new Date() };
   await getDb().insert(siteContent).values(values).onConflictDoUpdate({ target: siteContent.key, set: values });

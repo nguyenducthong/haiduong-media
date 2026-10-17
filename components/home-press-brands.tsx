@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/link";
 import { ArrowUpRight, Award, ExternalLink, Handshake, HeartHandshake, Quote, Star, Users } from "lucide-react";
 import type { BrandItem, PressItem, TestimonialItem } from "@/lib/site-content";
 

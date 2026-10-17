@@ -70,6 +70,11 @@ export default defineConfig(async ({ command }) => {
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),
     },
+    resolve: {
+      alias: {
+        "next/link": new URL("./components/link.tsx", import.meta.url).pathname,
+      },
+    },
     plugins: [
       vinext(),
       sites({ mockAuth: !managedLinux }),

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/link";
 import { Calendar, MapPin, ArrowRight, Sparkles, Clock } from "lucide-react";
 import type { EventItem } from "@/lib/site-content";
 

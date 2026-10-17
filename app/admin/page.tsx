@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { requireChatGPTUser } from "@/app/chatgpt-auth";
 import { loadSiteContent } from "@/lib/site-content";

@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowUpRight, Globe2, MapPin, MessageCircle, Phone, Tv } from "lucide-react";
+import Link from "@/components/link";
+import { ArrowUpRight, Globe2, Lock, MapPin, MessageCircle, Phone, Tv } from "lucide-react";
 import type { SiteContent } from "@/lib/site-content";
 
 const links = [
@@ -32,14 +32,35 @@ export function SiteHeader({ content }: { content: SiteContent }) {
             </Link>
           ))}
         </nav>
-        <a
-          className="header-phone"
-          href={`tel:${content.hotlineHref}`}
-          style={{ background: "#d42027" }}
-        >
-          <Phone size={17} />
-          <span>{content.hotline}</span>
-        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <a
+            className="header-phone"
+            href={`tel:${content.hotlineHref}`}
+            style={{ background: "#d42027" }}
+          >
+            <Phone size={17} />
+            <span>{content.hotline}</span>
+          </a>
+          <Link
+            href="/admin"
+            className="header-admin-btn"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "5px",
+              padding: "9px 14px",
+              borderRadius: "999px",
+              background: "#1e293b",
+              color: "#f8fafc",
+              fontSize: "13px",
+              fontWeight: 600,
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.15)",
+            }}
+          >
+            <Lock size={13} /> Quản trị
+          </Link>
+        </div>
         <details className="mobile-menu">
           <summary aria-label="Mở menu">Menu</summary>
           <nav>
@@ -48,7 +69,7 @@ export function SiteHeader({ content }: { content: SiteContent }) {
                 {label}
               </Link>
             ))}
-            <Link href="/admin">Quản trị</Link>
+            <Link href="/admin">Quản trị CMS</Link>
           </nav>
         </details>
       </div>

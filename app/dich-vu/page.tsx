@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import Link from "@/components/link";
 import { FloatingContact, PageHero, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { loadSiteContent } from "@/lib/site-content";
 

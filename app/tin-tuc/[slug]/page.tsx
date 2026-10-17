@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, User, Share2, Tag, ArrowRight } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";

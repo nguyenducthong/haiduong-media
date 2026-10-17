@@ -3,11 +3,12 @@ import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./schema";
 
 export function getDb() {
-  if (!env.DB) {
+  const d1Binding = env.DB || (env as Record<string, any>).database;
+  if (!d1Binding) {
     throw new Error(
-      "Cloudflare D1 binding `DB` is unavailable. Set the `d1` field in .openai/hosting.json to `DB` or let your control plane inject the real binding values before using the database."
+      "Cloudflare D1 binding `DB` hoac `database` is unavailable. Please ensure D1 binding is configured."
     );
   }
 
-  return drizzle(env.DB, { schema });
+  return drizzle(d1Binding, { schema });
 }

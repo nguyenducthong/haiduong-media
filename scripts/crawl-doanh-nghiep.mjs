@@ -136,7 +136,17 @@ export async function scanArticleDetail(url) {
   }
 }
 
-export function parseArticlesFromHtml(html) {
+export function detectTypeFromUrl(url) {
+  if (!url) return ["doanh-nghiep"];
+  const u = url.toLowerCase();
+  if (u.includes("doanh-nhan")) return ["doanh-nhan"];
+  if (u.includes("tin-tuc")) return ["tin-tuc"];
+  if (u.includes("san-pham")) return ["san-pham"];
+  if (u.includes("su-kien")) return ["su-kien"];
+  return ["doanh-nghiep"];
+}
+
+export function parseArticlesFromHtml(html, url = "") {
   const listMatch = html.match(/<ul class="list_cata">([\s\S]*?)<\/ul><!-- End \.list_cata -->/);
   if (!listMatch) return [];
 
@@ -174,6 +184,7 @@ export function parseArticlesFromHtml(html) {
       id: slug,
       slug,
       title,
+      type: detectTypeFromUrl(detailUrl || url),
       category,
       excerpt,
       image: imgUrl,
@@ -190,7 +201,7 @@ export function parseArticlesFromHtml(html) {
 
 export async function scanList(url) {
   const html = await fetchPage(url);
-  return parseArticlesFromHtml(html);
+  return parseArticlesFromHtml(html, url);
 }
 
 export function enrichArticle(article, contentHtml) {
@@ -214,6 +225,11 @@ export function enrichArticle(article, contentHtml) {
     imageCount,
     category: article.category || detectCategory(article.title, article.excerpt),
     author: article.author || "Viện Nghiên Cứu Kinh Tế Châu Á",
+    type: Array.isArray(article.type) && article.type.length > 0
+      ? article.type
+      : article.type && typeof article.type === "string"
+      ? [article.type.trim()]
+      : detectTypeFromUrl(article.sourceUrl || ""),
     active: true,
   };
 }

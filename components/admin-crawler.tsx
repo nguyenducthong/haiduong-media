@@ -93,7 +93,11 @@ export function AdminCrawler() {
   const toggleAssignedType = (typeId: string) => {
     setAssignedTypes((prev) => {
       const next = prev.includes(typeId) ? prev.filter((t) => t !== typeId) : [...prev, typeId];
-      return next.length === 0 ? [typeId] : next;
+      const finalTypes = next.length === 0 ? [typeId] : next;
+      setEnrichedArticles((list) =>
+        list.map((art) => ({ ...art, type: finalTypes }))
+      );
+      return finalTypes;
     });
   };
 
@@ -161,6 +165,15 @@ export function AdminCrawler() {
       }
       const articles: RawArticleItem[] = data.articles || [];
       setScannedList(articles);
+
+      // Tự động nhận diện loại menu từ URL nguồn
+      const lowerUrl = url.trim().toLowerCase();
+      let detectedTypes = ["doanh-nghiep"];
+      if (lowerUrl.includes("doanh-nhan")) detectedTypes = ["doanh-nhan"];
+      else if (lowerUrl.includes("tin-tuc")) detectedTypes = ["tin-tuc"];
+      else if (lowerUrl.includes("san-pham")) detectedTypes = ["san-pham"];
+      else if (lowerUrl.includes("su-kien")) detectedTypes = ["su-kien"];
+      setAssignedTypes(detectedTypes);
 
       // TỰ ĐỘNG CHỐNG TRÙNG LẶP:
       // Ưu tiên chọn những bài MỚI (chưa có trong hệ thống)
@@ -249,10 +262,12 @@ export function AdminCrawler() {
         });
         const data = await res.json();
         if (data.success && data.article) {
-          enrichedResults.push(data.article);
+          const type = assignedTypes && assignedTypes.length > 0 ? assignedTypes : (data.article.type || ["doanh-nghiep"]);
+          enrichedResults.push({ ...data.article, type });
         } else {
           enrichedResults.push({
             ...target,
+            type: assignedTypes && assignedTypes.length > 0 ? assignedTypes : ["doanh-nghiep"],
             wordCount: 0,
             readTime: "1 phút đọc",
             imageCount: 0,
@@ -261,6 +276,7 @@ export function AdminCrawler() {
       } catch (err) {
         enrichedResults.push({
           ...target,
+          type: assignedTypes && assignedTypes.length > 0 ? assignedTypes : ["doanh-nghiep"],
           wordCount: 0,
           readTime: "1 phút đọc",
           imageCount: 0,
@@ -1375,6 +1391,65 @@ export function AdminCrawler() {
                             background: "#fff",
                           }}
                         />
+                      </div>
+                    </div>
+
+                    {/* Menu Type Selector for this Card */}
+                    <div style={{ marginTop: "4px" }}>
+                      <label
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          color: "#64748b",
+                          textTransform: "uppercase",
+                          display: "block",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        Gán vào Menu hiển thị:
+                      </label>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                        {[
+                          { id: "doanh-nghiep", label: "Doanh nghiệp", color: "#d42027" },
+                          { id: "doanh-nhan", label: "Doanh nhân", color: "#0284c7" },
+                          { id: "san-pham", label: "Sản phẩm", color: "#16a34a" },
+                          { id: "tin-tuc", label: "Tin tức", color: "#9333ea" },
+                        ].map((t) => {
+                          const artTypes = Array.isArray(art.type) && art.type.length > 0 ? art.type : assignedTypes;
+                          const isChecked = artTypes.includes(t.id);
+                          return (
+                            <label
+                              key={t.id}
+                              style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                fontSize: "12px",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                padding: "5px 12px",
+                                borderRadius: "7px",
+                                border: isChecked ? `1.5px solid ${t.color}` : "1px solid var(--line)",
+                                background: isChecked ? "#fff" : "#f8fafc",
+                                color: isChecked ? t.color : "#64748b",
+                                transition: "all 0.15s ease",
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {
+                                  const next = isChecked
+                                    ? artTypes.filter((x: string) => x !== t.id)
+                                    : [...artTypes, t.id];
+                                  updateEnrichedArticle(idx, "type", next.length === 0 ? [t.id] : next);
+                                }}
+                                style={{ accentColor: t.color }}
+                              />
+                              {t.label}
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
 

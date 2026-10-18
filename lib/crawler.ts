@@ -177,6 +177,16 @@ export async function scanArticleDetail(url: string): Promise<string> {
   }
 }
 
+export function detectTypeFromUrl(url: string): string[] {
+  if (!url) return ["doanh-nghiep"];
+  const u = url.toLowerCase();
+  if (u.includes("doanh-nhan")) return ["doanh-nhan"];
+  if (u.includes("tin-tuc")) return ["tin-tuc"];
+  if (u.includes("san-pham")) return ["san-pham"];
+  if (u.includes("su-kien")) return ["su-kien"];
+  return ["doanh-nghiep"];
+}
+
 export function parseSingleArticleFromHtml(html: string, url = "") {
   const ogTitle =
     html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i)?.[1] ||
@@ -220,6 +230,7 @@ export function parseSingleArticleFromHtml(html: string, url = "") {
       id: slug,
       slug,
       title,
+      type: detectTypeFromUrl(detailUrl || url),
       category,
       excerpt,
       image: imgUrl,
@@ -282,6 +293,7 @@ export function parseArticlesFromHtml(html: string, url = "") {
       id: slug,
       slug,
       title,
+      type: detectTypeFromUrl(detailUrl || url),
       category,
       excerpt,
       image: imgUrl,
@@ -351,11 +363,11 @@ export function enrichArticle(article: any, contentHtml: string) {
     imageCount,
     category: article.category || detectCategory(article.title, article.excerpt),
     author: article.author || "Viện Nghiên Cứu Kinh Tế Châu Á",
-    type: Array.isArray(article.type)
+    type: Array.isArray(article.type) && article.type.length > 0
       ? article.type
-      : article.type
-      ? [article.type]
-      : ["doanh-nghiep"],
+      : typeof article.type === "string" && article.type.trim()
+      ? [article.type.trim()]
+      : detectTypeFromUrl(article.sourceUrl || ""),
     active: true,
   };
 }

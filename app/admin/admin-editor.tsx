@@ -14,12 +14,16 @@ import {
   Eye,
   EyeOff,
   Handshake,
+  Home,
   Image as ImageIcon,
   Layers,
+  LayoutGrid,
   Link as LinkIcon,
   ListOrdered,
   LoaderCircle,
   MessageSquareQuote,
+  Newspaper,
+  Package,
   Plus,
   Quote,
   Save,
@@ -46,13 +50,21 @@ import type {
 } from "@/lib/site-content";
 import { AdminRichEditor } from "@/components/admin-rich-editor";
 import { ImageUploadField } from "@/components/image-upload-field";
+import { AdminEnterprises } from "@/components/admin-enterprises";
 
 type Message = { type: "success" | "error"; text: string } | null;
+export type MainAdminTab =
+  | "trang-chu"
+  | "bai-viet"
+  | "su-kien"
+  | "cau-hinh";
 
 export default function AdminEditor({ initialContent }: { initialContent: SiteContent }) {
   const [content, setContent] = useState<SiteContent>(initialContent);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<Message>(null);
+  const [mainTab, setMainTab] = useState<MainAdminTab>("trang-chu");
+  const [eventAdminView, setEventAdminView] = useState<"articles" | "cards">("articles");
 
   // Collapsed state tracking (mặc định thu gọn)
   const [collapsedBanners, setCollapsedBanners] = useState<Record<string, boolean>>({});
@@ -673,37 +685,240 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
   ];
 
   return (
-    <div className="admin-layout">
-      {/* SIDEBAR NAVIGATION */}
-      <aside className="admin-nav">
-        <strong>Danh mục quản lý</strong>
-        <a href="#homepage-sections">01. Bật/Tắt & Thứ tự Trang chủ</a>
-        <a href="#banner-slider">02. Banner Slider Trang chủ</a>
-        <a href="#vtv-commercials-admin">03. Phim & TVC Trên VTV</a>
-        <a href="#tin-tuc">04. Quản lý Tin tức</a>
-        <a href="#kien-thuc">05. Kiến thức Truyền thông</a>
-        <a href="#su-kien">06. Danh mục Sự kiện</a>
-        <a href="#bao-chi-admin">07. Báo chí Đưa tin</a>
-        <a href="#thuong-hieu-admin">08. Thương hiệu & Hệ sinh thái</a>
-        <a href="#danh-gia-admin">09. Đánh giá Khách hàng</a>
-        <a href="#doi-tac-admin">10. Đối tác & Doanh nghiệp</a>
-        <a href="#quy-trinh-cta-admin">11. Quy trình & Kêu gọi CTA</a>
-        <a href="#thuong-hieu">12. Thông tin Thương hiệu</a>
-        <a href="#trang-chu">13. Giới thiệu & Niềm tin</a>
-        <a href="#dich-vu">14. Dịch vụ chủ lực</a>
-        <a href="#lien-he">15. Thông tin Liên hệ</a>
-      </aside>
-
-      <div className="admin-content">
-        {/* ========================================================
-            01. CẤU HÌNH HIỂN THỊ & SẮP XẾP CÁC MỤC TRÊN TRANG CHỦ
-            ======================================================== */}
-        <EditorSection
-          id="homepage-sections"
-          number="01"
-          title="Cấu hình Hiển thị & Sắp xếp các mục trên Trang chủ"
-          description="Bật/Tắt từng khối nội dung và điều chỉnh thứ tự xuất hiện trên trang chủ website bằng nút Lên/Xuống."
+    <div className="admin-editor-wrapper">
+      {/* ========================================================
+          MENU NGANG PHÂN QUẢN TRỊ THEO TỪNG DANH MỤC
+          ======================================================== */}
+      <nav className="admin-horizontal-nav-bar">
+        <button
+          type="button"
+          onClick={() => setMainTab("trang-chu")}
+          className={`admin-nav-tab-item ${mainTab === "trang-chu" ? "active" : ""}`}
         >
+          <div className="admin-nav-tab-icon">
+            <Home size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Trang chủ</span>
+            <span className="admin-nav-tab-desc">Chỉnh sửa khối & giao diện</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMainTab("bai-viet")}
+          className={`admin-nav-tab-item ${mainTab === "bai-viet" ? "active" : ""}`}
+        >
+          <div
+            className="admin-nav-tab-icon"
+            style={{
+              background: mainTab === "bai-viet" ? "#d42027" : undefined,
+              color: mainTab === "bai-viet" ? "#fff" : undefined,
+            }}
+          >
+            <BookOpen size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Bài viết</span>
+            <span className="admin-nav-tab-desc">Doanh nghiệp, Doanh nhân, SP, Tin tức</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setMainTab("su-kien");
+            setEventAdminView("articles");
+          }}
+          className={`admin-nav-tab-item ${mainTab === "su-kien" ? "active" : ""}`}
+        >
+          <div className="admin-nav-tab-icon">
+            <Calendar size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Sự kiện & Diễn đàn</span>
+            <span className="admin-nav-tab-desc">Quản lý bài viết & Thẻ sự kiện</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMainTab("cau-hinh")}
+          className={`admin-nav-tab-item ${mainTab === "cau-hinh" ? "active" : ""}`}
+        >
+          <div className="admin-nav-tab-icon">
+            <Sliders size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Cấu hình chung</span>
+            <span className="admin-nav-tab-desc">Thông tin liên hệ & thương hiệu</span>
+          </div>
+        </button>
+      </nav>
+
+      {/* ========================================================
+          TAB QUẢN LÝ TẤT CẢ BÀI VIẾT (LƯU TẬP TRUNG 1 FILE DUY NHẤT data/enterprises.json)
+          ======================================================== */}
+      {mainTab === "bai-viet" && (
+        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
+          <AdminEnterprises defaultType="all" />
+        </div>
+      )}
+
+      {/* ========================================================
+          TAB SỰ KIỆN CHẾ ĐỘ QUẢN LÝ BÀI VIẾT SỰ KIỆN & DIỄN ĐÀN
+          ======================================================== */}
+      {mainTab === "su-kien" && eventAdminView === "articles" && (
+        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
+          {/* Switcher header */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "14px",
+              background: "#ffffff",
+              padding: "16px 24px",
+              borderRadius: "16px",
+              border: "1px solid var(--line)",
+              marginBottom: "24px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
+            }}
+          >
+            <div>
+              <strong style={{ fontSize: "16px", color: "#0f172a", display: "block" }}>
+                Quản lý Sự Kiện & Diễn Đàn Doanh Nghiệp
+              </strong>
+              <span style={{ fontSize: "13px", color: "var(--muted)" }}>
+                Đang hiển thị danh sách bài viết sự kiện. Bạn có thể biên tập bài viết hoặc chuyển sang cấu hình thẻ sự kiện nổi bật.
+              </span>
+            </div>
+
+            <div style={{ display: "flex", gap: "8px", background: "#f1f5f9", padding: "4px", borderRadius: "10px" }}>
+              <button
+                type="button"
+                onClick={() => setEventAdminView("articles")}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  background: "#0f172a",
+                  color: "#fff",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                }}
+              >
+                <Newspaper size={15} /> Danh sách bài viết Sự kiện
+              </button>
+              <button
+                type="button"
+                onClick={() => setEventAdminView("cards")}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  border: "none",
+                  cursor: "pointer",
+                  background: "transparent",
+                  color: "#64748b",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Calendar size={15} /> Thẻ Sự kiện Trang chủ ({content.upcomingEvents.length})
+              </button>
+            </div>
+          </div>
+
+          <AdminEnterprises
+            defaultType="su-kien"
+            title="Quản lý Bài Viết Sự Kiện & Diễn Đàn Doanh Nghiệp"
+            subtitle="Danh sách bài viết sự kiện, diễn đàn kinh tế, chương trình vinh danh và thông báo tiếp nhận hồ sơ."
+          />
+        </div>
+      )}
+
+      {/* ========================================================
+          CÁC TAB SỬ DỤNG GIAO DIỆN CHỈNH SỬA VÀ LƯU FORM (CONTENT)
+          ======================================================== */}
+      {mainTab !== "bai-viet" && !(mainTab === "su-kien" && eventAdminView === "articles") && (
+        <div className="admin-layout">
+          {/* SIDEBAR NAVIGATION TAILORED TO ACTIVE TAB */}
+          <aside className="admin-nav">
+            {mainTab === "trang-chu" && (
+              <>
+                <strong>Mục Trang chủ</strong>
+                <a href="#homepage-sections">01. Bật/Tắt & Thứ tự</a>
+                <a href="#banner-slider">02. Banner Slider</a>
+                <a href="#vtv-commercials-admin">03. Phim & TVC Trên VTV</a>
+                <a href="#dich-vu">04. Dịch vụ chủ lực</a>
+                <a href="#trang-chu">05. Giới thiệu & Niềm tin</a>
+                <a href="#bao-chi-admin">06. Báo chí Đưa tin</a>
+                <a href="#thuong-hieu-admin">07. Hệ sinh thái</a>
+                <a href="#danh-gia-admin">08. Đánh giá Khách hàng</a>
+                <a href="#doi-tac-admin">09. Đối tác & Doanh nghiệp</a>
+                <a href="#quy-trinh-cta-admin">10. Quy trình & CTA</a>
+              </>
+            )}
+
+            {mainTab === "su-kien" && (
+              <>
+                <strong>Sự kiện & Diễn đàn</strong>
+                <button
+                  type="button"
+                  onClick={() => setEventAdminView("articles")}
+                  style={{
+                    background: "#0f172a",
+                    color: "#fff",
+                    border: "none",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    marginBottom: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    width: "100%",
+                  }}
+                >
+                  <Newspaper size={14} /> Danh sách bài viết
+                </button>
+                <a href="#su-kien" style={{ fontWeight: 800 }}>01. Thẻ Sự kiện Trang chủ</a>
+              </>
+            )}
+
+            {mainTab === "cau-hinh" && (
+              <>
+                <strong>Cấu hình chung</strong>
+                <a href="#thuong-hieu">01. Thông tin Thương hiệu</a>
+                <a href="#lien-he">02. Thông tin Liên hệ</a>
+              </>
+            )}
+          </aside>
+
+          <div className="admin-content">
+            {/* TRANG CHỦ PHẦN 1 */}
+            {mainTab === "trang-chu" && (
+              <>
+                {/* ========================================================
+                    01. CẤU HÌNH HIỂN THỊ & SẮP XẾP CÁC MỤC TRÊN TRANG CHỦ
+                    ======================================================== */}
+                <EditorSection
+                  id="homepage-sections"
+                  number="01"
+                  title="Cấu hình Hiển thị & Sắp xếp các mục trên Trang chủ"
+                  description="Bật/Tắt từng khối nội dung và điều chỉnh thứ tự xuất hiện trên trang chủ website bằng nút Lên/Xuống."
+                >
           <div style={{ display: "grid", gap: "10px" }}>
             {sectionsList.map((sec, index) => (
               <div
@@ -1409,7 +1624,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             })}
           </div>
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        TAB TIN TỨC & KIẾN THỨC
+        ======================================================== */}
+    {mainTab === "tin-tuc" && (
+      <>
         {/* ========================================================
             04. QUẢN LÝ BÀI VIẾT (TIN TỨC)
             ======================================================== */}
@@ -2086,7 +2308,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             })}
           </div>
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        TAB SỰ KIỆN
+        ======================================================== */}
+    {mainTab === "su-kien" && (
+      <>
         {/* ========================================================
             06. QUẢN LÝ SỰ KIỆN (CÓ THU GỌN, SẮP XẾP, ACTIVE)
             ======================================================== */}
@@ -2096,6 +2325,45 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
           title="Quản lý Sự Kiện & Diễn Đàn Doanh Nghiệp"
           description="Quản lý thẻ sự kiện hiển thị trên trang chủ và trang chi tiết sự kiện."
         >
+          {/* Switcher header between Articles and Event Cards */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "12px",
+              background: "#f8fafc",
+              border: "1px solid var(--line)",
+              borderRadius: "12px",
+              padding: "12px 18px",
+              marginBottom: "20px",
+            }}
+          >
+            <span style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+              Đang xem: <strong>Cấu hình Thẻ Sự kiện nổi bật (Trang chủ & /su-kien)</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setEventAdminView("articles")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 14px",
+                borderRadius: "8px",
+                background: "#0f172a",
+                color: "#fff",
+                fontSize: "13px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <Newspaper size={14} /> Mở Danh sách bài viết Sự kiện & Diễn đàn
+            </button>
+          </div>
+
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 700 }}>
@@ -2451,7 +2719,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             })}
           </div>
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        TRANG CHỦ PHẦN 2: BÁO CHÍ, THƯƠNG HIỆU, ĐÁNH GIÁ, ĐỐI TÁC, CTA
+        ======================================================== */}
+    {mainTab === "trang-chu" && (
+      <>
         {/* ========================================================
             07. BÁO CHÍ NÓI VỀ CHÚNG TÔI
             ======================================================== */}
@@ -3385,7 +3660,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             </div>
           </div>
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        CẤU HÌNH: THƯƠNG HIỆU
+        ======================================================== */}
+    {mainTab === "cau-hinh" && (
+      <>
         {/* ========================================================
             12. THÔNG TIN THƯƠNG HIỆU
             ======================================================== */}
@@ -3412,7 +3694,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             multiline
           />
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        TRANG CHỦ PHẦN 3: GIỚI THIỆU & DỊCH VỤ CHỦ LỰC
+        ======================================================== */}
+    {mainTab === "trang-chu" && (
+      <>
         {/* ========================================================
             13. TIÊU ĐỀ & GIỚI THIỆU CHUNG
             ======================================================== */}
@@ -3505,7 +3794,14 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             ))}
           </div>
         </EditorSection>
+      </>
+    )}
 
+    {/* ========================================================
+        CẤU HÌNH: THÔNG TIN LIÊN HỆ
+        ======================================================== */}
+    {mainTab === "cau-hinh" && (
+      <>
         {/* ========================================================
             15. THÔNG TIN LIÊN HỆ
             ======================================================== */}
@@ -3556,6 +3852,8 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
             onChange={(value) => update("mapUrl", value)}
           />
         </EditorSection>
+      </>
+    )}
 
         {/* Floating Save Bar */}
         <div className="admin-savebar">
@@ -3572,7 +3870,9 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
         </div>
       </div>
     </div>
-  );
+    )}
+  </div>
+);
 }
 
 function EditorSection({

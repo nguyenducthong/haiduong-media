@@ -3,7 +3,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, CalendarDays, User, Share2, Tag, ArrowRight } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { getNewsBySlug, loadSiteContent } from "@/lib/site-content";
+import { getArticleBySlug, getEnterprisesByType } from "@/lib/enterprises";
 import { ArticleContentRenderer } from "@/components/article-content-renderer";
+import { ViewCounter } from "@/components/view-counter";
 
 export const dynamic = "force-dynamic";
 
@@ -14,13 +16,17 @@ export default async function NewsDetailPage({
 }) {
   const { slug } = await params;
   const content = await loadSiteContent();
-  const article = content.news.find((n) => n.slug === slug);
+  const dbArticle = await getArticleBySlug(slug);
+  const article = dbArticle || content.news.find((n) => n.slug === slug);
 
   if (!article) {
     notFound();
   }
 
-  const relatedNews = content.news.filter((n) => n.slug !== slug);
+  const allNews = await getEnterprisesByType("tin-tuc");
+  const relatedNews = allNews.length > 0 
+    ? allNews.filter((n) => n.slug !== slug)
+    : content.news.filter((n) => n.slug !== slug);
 
   return (
     <>
@@ -46,6 +52,7 @@ export default async function NewsDetailPage({
               <span>
                 <User size={15} /> {article.author || "Ban Biên Tập"}
               </span>
+              <ViewCounter slug={article.slug || slug} initialViews={article.views} iconSize={15} />
             </div>
           </div>
         </section>

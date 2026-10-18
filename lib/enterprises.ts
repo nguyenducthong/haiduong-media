@@ -72,8 +72,6 @@ export const fallbackEnterprises: EnterpriseArticle[] = [
   },
 ];
 
-import enterprisesJson from "@/data/enterprises.json";
-
 let tableEnsured = false;
 async function ensureDbTable() {
   if (tableEnsured) return;
@@ -127,9 +125,9 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
       }
     }
   } catch (err) {
-    console.warn("Using imported enterprises.json:", err);
+    console.warn("Error reading local data file:", err);
   }
-  return sortArticlesByDateDescending((enterprisesJson as EnterpriseArticle[]) || fallbackEnterprises);
+  return [];
 }
 
 export async function saveEnterprisesToDb(articles: EnterpriseArticle[]): Promise<void> {

@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import initialEnterprises from "@/data/enterprises.json";
 import { balanceHtmlTags, getEnterprises, saveEnterprisesToDb } from "@/lib/enterprises";
 
 export function generateHash(content: string, length = 32): string {

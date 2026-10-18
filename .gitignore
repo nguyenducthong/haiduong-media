@@ -55,3 +55,6 @@ next-env.d.ts
 /.codex/
 /outputs/
 /work/
+
+# Local enterprise articles database
+/data/enterprises.json

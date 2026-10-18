@@ -108,10 +108,7 @@ export async function POST(req: Request) {
         preparedArticles.map((item: any) => localizeArticleImages(item))
       );
       const result = await saveEnterprises(localizedArticles, mode);
-      const msg =
-        mode === "overwrite"
-          ? `Đã ghi đè toàn bộ ${result.added} bài viết vào hệ thống!`
-          : `Đã lưu: Thêm mới ${result.added} bài, Cập nhật ${result.updated} bài, Bỏ qua ${result.skipped} bài trùng lặp!`;
+      const msg = `Đã lưu: Thêm mới ${result.added} bài, Cập nhật/Ghi đè ${result.updated} bài, Bỏ qua ${result.skipped} bài trùng không đổi. (Tổng: ${result.total} bài trong website)`;
 
       return NextResponse.json({
         success: true,

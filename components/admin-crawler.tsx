@@ -1119,8 +1119,8 @@ export function AdminCrawler() {
                       background: "#f8fafc",
                     }}
                   >
-                    <option value="merge">Hợp nhất & Chống trùng (Khuyến nghị)</option>
-                    <option value="overwrite">Ghi đè thay thế danh sách cũ</option>
+                    <option value="merge">Hợp nhất: Cập nhật nếu có đổi & Thêm mới (Khuyến nghị)</option>
+                    <option value="overwrite">Ghi đè: Ép buộc thay thế các bài viết trùng & Thêm mới</option>
                   </select>
 
                   <button

@@ -388,46 +388,73 @@ function getFileTarget(): string {
 
 export const loadCurrentEnterprises = getEnterprises;
 
-export async function saveEnterprises(newArticles: any[], mode: "merge" | "overwrite" = "merge") {
+export async function saveEnterprises(
+  newArticles: any[],
+  mode: "merge" | "overwrite" | "replace_all" = "merge"
+) {
   let finalArticles: any[] = [];
   let added = 0;
   let updated = 0;
   let skipped = 0;
 
-  if (mode === "overwrite") {
+  if (mode === "replace_all") {
     finalArticles = newArticles;
     added = newArticles.length;
   } else {
     const current = await getEnterprises();
-    const map = new Map<string, any>();
+    finalArticles = [...current];
 
-    // Index existing articles by slug
-    for (const a of current) {
-      map.set(a.slug, a);
-    }
-
-    // Process new articles with hash comparison
     for (const a of newArticles) {
-      const existing = map.get(a.slug);
-      if (!existing) {
-        map.set(a.slug, a);
+      // Tìm bài viết trùng theo slug, id, sourceUrl, urlHash, hoặc hash
+      const existingIdx = finalArticles.findIndex((x) =>
+        (a.slug && x.slug === a.slug) ||
+        (a.id && x.id === a.id) ||
+        (a.sourceUrl && x.sourceUrl === a.sourceUrl) ||
+        (a.urlHash && x.urlHash && x.urlHash === a.urlHash) ||
+        (a.hash && x.hash && x.hash === a.hash)
+      );
+
+      if (existingIdx === -1) {
+        // Bài viết mới hoàn toàn -> thêm vào đầu danh sách
+        finalArticles.unshift(a);
         added++;
       } else {
-        // Compare contentHash
-        if (
-          existing.contentHash &&
-          a.contentHash &&
-          existing.contentHash === a.contentHash
-        ) {
-          skipped++;
-        } else {
-          // Update existing with new data
-          map.set(a.slug, { ...existing, ...a });
+        const existing = finalArticles[existingIdx];
+
+        if (mode === "overwrite") {
+          // Ghi đè thay thế bài cũ bằng dữ liệu mới cào
+          finalArticles[existingIdx] = {
+            ...existing,
+            ...a,
+            id: existing.id || a.id,
+            slug: a.slug || existing.slug,
+          };
           updated++;
+        } else {
+          // Chế độ merge: kiểm tra xem có thay đổi nội dung, type, tiêu đề, ảnh, hay chuyên mục không
+          const typeA = JSON.stringify(a.type || []);
+          const typeEx = JSON.stringify(existing.type || []);
+          const isContentSame =
+            existing.contentHash && a.contentHash && existing.contentHash === a.contentHash;
+          const isTypeSame = typeA === typeEx;
+          const isTitleSame = existing.title === a.title;
+          const isCategorySame = existing.category === a.category;
+
+          if (isContentSame && isTypeSame && isTitleSame && isCategorySame) {
+            skipped++;
+          } else {
+            // Có thay đổi (nội dung hoặc phân loại menu/chuyên mục) -> Cập nhật
+            finalArticles[existingIdx] = {
+              ...existing,
+              ...a,
+              id: existing.id || a.id,
+              slug: a.slug || existing.slug,
+            };
+            updated++;
+          }
         }
       }
     }
-    finalArticles = Array.from(map.values());
   }
 
   await saveEnterprisesToDb(finalArticles);

@@ -249,21 +249,30 @@ export function saveEnterprises(newArticles, mode = "merge") {
   const outputPath = path.join(dataDir, "enterprises.json");
   let finalArticles = [];
 
-  if (mode === "overwrite") {
+  if (mode === "replace_all") {
     finalArticles = newArticles;
   } else {
-    // merge by slug
     const current = loadCurrentEnterprises();
-    const map = new Map();
-    // first put existing
-    for (const a of current) {
-      map.set(a.slug, a);
-    }
-    // then overwrite or prepend with new
+    finalArticles = [...current];
+
     for (const a of newArticles) {
-      map.set(a.slug, a);
+      const existingIdx = finalArticles.findIndex((x) =>
+        (a.slug && x.slug === a.slug) ||
+        (a.id && x.id === a.id) ||
+        (a.sourceUrl && x.sourceUrl === a.sourceUrl)
+      );
+
+      if (existingIdx === -1) {
+        finalArticles.unshift(a);
+      } else {
+        finalArticles[existingIdx] = {
+          ...finalArticles[existingIdx],
+          ...a,
+          id: finalArticles[existingIdx].id || a.id,
+          slug: a.slug || finalArticles[existingIdx].slug,
+        };
+      }
     }
-    finalArticles = Array.from(map.values());
   }
 
   fs.writeFileSync(outputPath, JSON.stringify(finalArticles, null, 2), "utf-8");

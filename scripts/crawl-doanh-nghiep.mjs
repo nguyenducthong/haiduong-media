@@ -61,6 +61,65 @@ export async function fetchPage(url) {
   return await res.text();
 }
 
+export function extractDetailFromHtml(html) {
+  if (!html) return "";
+
+  // 1. Try explicit comment match used by kinhtechaua.vn
+  const commentMatch = html.match(
+    /<div class="f-detail[^"]*">([\s\S]*?)<\/div>\s*<!--\s*End\s*\.f-detail\s*-->/i
+  );
+  let rawContent = "";
+  if (commentMatch && commentMatch[1]?.trim()) {
+    rawContent = commentMatch[1].trim();
+  } else {
+    // 2. Tag balancer to handle arbitrarily nested <div> tags inside f-detail
+    const markerIdx = html.search(/<div class="f-detail[^"]*"/i);
+    if (markerIdx !== -1) {
+      const openTagEnd = html.indexOf(">", markerIdx);
+      if (openTagEnd !== -1) {
+        const contentStart = openTagEnd + 1;
+        let depth = 1;
+        const divRegex = /<\/?div\b[^>]*>/gi;
+        divRegex.lastIndex = contentStart;
+        let match;
+        while ((match = divRegex.exec(html)) !== null) {
+          const tag = match[0].toLowerCase();
+          if (tag.startsWith("</div")) {
+            depth--;
+            if (depth === 0) {
+              rawContent = html.slice(contentStart, match.index).trim();
+              break;
+            }
+          } else if (!tag.endsWith("/>")) {
+            depth++;
+          }
+        }
+      }
+    }
+  }
+
+  if (!rawContent) {
+    const genericMatch = html.match(
+      /<(?:article|div)[^>]*class="[^"]*(?:article-body|detail-content|post-content|entry-content)[^"]*"[^>]*>([\s\S]*?)<\/(?:article|div)>/i
+    );
+    if (genericMatch) {
+      rawContent = genericMatch[1].trim();
+    }
+  }
+
+  if (!rawContent) return "";
+
+  // Convert relative images to absolute
+  rawContent = rawContent.replace(/src="([^"]+)"/g, (match, src) => {
+    return `src="${toAbsoluteUrl("https://kinhtechaua.vn", src)}"`;
+  });
+
+  // Remove empty h1 placeholder
+  rawContent = rawContent.replace(/<h1 style="text-align:center">\s*(&nbsp;|\s)*<\/h1>/gi, "");
+
+  return rawContent.trim();
+}
+
 export async function scanArticleDetail(url) {
   try {
     const res = await fetch(url, {
@@ -70,21 +129,7 @@ export async function scanArticleDetail(url) {
     });
     if (!res.ok) return "";
     const html = await res.text();
-
-    const detailMatch = html.match(/<div class="f-detail clearfix">([\s\S]*?)<\/div>/);
-    if (!detailMatch) return "";
-
-    let contentHtml = detailMatch[1];
-
-    // Convert relative images to absolute
-    contentHtml = contentHtml.replace(/src="([^"]+)"/g, (match, src) => {
-      return `src="${toAbsoluteUrl("https://kinhtechaua.vn", src)}"`;
-    });
-
-    // Remove empty h1 placeholder
-    contentHtml = contentHtml.replace(/<h1 style="text-align:center">\s*(&nbsp;|\s)*<\/h1>/gi, "");
-
-    return contentHtml.trim();
+    return extractDetailFromHtml(html);
   } catch (err) {
     console.warn(`Error fetching detail from ${url}:`, err.message);
     return "";

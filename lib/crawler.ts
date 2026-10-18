@@ -98,6 +98,69 @@ export async function fetchPage(url: string): Promise<string> {
   return await res.text();
 }
 
+export function extractDetailFromHtml(html: string): string {
+  if (!html) return "";
+
+  // 1. Try explicit comment match used by kinhtechaua.vn
+  const commentMatch = html.match(
+    /<div class="f-detail[^"]*">([\s\S]*?)<\/div>\s*<!--\s*End\s*\.f-detail\s*-->/i
+  );
+  let rawContent = "";
+  if (commentMatch && commentMatch[1]?.trim()) {
+    rawContent = commentMatch[1].trim();
+  } else {
+    // 2. Tag balancer to handle arbitrarily nested <div> tags inside f-detail
+    const markerIdx = html.search(/<div class="f-detail[^"]*"/i);
+    if (markerIdx !== -1) {
+      const openTagEnd = html.indexOf(">", markerIdx);
+      if (openTagEnd !== -1) {
+        const contentStart = openTagEnd + 1;
+        let depth = 1;
+        const divRegex = /<\/?div\b[^>]*>/gi;
+        divRegex.lastIndex = contentStart;
+        let match;
+        while ((match = divRegex.exec(html)) !== null) {
+          const tag = match[0].toLowerCase();
+          if (tag.startsWith("</div")) {
+            depth--;
+            if (depth === 0) {
+              rawContent = html.slice(contentStart, match.index).trim();
+              break;
+            }
+          } else if (!tag.endsWith("/>")) {
+            depth++;
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Fallback for generic article containers
+  if (!rawContent) {
+    const genericMatch = html.match(
+      /<(?:article|div)[^>]*class="[^"]*(?:article-body|detail-content|post-content|entry-content)[^"]*"[^>]*>([\s\S]*?)<\/(?:article|div)>/i
+    );
+    if (genericMatch) {
+      rawContent = genericMatch[1].trim();
+    }
+  }
+
+  if (!rawContent) return "";
+
+  // Convert relative images to absolute
+  rawContent = rawContent.replace(/src="([^"]+)"/g, (match, src) => {
+    return `src="${toAbsoluteUrl("https://kinhtechaua.vn", src)}"`;
+  });
+
+  // Remove empty placeholder tags
+  rawContent = rawContent.replace(
+    /<h1 style="text-align:center">\s*(&nbsp;|\s)*<\/h1>/gi,
+    ""
+  );
+
+  return rawContent.trim();
+}
+
 export async function scanArticleDetail(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
@@ -108,30 +171,76 @@ export async function scanArticleDetail(url: string): Promise<string> {
     });
     if (!res.ok) return "";
     const html = await res.text();
-
-    const detailMatch = html.match(/<div class="f-detail clearfix">([\s\S]*?)<\/div>/);
-    if (!detailMatch) return "";
-
-    let contentHtml = detailMatch[1];
-
-    // Convert relative images to absolute
-    contentHtml = contentHtml.replace(/src="([^"]+)"/g, (match, src) => {
-      return `src="${toAbsoluteUrl("https://kinhtechaua.vn", src)}"`;
-    });
-
-    // Remove empty placeholder tags
-    contentHtml = contentHtml.replace(/<h1 style="text-align:center">\s*(&nbsp;|\s)*<\/h1>/gi, "");
-
-    return contentHtml.trim();
+    return extractDetailFromHtml(html);
   } catch (err: any) {
     console.warn(`Error fetching detail from ${url}:`, err.message);
     return "";
   }
 }
 
-export function parseArticlesFromHtml(html: string) {
+export function parseSingleArticleFromHtml(html: string, url = "") {
+  const ogTitle =
+    html.match(/<meta\s+property="og:title"\s+content="([^"]+)"/i)?.[1] ||
+    html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]?.replace(/<[^>]+>/g, "").trim();
+
+  if (!ogTitle) return [];
+
+  const title = cleanText(ogTitle);
+  const ogImage =
+    html.match(/<meta\s+property="og:image"\s+content="([^"]+)"/i)?.[1] || "";
+  const ogDesc =
+    html.match(/<meta\s+property="og:description"\s+content="([^"]+)"/i)?.[1] ||
+    html.match(/<meta\s+name="description"\s+content="([^"]+)"/i)?.[1] || "";
+  const excerpt = cleanText(ogDesc);
+
+  const dateMatch = html.match(/<i class="icon_web_1"><\/i>\s*([^<\s]+)/);
+  const viewsMatch = html.match(/<i class="icon_web_2"><\/i>\s*([^<\s]+)/);
+  const date = dateMatch ? dateMatch[1].trim() : "16/09/2026";
+  const views = viewsMatch ? viewsMatch[1].trim() : "100";
+
+  const slug =
+    url.replace(/^.*\/([^/]+)\.htm(?:[?#].*)?$/, "$1") ||
+    title
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+  const category = detectCategory(title, excerpt);
+  const detailUrl = url || `https://kinhtechaua.vn/${slug}.htm`;
+  const imgUrl = toAbsoluteUrl("https://kinhtechaua.vn", ogImage);
+
+  const urlHash = generateHash(detailUrl, 16);
+  const titleHash = generateHash(title.toLowerCase(), 16);
+  const hash = generateHash(detailUrl + "::" + title, 32);
+
+  return [
+    {
+      id: slug,
+      slug,
+      title,
+      category,
+      excerpt,
+      image: imgUrl,
+      date,
+      views,
+      sourceUrl: detailUrl,
+      author: "Viện Nghiên Cứu Kinh Tế Châu Á",
+      urlHash,
+      titleHash,
+      hash,
+      active: true,
+    },
+  ];
+}
+
+export function parseArticlesFromHtml(html: string, url = "") {
   const listMatch = html.match(/<ul class="list_cata">([\s\S]*?)<\/ul><!-- End \.list_cata -->/);
-  if (!listMatch) return [];
+  if (!listMatch) {
+    return parseSingleArticleFromHtml(html, url);
+  }
 
   const rawItems = listMatch[1].split(/<li>\s*<figure>/).slice(1);
   const items = [];
@@ -193,7 +302,7 @@ export function parseArticlesFromHtml(html: string) {
 
 export async function scanList(url: string) {
   const html = await fetchPage(url);
-  const items = parseArticlesFromHtml(html);
+  const items = parseArticlesFromHtml(html, url);
 
   // Cross-reference with existing articles to detect duplicates
   const current = await getEnterprises();

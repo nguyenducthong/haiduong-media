@@ -18,13 +18,17 @@ import { HomeEventsSection } from "@/components/home-events-section";
 import { HomeNewsKnowledge } from "@/components/home-news-knowledge";
 import { HomePressBrands } from "@/components/home-press-brands";
 import { loadSiteContent } from "@/lib/site-content";
+import { getAllEvents } from "@/lib/enterprises";
 
 export const dynamic = "force-dynamic";
 
 const serviceIcons = [Tv, Clapperboard, Megaphone, Sparkles, ChartNoAxesCombined, Palette];
 
 export default async function Home() {
-  const content = await loadSiteContent();
+  const [content, allEvents] = await Promise.all([
+    loadSiteContent(),
+    getAllEvents(),
+  ]);
 
   const sectionRenderers: Record<string, () => React.ReactNode> = {
     banner: () => <HeroBannerSlider key="banner" slides={content.bannerSlides} />,
@@ -42,7 +46,7 @@ export default async function Home() {
       </section>
     ),
     vtv: () => <HomeVtvSection key="vtv" commercials={content.vtvCommercials} />,
-    events: () => <HomeEventsSection key="events" events={content.upcomingEvents} />,
+    events: () => <HomeEventsSection key="events" events={allEvents} />,
     services: () => (
       <section key="services" className="section services-section" id="dich-vu-chinh">
         <div className="site-container">

@@ -201,7 +201,14 @@ export function sortArticlesByDateDescending(articles: EnterpriseArticle[]): Ent
 
 export async function getEnterprisesByType(type: string): Promise<EnterpriseArticle[]> {
   const all = await getEnterprises();
-  const filtered = all.filter((a) => getArticleTypes(a).includes(type));
+  const filtered = all.filter((a) => {
+    const types = getArticleTypes(a);
+    if (types.includes(type)) return true;
+    if (type === "su-kien" && (a.category === "Sự kiện & Diễn đàn" || a.category === "Sự kiện")) {
+      return true;
+    }
+    return false;
+  });
   return sortArticlesByDateDescending(filtered);
 }
 
@@ -249,6 +256,60 @@ export async function incrementArticleViews(slug: string): Promise<string> {
   return formatted;
 }
 
+export function articleToEventItem(article: EnterpriseArticle): any {
+  return {
+    id: article.id || article.slug,
+    slug: article.slug,
+    title: article.title,
+    date: article.date || "2026",
+    time: "Theo lịch trình",
+    location: "Việt Nam & Quốc Tế",
+    tag: article.category || "Sự kiện",
+    image: article.image || "/images/events/event-korea.png",
+    summary: article.excerpt || "",
+    description: article.content || article.excerpt || "",
+    agenda: [],
+    benefits: [],
+    contactPerson: "Hotline Ban Tổ Chức: 090 377 2086",
+    active: article.active !== false,
+  };
+}
+
+export async function getAllEvents(): Promise<any[]> {
+  const { loadSiteContent } = await import("./site-content");
+  const [content, dbEvents] = await Promise.all([
+    loadSiteContent(),
+    getEnterprisesByType("su-kien"),
+  ]);
+
+  const dbEventItems = dbEvents.filter((a) => a.active !== false).map(articleToEventItem);
+  const slugSet = new Set(dbEventItems.map((e) => e.slug));
+  const staticEvents = (content.upcomingEvents || []).filter(
+    (e) => e.active !== false && !slugSet.has(e.slug)
+  );
+
+  return [...dbEventItems, ...staticEvents];
+}
+
+export async function getUnifiedEventBySlug(slug: string): Promise<any | null> {
+  const { loadSiteContent } = await import("./site-content");
+  const content = await loadSiteContent();
+  const normalizedSlug = decodeURIComponent(slug).trim().toLowerCase();
+
+  const staticEvent = (content.upcomingEvents || []).find(
+    (e) => e.slug.toLowerCase() === normalizedSlug
+  );
+  if (staticEvent) return staticEvent;
+
+  const dbArticle = await getEnterpriseBySlug(slug);
+  if (dbArticle) {
+    return articleToEventItem(dbArticle);
+  }
+
+  return null;
+}
+
 export const getAllArticles = getEnterprises;
 export const getArticlesByType = getEnterprisesByType;
 export const getArticleBySlug = getEnterpriseBySlug;
+

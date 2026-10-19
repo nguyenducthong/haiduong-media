@@ -16,10 +16,19 @@ export function HomeEventsSection({ events }: { events: EventItem[] }) {
             </span>
             <h2>Sự Kiện Sắp Diễn Ra</h2>
           </div>
-          <p>
-            Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế
-            do Hải Dương Media đồng hành tổ chức tại Việt Nam và các nước Châu Á.
-          </p>
+          <div>
+            <p style={{ marginBottom: "8px" }}>
+              Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế
+              do Hải Dương Media đồng hành tổ chức tại Việt Nam và các nước Châu Á.
+            </p>
+            <Link
+              href="/su-kien"
+              className="text-link"
+              style={{ fontWeight: 800, color: "#d42027", display: "inline-flex", alignItems: "center", gap: "4px" }}
+            >
+              Xem tất cả sự kiện ({visibleEvents.length}) <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
 
         <div className="events-grid">
@@ -30,13 +39,13 @@ export function HomeEventsSection({ events }: { events: EventItem[] }) {
                 {/* Poster Image */}
                 <Link href={eventUrl} className="event-poster-wrapper" aria-label={event.title}>
                   <img
-                    src={event.image}
+                    src={event.image || "/images/events/event-korea.png"}
                     alt={event.title}
                     className="event-poster-img"
                     loading="lazy"
                   />
                   <div className="event-poster-overlay">
-                    <span className="event-tag">{event.tag}</span>
+                    <span className="event-tag">{event.tag || "Sự kiện"}</span>
                   </div>
                 </Link>
 
@@ -51,10 +60,12 @@ export function HomeEventsSection({ events }: { events: EventItem[] }) {
                       <Calendar size={15} className="event-icon" />
                       <span>{event.date}</span>
                     </div>
-                    <div className="event-info-item">
-                      <MapPin size={15} className="event-icon" />
-                      <span>{event.location}</span>
-                    </div>
+                    {event.location && (
+                      <div className="event-info-item">
+                        <MapPin size={15} className="event-icon" />
+                        <span>{event.location}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="event-card-action">

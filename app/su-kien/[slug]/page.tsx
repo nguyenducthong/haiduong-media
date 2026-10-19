@@ -15,10 +15,31 @@ import {
   Sparkles,
 } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
-import { getEventBySlug, loadSiteContent } from "@/lib/site-content";
+import { loadSiteContent } from "@/lib/site-content";
+import { getUnifiedEventBySlug, getAllEvents } from "@/lib/enterprises";
 import { ArticleContentRenderer } from "@/components/article-content-renderer";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const event = await getUnifiedEventBySlug(slug);
+  if (!event) return { title: "Không tìm thấy sự kiện | Hải Dương Media" };
+
+  return {
+    title: `${event.title} | Hải Dương Media`,
+    description: event.summary || event.title,
+    openGraph: {
+      title: event.title,
+      description: event.summary,
+      images: event.image ? [event.image] : [],
+    },
+  };
+}
 
 export default async function EventDetailPage({
   params,
@@ -26,14 +47,17 @@ export default async function EventDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const content = await loadSiteContent();
-  const event = content.upcomingEvents.find((e) => e.slug === slug);
+  const [content, event, allEvents] = await Promise.all([
+    loadSiteContent(),
+    getUnifiedEventBySlug(slug),
+    getAllEvents(),
+  ]);
 
   if (!event) {
     notFound();
   }
 
-  const otherEvents = content.upcomingEvents.filter((e) => e.slug !== slug);
+  const otherEvents = allEvents.filter((e) => e.slug !== slug);
 
   return (
     <>
@@ -69,7 +93,7 @@ export default async function EventDetailPage({
               {/* Event Poster Card */}
               <div className="event-poster-container">
                 <img
-                  src={event.image}
+                  src={event.image || "/images/events/event-korea.png"}
                   alt={event.title}
                   className="event-main-poster"
                 />
@@ -89,7 +113,7 @@ export default async function EventDetailPage({
                   <MapPin size={20} className="spec-icon" />
                   <div>
                     <small>Địa điểm</small>
-                    <strong>{event.location}</strong>
+                    <strong>{event.location || "Việt Nam & Quốc Tế"}</strong>
                   </div>
                 </div>
                 <div className="spec-item">
@@ -112,7 +136,7 @@ export default async function EventDetailPage({
                 <div className="event-content-section">
                   <h2>Lịch trình chương trình</h2>
                   <div className="agenda-timeline">
-                    {event.agenda.map((item, idx) => (
+                    {event.agenda.map((item: string, idx: number) => (
                       <div className="agenda-item" key={idx}>
                         <div className="agenda-marker">{idx + 1}</div>
                         <div className="agenda-text">{item}</div>
@@ -127,7 +151,7 @@ export default async function EventDetailPage({
                 <div className="event-content-section">
                   <h2>Quyền lợi đại biểu & Doanh nghiệp</h2>
                   <ul className="benefits-list">
-                    {event.benefits.map((benefit, idx) => (
+                    {event.benefits.map((benefit: string, idx: number) => (
                       <li key={idx}>
                         <CheckCircle2 size={18} className="benefit-icon" />
                         <span>{benefit}</span>
@@ -175,7 +199,9 @@ export default async function EventDetailPage({
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <small style={{ color: "var(--muted)", fontSize: "12px" }}>Địa điểm tổ chức:</small>
-                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>{event.location}</span>
+                      <span style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
+                        {event.location || "Việt Nam & Quốc Tế"}
+                      </span>
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -207,7 +233,7 @@ export default async function EventDetailPage({
                   <div className="sidebar-card" style={{ marginTop: "24px" }}>
                     <h3>Sự kiện tiếp theo</h3>
                     <div className="recent-posts-list">
-                      {otherEvents.slice(0, 3).map((item, idx) => (
+                      {otherEvents.slice(0, 3).map((item: any, idx: number) => (
                         <article className="recent-post-item" key={idx}>
                           <span className="recent-category">{item.tag}</span>
                           <h4>
@@ -239,7 +265,7 @@ export default async function EventDetailPage({
               </div>
 
               <div className="events-grid">
-                {otherEvents.slice(0, 3).map((item, idx) => (
+                {otherEvents.slice(0, 3).map((item: any, idx: number) => (
                   <article className="event-card has-poster" key={idx}>
                     <Link href={`/su-kien/${item.slug}`} className="event-poster-wrapper">
                       <img src={item.image} alt={item.title} className="event-poster-img" />

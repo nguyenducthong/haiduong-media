@@ -68,6 +68,14 @@ interface AdminArticlesProps {
   subtitle?: string;
 }
 
+export function getArticleViewUrl(art?: EnterpriseArticle | Partial<EnterpriseArticle> | null): string {
+  if (!art || !art.slug) return "#";
+  const types = getArticleTypes(art);
+  if (types.includes("su-kien")) return `/su-kien/${art.slug}`;
+  if (types.includes("tin-tuc")) return `/tin-tuc/${art.slug}`;
+  return `/doanh-nghiep/${art.slug}`;
+}
+
 export function AdminEnterprises({
   defaultType = "doanh-nghiep",
   title,
@@ -1357,7 +1365,7 @@ export function AdminEnterprises({
                         }}
                       >
                         <a
-                          href={`/doanh-nghiep/${art.slug}`}
+                          href={getArticleViewUrl(art)}
                           target="_blank"
                           style={{ color: "inherit", textDecoration: "none" }}
                           onMouseEnter={(e) => (e.currentTarget.style.color = "#d42027")}
@@ -1535,7 +1543,7 @@ export function AdminEnterprises({
 
                     {/* Web link */}
                     <a
-                      href={`/doanh-nghiep/${art.slug}`}
+                      href={getArticleViewUrl(art)}
                       target="_blank"
                       style={{
                         padding: "8px 10px",
@@ -2324,7 +2332,7 @@ export function AdminEnterprises({
               }}
             >
               <a
-                href={`/doanh-nghiep/${previewArticle.slug}`}
+                href={getArticleViewUrl(previewArticle)}
                 target="_blank"
                 style={{
                   color: "var(--blue)",

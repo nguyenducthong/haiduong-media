@@ -197,6 +197,19 @@ export async function POST(req: Request) {
         author: article.author || "Ban biên tập",
         sourceUrl: article.sourceUrl || "",
         active: article.active !== false,
+        location: article.location || "",
+        time: article.time || "",
+        contactPerson: article.contactPerson || "",
+        agenda: Array.isArray(article.agenda)
+          ? article.agenda
+          : typeof article.agenda === "string"
+          ? article.agenda.split("\n").map((s: string) => s.trim()).filter(Boolean)
+          : [],
+        benefits: Array.isArray(article.benefits)
+          ? article.benefits
+          : typeof article.benefits === "string"
+          ? article.benefits.split("\n").map((s: string) => s.trim()).filter(Boolean)
+          : [],
       };
 
       const localizedArticle = await localizeArticleImages(enrichedArticle);

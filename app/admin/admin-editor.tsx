@@ -720,24 +720,7 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
           </div>
           <div className="admin-nav-tab-info">
             <span className="admin-nav-tab-label">Bài viết</span>
-            <span className="admin-nav-tab-desc">Doanh nghiệp, Doanh nhân, SP, Tin tức</span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            setMainTab("su-kien");
-            setEventAdminView("articles");
-          }}
-          className={`admin-nav-tab-item ${mainTab === "su-kien" ? "active" : ""}`}
-        >
-          <div className="admin-nav-tab-icon">
-            <Calendar size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Sự kiện & Diễn đàn</span>
-            <span className="admin-nav-tab-desc">Quản lý bài viết & Thẻ sự kiện</span>
+            <span className="admin-nav-tab-desc">Doanh nghiệp, Doanh nhân, Sự kiện, Tin tức</span>
           </div>
         </button>
 

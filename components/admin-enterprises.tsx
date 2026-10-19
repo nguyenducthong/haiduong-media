@@ -34,6 +34,7 @@ import {
   Tag,
   Upload,
   FolderOpen,
+  MapPin,
 } from "lucide-react";
 import type { EnterpriseArticle } from "@/lib/enterprises-types";
 import { getArticleTypes } from "@/lib/enterprises-types";
@@ -359,6 +360,18 @@ export function AdminEnterprises({
       return;
     }
 
+    const agendaList = Array.isArray(editingArticle.agenda)
+      ? editingArticle.agenda.map((s) => String(s).trim()).filter(Boolean)
+      : typeof editingArticle.agenda === "string"
+      ? (editingArticle.agenda as string).split("\n").map((s) => s.trim()).filter(Boolean)
+      : [];
+
+    const benefitsList = Array.isArray(editingArticle.benefits)
+      ? editingArticle.benefits.map((s) => String(s).trim()).filter(Boolean)
+      : typeof editingArticle.benefits === "string"
+      ? (editingArticle.benefits as string).split("\n").map((s) => s.trim()).filter(Boolean)
+      : [];
+
     setSavingEdit(true);
     try {
       const res = await fetch("/api/crawl-doanh-nghiep", {
@@ -369,6 +382,8 @@ export function AdminEnterprises({
           article: {
             ...editingArticle,
             type: finalTypes,
+            agenda: agendaList,
+            benefits: benefitsList,
           },
         }),
       });
@@ -2110,6 +2125,258 @@ export function AdminEnterprises({
                     }}
                   />
                 </div>
+
+                {/* Event Fields Section */}
+                {getArticleTypes(editingArticle).includes("su-kien") ? (
+                  <div
+                    style={{
+                      background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%)",
+                      border: "2px solid #ea580c",
+                      borderRadius: "14px",
+                      padding: "20px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "16px",
+                      boxShadow: "0 4px 14px rgba(234, 88, 12, 0.08)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        borderBottom: "1px dashed #fdba74",
+                        paddingBottom: "12px",
+                        flexWrap: "wrap",
+                        gap: "8px",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <Calendar size={18} color="#ea580c" />
+                        <span style={{ fontSize: "14px", fontWeight: 900, textTransform: "uppercase", color: "#9a3412" }}>
+                          Thông tin chi tiết Sự kiện & Diễn đàn
+                        </span>
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          padding: "4px 10px",
+                          borderRadius: "99px",
+                          background: "#ea580c",
+                          color: "#fff",
+                        }}
+                      >
+                        ✓ Kích hoạt do gắn loại Sự kiện
+                      </span>
+                    </div>
+
+                    {/* Time & Contact Person */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+                      <div>
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            color: "#9a3412",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          <Clock size={13} /> Thời gian diễn ra
+                        </label>
+                        <input
+                          type="text"
+                          value={editingArticle.time || ""}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, time: e.target.value })}
+                          placeholder="vd: 08:00 - 17:30, Ngày 25/11/2026"
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "10px",
+                            border: "1px solid #fdba74",
+                            fontSize: "13px",
+                            background: "#fff",
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            color: "#9a3412",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          <Users size={13} /> Người phụ trách / Hotline
+                        </label>
+                        <input
+                          type="text"
+                          value={editingArticle.contactPerson || ""}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, contactPerson: e.target.value })}
+                          placeholder="vd: Ban tổ chức - Hotline: 0988.xxx.xxx"
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "10px",
+                            border: "1px solid #fdba74",
+                            fontSize: "13px",
+                            background: "#fff",
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Location */}
+                    <div>
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "6px",
+                          fontSize: "12px",
+                          fontWeight: 800,
+                          textTransform: "uppercase",
+                          color: "#9a3412",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        <MapPin size={13} /> Địa điểm tổ chức
+                      </label>
+                      <input
+                        type="text"
+                        value={editingArticle.location || ""}
+                        onChange={(e) => setEditingArticle({ ...editingArticle, location: e.target.value })}
+                        placeholder="vd: Trung tâm Hội nghị Tỉnh Hải Dương, 109 Phạm Ngũ Lão, TP. Hải Dương"
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #fdba74",
+                          fontSize: "13px",
+                          background: "#fff",
+                        }}
+                      />
+                    </div>
+
+                    {/* Agenda */}
+                    <div>
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "12px",
+                          fontWeight: 800,
+                          textTransform: "uppercase",
+                          color: "#9a3412",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        Lịch trình chi tiết (Agenda - Mỗi dòng 1 mốc)
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={
+                          Array.isArray(editingArticle.agenda)
+                            ? editingArticle.agenda.join("\n")
+                            : (editingArticle.agenda as unknown as string) || ""
+                        }
+                        onChange={(e) => setEditingArticle({ ...editingArticle, agenda: e.target.value as any })}
+                        placeholder={`08:00 - 08:30: Đón tiếp đại biểu và check-in\n08:30 - 09:30: Phát biểu khai mạc và tọa đàm chính\n09:30 - 11:30: Kết nối giao thương B2B & Ký kết hợp tác`}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #fdba74",
+                          fontSize: "13px",
+                          lineHeight: 1.5,
+                          background: "#fff",
+                        }}
+                      />
+                    </div>
+
+                    {/* Benefits */}
+                    <div>
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "12px",
+                          fontWeight: 800,
+                          textTransform: "uppercase",
+                          color: "#9a3412",
+                          marginBottom: "6px",
+                        }}
+                      >
+                        Quyền lợi đại biểu & Doanh nghiệp (Benefits - Mỗi dòng 1 quyền lợi)
+                      </label>
+                      <textarea
+                        rows={4}
+                        value={
+                          Array.isArray(editingArticle.benefits)
+                            ? editingArticle.benefits.join("\n")
+                            : (editingArticle.benefits as unknown as string) || ""
+                        }
+                        onChange={(e) => setEditingArticle({ ...editingArticle, benefits: e.target.value as any })}
+                        placeholder={`Được tiếp cận mạng lưới hơn 500 doanh nghiệp tiêu biểu\nĐược truyền thông thương hiệu trên cổng thông tin Hải Dương Media\nĐược nhận tài liệu và quà tặng kỷ niệm từ ban tổ chức`}
+                        style={{
+                          width: "100%",
+                          padding: "10px 14px",
+                          borderRadius: "10px",
+                          border: "1px solid #fdba74",
+                          fontSize: "13px",
+                          lineHeight: 1.5,
+                          background: "#fff",
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      background: "#f8fafc",
+                      border: "1px dashed #cbd5e1",
+                      borderRadius: "12px",
+                      padding: "12px 16px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "12px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#64748b", fontSize: "13px" }}>
+                      <Calendar size={16} color="#94a3b8" />
+                      <span>Bài viết này là Sự kiện / Diễn đàn? Thêm thời gian, địa điểm, lịch trình...</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleType("su-kien")}
+                      style={{
+                        background: "#fff7ed",
+                        border: "1px solid #fdba74",
+                        color: "#ea580c",
+                        padding: "6px 14px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                      }}
+                    >
+                      <Plus size={14} /> Gán loại Sự kiện & Nhập thông tin
+                    </button>
+                  </div>
+                )}
 
                 {/* Content Visual & HTML Editor */}
                 <div>

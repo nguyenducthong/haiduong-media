@@ -19,6 +19,12 @@ export type EnterpriseArticle = {
   titleHash?: string;
   contentHash?: string;
   hash?: string;
+  // Event-specific fields
+  location?: string;
+  time?: string;
+  contactPerson?: string;
+  agenda?: string[] | string;
+  benefits?: string[] | string;
 };
 
 export function getArticleTypes(article: any): string[] {

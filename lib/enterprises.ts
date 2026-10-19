@@ -262,15 +262,23 @@ export function articleToEventItem(article: EnterpriseArticle): any {
     slug: article.slug,
     title: article.title,
     date: article.date || "2026",
-    time: "Theo lịch trình",
-    location: "Việt Nam & Quốc Tế",
+    time: article.time || "Theo lịch trình",
+    location: article.location || "Việt Nam & Quốc Tế",
     tag: article.category || "Sự kiện",
     image: article.image || "/images/events/event-korea.png",
     summary: article.excerpt || "",
     description: article.content || article.excerpt || "",
-    agenda: [],
-    benefits: [],
-    contactPerson: "Hotline Ban Tổ Chức: 090 377 2086",
+    agenda: Array.isArray(article.agenda)
+      ? article.agenda
+      : typeof article.agenda === "string"
+      ? article.agenda.split("\n").map((s) => s.trim()).filter(Boolean)
+      : [],
+    benefits: Array.isArray(article.benefits)
+      ? article.benefits
+      : typeof article.benefits === "string"
+      ? article.benefits.split("\n").map((s) => s.trim()).filter(Boolean)
+      : [],
+    contactPerson: article.contactPerson || "Hotline Ban Tổ Chức: 090 377 2086",
     active: article.active !== false,
   };
 }

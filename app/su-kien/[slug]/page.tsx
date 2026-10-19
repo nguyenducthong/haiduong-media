@@ -105,8 +105,7 @@ export default async function EventDetailPage({
                   <Calendar size={20} className="spec-icon" />
                   <div>
                     <small>Thời gian tổ chức</small>
-                    <strong>{event.date}</strong>
-                    <span>{event.time || "Theo lịch trình"}</span>
+                    <strong>{event.time || event.date}</strong>
                   </div>
                 </div>
                 <div className="spec-item">
@@ -191,9 +190,9 @@ export default async function EventDetailPage({
                     </div>
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                      <small style={{ color: "var(--muted)", fontSize: "12px" }}>Thời gian:</small>
+                      <small style={{ color: "var(--muted)", fontSize: "12px" }}>Thời gian tổ chức:</small>
                       <span style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>
-                        {event.date} ({event.time || "Theo lịch trình"})
+                        {event.time || event.date}
                       </span>
                     </div>
 

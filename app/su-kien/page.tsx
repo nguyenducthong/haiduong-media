@@ -60,7 +60,7 @@ export default async function EventsIndexPage() {
                         <div className="event-info-list">
                           <div className="event-info-item">
                             <Calendar size={15} className="event-icon" />
-                            <span>{event.date}</span>
+                            <span>{event.time || event.date}</span>
                           </div>
                           {event.location && (
                             <div className="event-info-item">

@@ -1,4 +1,5 @@
 import React from "react";
+import { balanceHtmlTags } from "@/lib/enterprises-types";
 
 interface ArticleContentRendererProps {
   content?: string;
@@ -57,6 +58,23 @@ export function ArticleContentRenderer({
   className = "",
 }: ArticleContentRendererProps) {
   if (!content) return null;
+
+  // If content contains HTML tags (e.g. from rich editor, Word/PDF converter, or crawler), render directly as HTML
+  const hasHtml = /<[a-z][\s\S]*>/i.test(content);
+  if (hasHtml) {
+    return (
+      <div
+        className={`article-rendered-content article-full-text enterprise-content ${className}`}
+        style={{
+          lineHeight: 1.8,
+          fontSize: "16px",
+          color: "#1e293b",
+        }}
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: balanceHtmlTags(content) }}
+      />
+    );
+  }
 
   // Split content by alignment tags or double newlines
   const blocks = content.split(/\n\s*\n/);

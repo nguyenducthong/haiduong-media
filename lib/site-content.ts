@@ -155,7 +155,7 @@ export type SiteContent = {
 };
 
 export const defaultSiteContent: SiteContent = {
-  brandName: "HẢI DƯƠNG MEDIA",
+  brandName: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
   brandKicker: "Dịch vụ Quảng Cáo và Xây Dựng Thương Hiệu Toàn Diện",
   heroEyebrow: "Đồng hành cùng doanh nghiệp trong kỷ nguyên số",
   heroTitle: "Giải pháp truyền thông giúp thương hiệu được nhìn thấy và ghi nhớ",
@@ -249,7 +249,7 @@ export const defaultSiteContent: SiteContent = {
   zaloUrl: "https://zalo.me/84903772086",
   facebookUrl: "https://www.facebook.com/haiduongmedia",
   mapUrl: "https://maps.google.com/?q=64+Vo+Thi+Sau+Tan+Dinh+Quan+1+HCM",
-  footerNote: "Hải Dương Media - Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và booking báo đài uy tín hàng đầu Việt Nam.",
+  footerNote: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM - Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và booking báo đài uy tín hàng đầu Việt Nam.",
   bannerSlides: [
     {
       id: "banner-1",

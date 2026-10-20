@@ -17,9 +17,12 @@ export function SiteHeader({ content }: { content: SiteContent }) {
     <header className="site-header">
       <div className="site-container header-inner">
         <Link href="/" className="brand" aria-label="Trang chủ">
-          <span className="brand-mark" style={{ background: "linear-gradient(135deg, #d42027, #ff6b35)" }}>
-            HD
-          </span>
+          <img
+            src="/images/logo.jpg"
+            alt={content.brandName}
+            className="brand-logo-img"
+            style={{ width: "42px", height: "42px", objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
+          />
           <span>
             <strong>{content.brandName}</strong>
             <small>{content.brandKicker}</small>
@@ -62,9 +65,12 @@ export function SiteFooter({ content }: { content: SiteContent }) {
       <div className="site-container footer-grid">
         <div>
           <div className="brand footer-brand">
-            <span className="brand-mark" style={{ background: "linear-gradient(135deg, #d42027, #ff6b35)" }}>
-              HD
-            </span>
+            <img
+              src="/images/logo.jpg"
+              alt={content.brandName}
+              className="brand-logo-img"
+              style={{ width: "42px", height: "42px", objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
+            />
             <span>
               <strong>{content.brandName}</strong>
               <small style={{ color: "#94a3b8" }}>{content.brandKicker}</small>

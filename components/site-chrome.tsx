@@ -6,10 +6,10 @@ import { HeaderNav } from "@/components/header-nav";
 const links = [
   ["Trang chủ", "/"],
   ["Giới thiệu", "/gioi-thieu"],
+  ["Tin tức", "/tin-tuc"],
   ["Doanh nghiệp", "/doanh-nghiep"],
   ["Doanh nhân", "/doanh-nhan"],
   ["Sản phẩm", "/san-pham"],
-  ["Tin tức", "/tin-tuc"],
   ["Liên hệ", "/lien-he"],
 ] as const;
 
@@ -19,7 +19,7 @@ export function SiteHeader({ content }: { content: SiteContent }) {
       <div className="site-container header-inner">
         <Link href="/" className="brand" aria-label="Trang chủ">
           <img
-            src="/images/logo.jpg"
+            src="/images/logo.png"
             alt={content.brandName}
             className="brand-logo-img"
           />
@@ -44,15 +44,6 @@ export function SiteHeader({ content }: { content: SiteContent }) {
               <Search size={15} />
             </button>
           </form>
-
-          <a
-            className="header-phone"
-            href={`tel:${content.hotlineHref}`}
-            aria-label={`Hotline ${content.hotline}`}
-          >
-            <Phone size={15} className="phone-icon" />
-            <span>{content.hotline}</span>
-          </a>
         </div>
 
         <details className="mobile-menu">
@@ -100,7 +91,7 @@ export function SiteFooter({ content }: { content: SiteContent }) {
         <div>
           <div className="brand footer-brand">
             <img
-              src="/images/logo.jpg"
+              src="/images/logo.png"
               alt={content.brandName}
               className="brand-logo-img"
               style={{ width: "42px", height: "42px", objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
@@ -115,8 +106,8 @@ export function SiteFooter({ content }: { content: SiteContent }) {
         <div>
           <h3>Khám phá</h3>
           <Link href="/#vtv-commercials">Phim quảng cáo trên VTV</Link>
-          <Link href="/#upcoming-events">Sự kiện sắp diễn ra</Link>
-          <Link href="/#news-and-knowledge">Tin mới & Kiến thức</Link>
+          <Link href="/tin-tuc">Tin tức & Hoạt động</Link>
+          <Link href="/doanh-nghiep">Doanh nghiệp tiêu biểu</Link>
           <Link href="/#press-coverage">Báo chí nói về chúng tôi</Link>
           <Link href="/#our-brands">Thương hiệu của chúng tôi</Link>
           <Link href="/#our-partners">Đối tác & Khách hàng</Link>
@@ -150,36 +141,50 @@ export function FloatingContact({ content }: { content: SiteContent }) {
       <a
         href={`tel:${content.hotlineHref}`}
         aria-label="Gọi điện"
+        className="floating-btn-phone"
         style={{ background: "#d42027" }}
       >
-        <Phone size={20} />
+        <Phone size={21} />
       </a>
       <a
         href={content.zaloUrl}
         target="_blank"
         rel="noreferrer"
         aria-label="Chat Zalo"
-        style={{ background: "#0068ff" }}
+        className="floating-btn-zalo"
+        style={{ padding: 0, overflow: "hidden" }}
       >
-        <MessageCircle size={20} />
+        <img
+          src="/images/zalo-round-color-icon.png?v=2"
+          alt="Zalo"
+          className="floating-icon-img"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
       </a>
       <a
         href={content.facebookUrl}
         target="_blank"
         rel="noreferrer"
         aria-label="Mở Fanpage"
-        style={{ background: "#1877f2" }}
+        className="floating-btn-facebook"
+        style={{ background: "#1877f2", padding: 0, overflow: "hidden" }}
       >
-        <Globe2 size={20} />
+        <img
+          src="/images/facebook-round-color-icon.png"
+          alt="Facebook"
+          className="floating-icon-img"
+          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+        />
       </a>
       <a
         href={content.mapUrl}
         target="_blank"
         rel="noreferrer"
         aria-label="Xem bản đồ"
+        className="floating-btn-map"
         style={{ background: "#ea4335" }}
       >
-        <MapPin size={20} />
+        <MapPin size={21} />
       </a>
     </div>
   );

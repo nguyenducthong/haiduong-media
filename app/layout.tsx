@@ -4,6 +4,29 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
   description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+  metadataBase: new URL("https://thuonghieuhangdauvn.com"),
+  openGraph: {
+    title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
+    description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+    url: "https://thuonghieuhangdauvn.com",
+    siteName: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+    images: [
+      {
+        url: "/images/logo.png",
+        width: 1200,
+        height: 1200,
+        alt: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+      },
+    ],
+    locale: "vi_VN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
+    description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+    images: ["/images/logo.png"],
+  },
   icons: {
     icon: [
       { url: "/favicon.png", type: "image/png" },

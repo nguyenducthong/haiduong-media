@@ -6,7 +6,7 @@ import { sites } from "./build/sites-vite-plugin";
 import { connectorPreview } from "./build/connector-preview-plugin.mjs";
 
 const CLOUDFLARE_D1_DATABASE_ID =
-  "4124ecd5-cf77-4f09-b6ce-b942a4aa6c5f";
+  "ecd2a1de-c011-4f11-b88d-3e10145f0999";
 
 const { d1, r2 } = hostingConfig;
 

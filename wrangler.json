@@ -1,0 +1,10 @@
+{
+  "name": "haiduong-media",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "haiduong-media-db",
+      "database_id": "ecd2a1de-c011-4f11-b88d-3e10145f0999"
+    }
+  ]
+}

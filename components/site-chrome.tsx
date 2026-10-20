@@ -1,6 +1,7 @@
 import Link from "@/components/link";
-import { ArrowUpRight, Globe2, MapPin, MessageCircle, Phone, Tv } from "lucide-react";
+import { ArrowUpRight, Globe2, MapPin, MessageCircle, Phone, Search, Tv } from "lucide-react";
 import type { SiteContent } from "@/lib/site-content";
+import { HeaderNav } from "@/components/header-nav";
 
 const links = [
   ["Trang chủ", "/"],
@@ -21,38 +22,71 @@ export function SiteHeader({ content }: { content: SiteContent }) {
             src="/images/logo.jpg"
             alt={content.brandName}
             className="brand-logo-img"
-            style={{ width: "42px", height: "42px", objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
           />
-          <span>
-            <strong>{content.brandName}</strong>
-            <small>{content.brandKicker}</small>
+          <span className="brand-text">
+            <strong className="brand-title">{content.brandName}</strong>
+            <small className="brand-subtitle">{content.brandKicker || "XÂY DỰNG THƯƠNG HIỆU TOÀN DIỆN"}</small>
           </span>
         </Link>
-        <nav className="desktop-nav" aria-label="Điều hướng chính">
-          {links.map(([label, href]) => (
-            <Link key={href} href={href}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <a
-          className="header-phone"
-          href={`tel:${content.hotlineHref}`}
-          style={{ background: "#d42027" }}
-        >
-          <Phone size={17} />
-          <span>{content.hotline}</span>
-        </a>
+
+        <HeaderNav links={links} />
+
+        <div className="header-actions">
+          <form action="/tin-tuc" method="GET" className="header-search">
+            <input
+              type="search"
+              name="q"
+              placeholder="Tìm kiếm..."
+              aria-label="Tìm kiếm bài viết"
+              className="header-search-input"
+            />
+            <button type="submit" className="header-search-btn" aria-label="Tìm kiếm">
+              <Search size={15} />
+            </button>
+          </form>
+
+          <a
+            className="header-phone"
+            href={`tel:${content.hotlineHref}`}
+            aria-label={`Hotline ${content.hotline}`}
+          >
+            <Phone size={15} className="phone-icon" />
+            <span>{content.hotline}</span>
+          </a>
+        </div>
+
         <details className="mobile-menu">
-          <summary aria-label="Mở menu">Menu</summary>
-          <nav>
-            {links.map(([label, href]) => (
-              <Link key={href} href={href}>
-                {label}
-              </Link>
-            ))}
-            <Link href="/admin">Quản trị CMS</Link>
-          </nav>
+          <summary aria-label="Mở menu">
+            <span>Menu</span>
+          </summary>
+          <div className="mobile-menu-dropdown">
+            <form action="/tin-tuc" method="GET" className="mobile-search">
+              <input
+                type="search"
+                name="q"
+                placeholder="Tìm kiếm..."
+                aria-label="Tìm kiếm"
+              />
+              <button type="submit" aria-label="Tìm kiếm">
+                <Search size={15} />
+              </button>
+            </form>
+            <nav>
+              {links.map(([label, href]) => (
+                <Link key={href} href={href}>
+                  {label}
+                </Link>
+              ))}
+              <Link href="/admin">Quản trị CMS</Link>
+            </nav>
+            <a
+              className="mobile-phone-btn"
+              href={`tel:${content.hotlineHref}`}
+            >
+              <Phone size={15} />
+              <span>Hotline: {content.hotline}</span>
+            </a>
+          </div>
         </details>
       </div>
     </header>

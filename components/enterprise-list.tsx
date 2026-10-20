@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import Link from "@/components/link";
 import {
   CalendarDays,
@@ -34,6 +34,16 @@ export function EnterpriseList({
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get("q");
+      if (q) {
+        setSearchTerm(q);
+      }
+    }
+  }, []);
 
   // Extract unique categories (only non-empty ones)
   const categories = useMemo(() => {

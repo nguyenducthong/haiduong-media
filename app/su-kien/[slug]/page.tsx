@@ -183,7 +183,7 @@ export default async function EventDetailPage({
                     <p>Ban tổ chức chương trình & Tiếp nhận thông tin</p>
                   </div>
 
-                  <div style={{ padding: "0 24px 20px", display: "grid", gap: "14px" }}>
+                  <div className="reg-info-list" style={{ padding: "0 0 20px", display: "grid", gap: "14px" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <small style={{ color: "var(--muted)", fontSize: "12px" }}>Đơn vị tổ chức:</small>
                       <strong style={{ fontSize: "14px", color: "#0f172a" }}>Hải Dương Media & Đối tác</strong>
@@ -211,7 +211,7 @@ export default async function EventDetailPage({
                     </div>
                   </div>
 
-                  <div className="reg-support-box" style={{ borderTop: "1px solid var(--line)", margin: "0", borderRadius: "0 0 20px 20px" }}>
+                  <div className="reg-support-box" style={{ borderTop: "1px solid var(--line)", margin: "0", borderRadius: "0 0 16px 16px" }}>
                     <small>Liên hệ trực tiếp để được tư vấn:</small>
                     <a href={`tel:${content.hotlineHref}`} className="support-link">
                       <Phone size={16} /> Hotline: {content.hotline}

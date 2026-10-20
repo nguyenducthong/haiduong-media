@@ -11,6 +11,20 @@ import { getArticleTypes, balanceHtmlTags, type EnterpriseArticle } from "./ente
 // Fallback in case file isn't created yet or reading in edge worker
 export const fallbackEnterprises: EnterpriseArticle[] = [
   {
+    id: "le-cong-bo-thuong-hieu-uy-tin-hang-dau-chau-a-2026",
+    slug: "le-cong-bo-thuong-hieu-uy-tin-hang-dau-chau-a-2026",
+    title: "LỄ CÔNG BỐ THƯƠNG HIỆU UY TÍN HÀNG ĐẦU CHÂU Á 2026",
+    type: ["su-kien", "tin-tuc", "doanh-nghiep"],
+    category: "Sự kiện & Diễn đàn",
+    excerpt: "Vietnam – Korea Business Forum 2026 tại Seoul: Kết nối doanh nghiệp Việt Nam – Hàn Quốc và Lễ công bố Thương hiệu uy tín hàng đầu Châu Á 2026.",
+    content: "<p><strong>Vietnam - Korea Business Forum 2026</strong> và <strong>Lễ công bố Thương Hiệu Uy Tín Hàng Đầu Châu Á 2026</strong> là sự kiện xúc tiến thương mại quốc tế uy tín do Hải Dương Media phối hợp cùng các tổ chức kinh tế và cơ quan truyền thông Hàn Quốc tổ chức tại thủ đô Seoul.</p><h2>Cầu nối giao thương chiến lược Việt Nam - Hàn Quốc</h2><p>Sự kiện mở ra cơ hội vàng cho các doanh nhân, doanh nghiệp Việt mở rộng chuỗi cung ứng, tìm kiếm đại lý phân phối và nâng cao uy tín thương hiệu trên trường quốc tế. Chương trình có sự tham dự của đại diện Đại sứ quán, các hiệp hội doanh nghiệp và hơn 150 lãnh đạo tập đoàn hàng đầu.</p><blockquote>Vươn ra biển lớn đòi hỏi sự chuẩn bị bài bản về thương hiệu, chứng nhận uy tín và sự đồng hành của các kênh truyền thông chính thống.</blockquote><p><strong>Hạn chót tiếp nhận hồ sơ tham gia đoàn đại biểu: 30/11/2026</strong></p>",
+    image: "/images/events/event-korea.png",
+    date: "18/12/2026",
+    views: "850",
+    author: "Ban Sự Kiện Quốc Tế",
+    active: true,
+  },
+  {
     id: "cong-nghe-va-nang-luc-san-xuat-phia-sau-dau-an-top-10-sao-vang-thuong-hieu-quoc-gia-cua-anvy",
     slug: "cong-nghe-va-nang-luc-san-xuat-phia-sau-dau-an-top-10-sao-vang-thuong-hieu-quoc-gia-cua-anvy",
     title: "Công nghệ và năng lực sản xuất phía sau dấu ấn TOP 10 Sao Vàng Thương hiệu Quốc gia của ANVY",
@@ -100,7 +114,7 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
 
     if (row && row.data) {
       const parsed = JSON.parse(row.data);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return sortArticlesByDateDescending(parsed);
       }
     }
@@ -119,7 +133,7 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
       if (fs.existsSync(dataFilePath)) {
         const raw = fs.readFileSync(dataFilePath, "utf-8");
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           return sortArticlesByDateDescending(parsed);
         }
       }
@@ -127,7 +141,7 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
   } catch (err) {
     console.warn("Error reading local data file:", err);
   }
-  return [];
+  return fallbackEnterprises;
 }
 
 export async function saveEnterprisesToDb(articles: EnterpriseArticle[]): Promise<void> {

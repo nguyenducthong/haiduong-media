@@ -66,7 +66,7 @@ export default async function EnterpriseDetailPage({
               <span>/</span>
               <Link href="/doanh-nghiep">Doanh nghiệp</Link>
               <span>/</span>
-              <span className="current" style={{ maxWidth: "350px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span className="current">
                 {article.title}
               </span>
             </nav>
@@ -114,23 +114,24 @@ export default async function EnterpriseDetailPage({
         </section>
 
         {/* Content Section */}
-        <section className="section news-detail-body" style={{ paddingTop: "32px", paddingBottom: "80px" }}>
+        <section className="section news-detail-body">
           <div className="site-container news-layout-grid">
             <article className="news-main-article">
 
 
               {article.excerpt && (
                 <div
+                  className="article-lead-p"
                   style={{
                     background: "#f8fafc",
                     borderLeft: "4px solid #d42027",
                     borderRadius: "0 12px 12px 0",
-                    padding: "18px 24px",
-                    fontSize: "16px",
+                    padding: "16px 20px",
+                    fontSize: "15px",
                     fontWeight: 600,
                     lineHeight: 1.7,
                     color: "#334155",
-                    marginBottom: "32px",
+                    marginBottom: "28px",
                   }}
                 >
                   {article.excerpt}
@@ -141,11 +142,6 @@ export default async function EnterpriseDetailPage({
               {article.content ? (
                 <div
                   className="article-full-text enterprise-content"
-                  style={{
-                    lineHeight: 1.8,
-                    fontSize: "16px",
-                    color: "#1e293b",
-                  }}
                   suppressHydrationWarning
                   dangerouslySetInnerHTML={{ __html: balanceHtmlTags(article.content) }}
                 />
@@ -156,45 +152,18 @@ export default async function EnterpriseDetailPage({
               )}
 
               {/* Consultation CTA Card */}
-              <div
-                className="article-share-cta"
-                style={{
-                  marginTop: "48px",
-                  background: "#fff",
-                  border: "1px solid var(--line)",
-                  borderRadius: "16px",
-                  padding: "30px",
-                  boxShadow: "0 4px 20px rgba(0,0,0,0.04)",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "20px",
-                }}
-              >
+              <div className="article-share-cta article-enterprise-cta">
                 <div>
-                  <strong style={{ fontSize: "17px", color: "#0f172a", display: "block", marginBottom: "6px" }}>
+                  <strong>
                     Doanh nghiệp của bạn muốn đăng ký chương trình & booking truyền thông?
                   </strong>
-                  <p style={{ margin: 0, color: "#64748b", fontSize: "14px" }}>
+                  <p>
                     Liên hệ ngay hotline {content.hotline} để nhận tư vấn hồ sơ và báo giá phát sóng VTV/HTV.
                   </p>
                 </div>
                 <Link
                   href="/lien-he"
                   className="button button-primary"
-                  style={{
-                    background: "#d42027",
-                    color: "#fff",
-                    padding: "12px 24px",
-                    borderRadius: "10px",
-                    fontWeight: 700,
-                    fontSize: "14px",
-                    textDecoration: "none",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
                 >
                   Nhận tư vấn ngay <ArrowRight size={15} />
                 </Link>

@@ -139,6 +139,8 @@ export default function AdminEditor({
       badge: "NỔI BẬT",
       bgImage: "/images/vtv-studio.jpg",
       active: true,
+      secondaryCtaText: "Xem mẫu phim VTV",
+      secondaryCtaHref: "#vtv-commercials",
     };
     setContent((current) => ({
       ...current,
@@ -1161,6 +1163,18 @@ export default function AdminEditor({
                         {slide.title || slide.highlight || "Banner hình ảnh (Không có tiêu đề)"}
                       </strong>
 
+                      {slide.tag && (
+                        <span style={{ fontSize: "11px", padding: "2px 7px", borderRadius: "4px", background: "#fee2e2", color: "#b91c1c", fontWeight: 700, whiteSpace: "nowrap" }}>
+                          {slide.tag}
+                        </span>
+                      )}
+
+                      {slide.badge && (
+                        <span style={{ fontSize: "11px", padding: "2px 7px", borderRadius: "4px", background: "#f1f5f9", color: "#334155", fontWeight: 700, border: "1px solid var(--line)", whiteSpace: "nowrap" }}>
+                          🛡️ {slide.badge}
+                        </span>
+                      )}
+
                       {slide.active === false ? (
                         <span style={{ fontSize: "11px", padding: "2px 8px", borderRadius: "999px", background: "#f1f5f9", color: "#64748b", fontWeight: 700 }}>
                           Đã ẩn
@@ -1307,37 +1321,75 @@ export default function AdminEditor({
                         onChange={(val) => updateBanner(index, "ctaHref", val)}
                       />
 
-                      {/* Optional Content fields */}
+                      {/* Tag tiêu điểm & Huy hiệu phụ / Khuyến mãi */}
                       <div className="field-row">
                         <Field
-                          label="Tiêu đề Banner (Không bắt buộc)"
-                          value={slide.title || ""}
-                          onChange={(val) => updateBanner(index, "title", val)}
+                          label="Tag tiêu điểm màu đỏ (Ví dụ: BOOKING PR / ADS, VTV BROADCAST)"
+                          value={slide.tag || ""}
+                          onChange={(val) => updateBanner(index, "tag", val)}
+                          placeholder="vd: BOOKING PR / ADS"
                         />
                         <Field
-                          label="Dòng chữ nổi bật / Phụ đề (Không bắt buộc)"
+                          label="Huy hiệu phụ / Khuyến mãi màu xám kính (Ví dụ: CHIẾT KHẤU ĐẾN 51%, CHUẨN PHÁT SÓNG VTV)"
+                          value={slide.badge || ""}
+                          onChange={(val) => updateBanner(index, "badge", val)}
+                          placeholder="vd: CHIẾT KHẤU ĐẾN 51%"
+                        />
+                      </div>
+
+                      {/* Tiêu đề & Dòng nổi bật */}
+                      <div className="field-row">
+                        <Field
+                          label="Tiêu đề lớn Banner"
+                          value={slide.title || ""}
+                          onChange={(val) => updateBanner(index, "title", val)}
+                          placeholder="vd: Booking Quảng Cáo Báo Mạng Toàn Quốc"
+                        />
+                        <Field
+                          label="Dòng chữ nổi bật màu cam"
                           value={slide.highlight || ""}
                           onChange={(val) => updateBanner(index, "highlight", val)}
+                          placeholder="vd: Ưu đãi chiết khấu lên đến 51% tại các đầu báo hàng đầu"
                         />
                       </div>
 
                       <Field
-                        label="Mô tả nội dung chi tiết nếu có (Không bắt buộc)"
+                        label="Mô tả nội dung chi tiết"
                         value={slide.description || ""}
                         onChange={(val) => updateBanner(index, "description", val)}
                         multiline
+                        placeholder="vd: Booking bài viết PR trên VnExpress, Dân Trí, Tuổi Trẻ, CafeF, VietnamNet..."
                       />
 
+                      {/* Nút bấm chính */}
                       <div className="field-row">
                         <Field
-                          label="Tag tiêu điểm (Ví dụ: VTV BROADCAST, SỰ KIỆN QUỐC TẾ)"
-                          value={slide.tag || ""}
-                          onChange={(val) => updateBanner(index, "tag", val)}
-                        />
-                        <Field
-                          label="Nhãn nút bấm (Ví dụ: Khám phá ngay, Xem bảng giá)"
+                          label="Chữ nút bấm chính (Ví dụ: Nhận báo giá báo mạng, Khám phá ngay)"
                           value={slide.ctaText || ""}
                           onChange={(val) => updateBanner(index, "ctaText", val)}
+                          placeholder="vd: Nhận báo giá báo mạng"
+                        />
+                        <Field
+                          label="Đường dẫn nút chính (Ví dụ: /lien-he, #vtv-commercials, https://...)"
+                          value={slide.ctaHref || ""}
+                          onChange={(val) => updateBanner(index, "ctaHref", val)}
+                          placeholder="vd: /lien-he"
+                        />
+                      </div>
+
+                      {/* Nút bấm phụ */}
+                      <div className="field-row">
+                        <Field
+                          label="Chữ nút bấm phụ (Ví dụ: Xem mẫu phim VTV - để trống nếu muốn ẩn)"
+                          value={slide.secondaryCtaText ?? "Xem mẫu phim VTV"}
+                          onChange={(val) => updateBanner(index, "secondaryCtaText", val)}
+                          placeholder="vd: Xem mẫu phim VTV"
+                        />
+                        <Field
+                          label="Đường dẫn nút phụ (Ví dụ: #vtv-commercials hoặc /lien-he)"
+                          value={slide.secondaryCtaHref || "#vtv-commercials"}
+                          onChange={(val) => updateBanner(index, "secondaryCtaHref", val)}
+                          placeholder="vd: #vtv-commercials"
                         />
                       </div>
 

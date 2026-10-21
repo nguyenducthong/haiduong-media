@@ -111,9 +111,11 @@ export function HeroBannerSlider({ slides }: { slides: BannerSlide[] }) {
                         {slide.ctaText || "Khám phá ngay"} <ArrowRight size={17} />
                       </a>
                     )}
-                    <a href="#vtv-commercials" className="banner-btn banner-btn-glass">
-                      <Tv size={16} /> Xem mẫu phim VTV
-                    </a>
+                    {slide.secondaryCtaText !== "" && (
+                      <a href={slide.secondaryCtaHref || "#vtv-commercials"} className="banner-btn banner-btn-glass">
+                        <Tv size={16} /> {slide.secondaryCtaText || "Xem mẫu phim VTV"}
+                      </a>
+                    )}
                   </div>
                 </div>
               ) : (

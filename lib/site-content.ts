@@ -35,6 +35,8 @@ export type BannerSlide = {
   badge?: string;
   bgImage?: string;
   active?: boolean;
+  secondaryCtaText?: string;
+  secondaryCtaHref?: string;
 };
 
 export type EventItem = {
@@ -612,6 +614,8 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
         badge: cleanBrandText(slide.badge || ""),
         bgImage: slide.bgImage || "",
         active: slide.active !== false,
+        secondaryCtaText: slide.secondaryCtaText !== undefined ? cleanBrandText(slide.secondaryCtaText) : undefined,
+        secondaryCtaHref: slide.secondaryCtaHref || undefined,
       }))
     : defaultSiteContent.bannerSlides;
 

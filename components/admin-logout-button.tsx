@@ -7,9 +7,6 @@ export function AdminLogoutButton() {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = async () => {
-    if (!confirm("Bạn có chắc chắn muốn đăng xuất khỏi trang quản trị?")) {
-      return;
-    }
     setLoading(true);
     try {
       await fetch("/api/admin/auth", {
@@ -17,10 +14,13 @@ export function AdminLogoutButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "logout" }),
       });
-      window.location.href = "/admin";
-    } catch {
-      window.location.reload();
-    }
+    } catch {}
+
+    // Xóa cookie client-side dự phòng
+    document.cookie = "admin_session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
+
+    // Điều hướng cưỡng bức tải lại trang đăng nhập (thêm timestamp để xóa router cache)
+    window.location.replace("/admin?t=" + Date.now());
   };
 
   return (

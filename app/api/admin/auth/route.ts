@@ -62,7 +62,14 @@ export async function POST(request: Request) {
         success: true,
         message: "Đã đăng xuất khỏi hệ thống CMS.",
       });
-      response.cookies.delete("admin_session");
+      response.cookies.set("admin_session", "", {
+        path: "/",
+        maxAge: 0,
+        expires: new Date(0),
+        httpOnly: true,
+        sameSite: "lax",
+      });
+      response.cookies.delete({ name: "admin_session", path: "/" });
       return response;
     }
 
@@ -372,7 +379,21 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  if (url.searchParams.get("action") === "logout") {
+    const response = NextResponse.redirect(new URL("/admin", request.url));
+    response.cookies.set("admin_session", "", {
+      path: "/",
+      maxAge: 0,
+      expires: new Date(0),
+      httpOnly: true,
+      sameSite: "lax",
+    });
+    response.cookies.delete({ name: "admin_session", path: "/" });
+    return response;
+  }
+
   const user = await getLoggedInAdminUser();
   if (!user) {
     return NextResponse.json({ success: false, error: "Chưa đăng nhập." }, { status: 401 });

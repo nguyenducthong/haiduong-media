@@ -10,7 +10,6 @@ import {
   ArrowRight,
   ChevronLeft,
   ChevronRight,
-  User,
 } from "lucide-react";
 import type { EnterpriseArticle } from "@/lib/enterprises-types";
 
@@ -340,18 +339,6 @@ export function EnterpriseList({
                   >
                     <CalendarDays size={13} color="#d42027" /> {item.date}
                   </span>
-
-                  {item.author && (
-                    <span
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "4px",
-                      }}
-                    >
-                      <User size={13} /> {item.author}
-                    </span>
-                  )}
 
                   {item.views && (
                     <span

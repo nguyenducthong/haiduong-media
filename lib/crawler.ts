@@ -236,8 +236,7 @@ export function parseSingleArticleFromHtml(html: string, url = "") {
       image: imgUrl,
       date,
       views,
-      sourceUrl: detailUrl,
-      author: "Viện Nghiên Cứu Kinh Tế Châu Á",
+      author: "",
       urlHash,
       titleHash,
       hash,
@@ -299,8 +298,7 @@ export function parseArticlesFromHtml(html: string, url = "") {
       image: imgUrl,
       date,
       views,
-      sourceUrl: detailUrl,
-      author: "Viện Nghiên Cứu Kinh Tế Châu Á",
+      author: "",
       urlHash,
       titleHash,
       hash,
@@ -362,7 +360,7 @@ export function enrichArticle(article: any, contentHtml: string) {
     readTime,
     imageCount,
     category: article.category || detectCategory(article.title, article.excerpt),
-    author: article.author || "Viện Nghiên Cứu Kinh Tế Châu Á",
+    author: article.author || "",
     type: Array.isArray(article.type) && article.type.length > 0
       ? article.type
       : typeof article.type === "string" && article.type.trim()

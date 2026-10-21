@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ArrowLeft,
   Building2,
-  ExternalLink,
   Share2,
 } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
@@ -79,36 +78,6 @@ export default async function EnterpriseDetailPage({
                 <CalendarDays size={15} /> {article.date}
               </span>
               <ViewCounter slug={article.slug || article.id} initialViews={article.views} iconSize={15} />
-              {article.sourceUrl && (
-                article.sourceUrl.startsWith("/") || article.sourceUrl.includes("haiduongmedia") ? (
-                  <span
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "5px",
-                      color: "#d42027",
-                      fontWeight: 700,
-                    }}
-                  >
-                    Hải Dương Media
-                  </span>
-                ) : (
-                  <a
-                    href={article.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "4px",
-                      color: "inherit",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    <ExternalLink size={13} /> Nguồn gốc
-                  </a>
-                )
-              )}
             </div>
           </div>
         </section>

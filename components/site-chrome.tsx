@@ -91,14 +91,16 @@ export function SiteFooter({ content }: { content: SiteContent }) {
         <div className="footer-main-grid">
             {/* Cột 1: Thông tin thương hiệu */}
             <div className="footer-col-brand">
-              <div className="footer-logo-badge">
-                <img
-                  src="/images/logo.png"
-                  alt={brandName}
-                  className="footer-logo-img"
-                />
+              <div className="footer-brand-header">
+                <div className="footer-logo-badge">
+                  <img
+                    src="/images/logo.png"
+                    alt={brandName}
+                    className="footer-logo-img"
+                  />
+                </div>
+                <h3 className="footer-brand-title">{brandName}</h3>
               </div>
-              <h3 className="footer-brand-title">{brandName}</h3>
               <p className="footer-brand-desc">
                 Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và kết nối doanh nghiệp với các chương trình truyền hình, báo chí.
               </p>

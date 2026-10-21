@@ -7,9 +7,9 @@ import { getAllEvents } from "@/lib/enterprises";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Sự Kiện & Diễn Đàn Doanh Nhân | Hải Dương Media",
+  title: "Sự Kiện & Diễn Đàn Doanh Nhân",
   description:
-    "Khám phá các chương trình vinh danh thương hiệu uy tín, diễn đàn kinh tế và sự kiện xúc tiến thương mại quốc tế do Hải Dương Media đồng hành tổ chức.",
+    "Khám phá các chương trình vinh danh thương hiệu uy tín, diễn đàn kinh tế và sự kiện quốc tế do THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) đồng hành tổ chức.",
 };
 
 export default async function EventsIndexPage() {

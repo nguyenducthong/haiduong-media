@@ -28,13 +28,13 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const event = await getUnifiedEventBySlug(slug);
-  if (!event) return { title: "Không tìm thấy sự kiện | Hải Dương Media" };
+  if (!event) return { title: "Không tìm thấy sự kiện" };
 
   return {
-    title: `${event.title} | Hải Dương Media`,
+    title: event.title,
     description: event.summary || event.title,
     openGraph: {
-      title: event.title,
+      title: `${event.title} - Thương Hiệu Hàng Đầu VN`,
       description: event.summary,
       images: event.image ? [event.image] : [],
     },

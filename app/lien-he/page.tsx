@@ -4,6 +4,12 @@ import { loadSiteContent } from "@/lib/site-content";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "Liên Hệ Tư Vấn Chiến Lược Truyền Thông",
+  description:
+    "Liên hệ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Hotline: 0931 538 666. Tư vấn sản xuất phim quảng cáo, phát sóng VTV và booking báo chí toàn quốc.",
+};
+
 export default async function ContactPage() {
   const content = await loadSiteContent();
   const items = [

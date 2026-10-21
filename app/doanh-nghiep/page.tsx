@@ -8,9 +8,9 @@ import { EnterpriseList } from "@/components/enterprise-list";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Doanh Nghiệp & Thương Hiệu Tiêu Biểu | Hải Dương Media",
+  title: "Doanh Nghiệp & Thương Hiệu Tiêu Biểu",
   description:
-    "Danh sách các doanh nghiệp, thương hiệu tiêu biểu được vinh danh, bảo trợ truyền thông và phủ sóng trên sóng truyền hình quốc gia VTV, HTV.",
+    "Danh sách các doanh nghiệp, thương hiệu tiêu biểu được vinh danh và bảo trợ truyền thông bởi THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
 };
 
 export default async function DoanhNghiepPage() {

@@ -22,6 +22,12 @@ import { getAllEvents } from "@/lib/enterprises";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | thuonghieuhangdauvn.com",
+  description:
+    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
+};
+
 const serviceIcons = [Tv, Clapperboard, Megaphone, Sparkles, ChartNoAxesCombined, Palette];
 
 export default async function Home() {

@@ -6,9 +6,9 @@ import { EnterpriseList } from "@/components/enterprise-list";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Tin Tức & Hoạt Động Doanh Nghiệp | Hải Dương Media",
+  title: "Tin Tức & Hoạt Động Doanh Nghiệp",
   description:
-    "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số.",
+    "Cập nhật tin tức kinh tế, hoạt động doanh nghiệp và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
 };
 
 export default async function NewsPage() {

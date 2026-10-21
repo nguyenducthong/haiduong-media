@@ -2,12 +2,30 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-  description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+  title: {
+    default: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
+    template: "%s - Thương Hiệu Hàng Đầu VN",
+  },
+  description:
+    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
+  keywords: [
+    "thuonghieuhangdauvn",
+    "thương hiệu hàng đầu việt nam",
+    "thương hiệu hàng đầu vn",
+    "truyền thông thương hiệu",
+    "sản xuất tvc vtv",
+    "booking báo chí pr",
+    "vinh danh thương hiệu",
+    "thuong hieu hang dau viet nam",
+  ],
   metadataBase: new URL("https://thuonghieuhangdauvn.com"),
+  alternates: {
+    canonical: "https://thuonghieuhangdauvn.com",
+  },
   openGraph: {
     title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-    description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+    description:
+      "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
     url: "https://thuonghieuhangdauvn.com",
     siteName: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
     images: [
@@ -15,7 +33,7 @@ export const metadata: Metadata = {
         url: "/images/logo.png",
         width: 1200,
         height: 1200,
-        alt: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+        alt: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM - thuonghieuhangdauvn",
       },
     ],
     locale: "vi_VN",
@@ -24,7 +42,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-    description: "Giải pháp truyền thông, nội dung, quảng cáo, sự kiện và xây dựng thương hiệu cho doanh nghiệp.",
+    description:
+      "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
     images: ["/images/logo.png"],
   },
   icons: {
@@ -41,6 +60,44 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://thuonghieuhangdauvn.com/#organization",
+      name: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+      alternateName: ["thuonghieuhangdauvn", "Thương Hiệu Hàng Đầu VN"],
+      url: "https://thuonghieuhangdauvn.com",
+      logo: "https://thuonghieuhangdauvn.com/images/logo.png",
+      description:
+        "Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và kết nối doanh nghiệp với các chương trình truyền hình, báo chí.",
+      telephone: "0931 538 666",
+      email: "bantochuc.thuonghieu2009@gmail.com",
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "89 Lê Đức Thọ, Mỹ Đình 2",
+        addressLocality: "Hà Nội",
+        addressCountry: "VN",
+      },
+      sameAs: [
+        "https://www.facebook.com/haiduongmedia",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://thuonghieuhangdauvn.com/#website",
+      url: "https://thuonghieuhangdauvn.com",
+      name: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+      alternateName: "thuonghieuhangdauvn",
+      publisher: {
+        "@id": "https://thuonghieuhangdauvn.com/#organization",
+      },
+      inLanguage: "vi",
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,6 +105,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );

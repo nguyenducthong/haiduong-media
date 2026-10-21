@@ -22,13 +22,13 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const article = await getEnterpriseBySlug(slug);
-  if (!article) return { title: "Không tìm thấy bài viết | Hải Dương Media" };
+  if (!article) return { title: "Không tìm thấy bài viết" };
 
   return {
-    title: `${article.title} | Hải Dương Media`,
+    title: article.title,
     description: article.excerpt || article.title,
     openGraph: {
-      title: article.title,
+      title: `${article.title} - Thương Hiệu Hàng Đầu VN`,
       description: article.excerpt,
       images: article.image ? [article.image] : [],
     },

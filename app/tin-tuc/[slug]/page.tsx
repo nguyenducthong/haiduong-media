@@ -9,6 +9,28 @@ import { ViewCounter } from "@/components/view-counter";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const content = await loadSiteContent();
+  const dbArticle = await getArticleBySlug(slug);
+  const article = dbArticle || content.news.find((n) => n.slug === slug);
+  if (!article) return { title: "Không tìm thấy bài viết" };
+
+  return {
+    title: article.title,
+    description: article.excerpt || article.title,
+    openGraph: {
+      title: `${article.title} - Thương Hiệu Hàng Đầu VN`,
+      description: article.excerpt,
+      images: article.image ? [article.image] : [],
+    },
+  };
+}
+
 export default async function NewsDetailPage({
   params,
 }: {

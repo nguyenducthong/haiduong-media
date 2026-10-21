@@ -6,9 +6,9 @@ import { EnterpriseList } from "@/components/enterprise-list";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu | Hải Dương Media",
+  title: "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu",
   description:
-    "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp.",
+    "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng đồng hành cùng THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
 };
 
 export default async function DoanhNhanPage() {

@@ -200,6 +200,9 @@ export async function POST(req: Request) {
         location: article.location || "",
         time: article.time || "",
         contactPerson: article.contactPerson || "",
+        organizer: article.organizer || "",
+        partner: article.partner || article.coOrganizer || "",
+        coOrganizer: article.coOrganizer || article.partner || "",
         agenda: Array.isArray(article.agenda)
           ? article.agenda
           : typeof article.agenda === "string"

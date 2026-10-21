@@ -1,57 +1,40 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Clapperboard, Play, Sparkles, Tv, Volume2, X } from "lucide-react";
+import { Play, Tv, X } from "lucide-react";
 import type { VtvCommercial } from "@/lib/site-content";
 
-export function HomeVtvSection({ commercials }: { commercials: VtvCommercial[] }) {
+export function HomeVtvSection({
+  commercials,
+  badge,
+  title,
+  description,
+}: {
+  commercials: VtvCommercial[];
+  badge?: string;
+  title?: string;
+  description?: string;
+}) {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
   const visibleCommercials = (commercials || []).filter((item) => item.active !== false);
+
+  const displayBadge = badge ?? "TRUYỀN HÌNH QUỐC GIA & ĐÀI LỚN";
+  const displayTitle = title ?? "Sản Xuất Phim Quảng Cáo Trên VTV";
+  const displayDesc =
+    description ??
+    "Đơn vị đối tác chiến lược sản xuất TVC, phim tự giới thiệu doanh nghiệp và booking phát sóng các khung giờ vàng trên các kênh VTV1, VTV3, VTV6, HTV9, HTV7, HN1 và THVL.";
 
   return (
     <section className="section vtv-section" id="vtv-commercials">
       <div className="site-container">
         <div className="vtv-header-box">
-          <div className="vtv-eyebrow-badge">
-            <Tv size={16} /> TRUYỀN HÌNH QUỐC GIA & ĐÀI LỚN
-          </div>
-          <h2>Sản Xuất Phim Quảng Cáo Trên VTV</h2>
-          <p className="vtv-header-desc">
-            Hải Dương Media tự hào là đối tác chiến lược sản xuất TVC, phim tự giới thiệu doanh nghiệp và booking
-            phát sóng các khung giờ vàng trên các kênh VTV1, VTV3, VTV6, HTV9, HTV7, HN1 và THVL.
-          </p>
-        </div>
-
-        {/* Highlight Broadcast Badges */}
-        <div className="vtv-specs-grid">
-          <div className="vtv-spec-card">
-            <span className="vtv-spec-icon"><Clapperboard size={22} /></span>
-            <div>
-              <strong>Chuẩn điện ảnh 4K / UHD</strong>
-              <small>Hệ thống máy quay RED, ARRI cinema camera sắc nét từng khung hình.</small>
+          {displayBadge ? (
+            <div className="vtv-eyebrow-badge">
+              <Tv size={16} /> {displayBadge}
             </div>
-          </div>
-          <div className="vtv-spec-card">
-            <span className="vtv-spec-icon"><Volume2 size={22} /></span>
-            <div>
-              <strong>Âm thanh EBU R128</strong>
-              <small>Đạt tiêu chuẩn kỹ thuật âm lượng phát thanh truyền hình nghiêm ngặt.</small>
-            </div>
-          </div>
-          <div className="vtv-spec-card">
-            <span className="vtv-spec-icon"><CheckCircle2 size={22} /></span>
-            <div>
-              <strong>100% Giấy phép & Duyệt đài</strong>
-              <small>Hỗ trợ xin giấy phép quảng cáo, hồ sơ pháp lý và thẩm duyệt của VTV.</small>
-            </div>
-          </div>
-          <div className="vtv-spec-card">
-            <span className="vtv-spec-icon"><Sparkles size={22} /></span>
-            <div>
-              <strong>Khung giờ vàng uy tín</strong>
-              <small>Phủ sóng trước Thời sự 19h VTV1, Chuyển động 24h, Thông tin 260 VTV3.</small>
-            </div>
-          </div>
+          ) : null}
+          {displayTitle ? <h2>{displayTitle}</h2> : null}
+          {displayDesc ? <p className="vtv-header-desc">{displayDesc}</p> : null}
         </div>
 
         {/* Video Grid */}

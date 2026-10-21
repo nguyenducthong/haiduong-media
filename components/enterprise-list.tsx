@@ -8,7 +8,6 @@ import {
   Search,
   Building2,
   ArrowRight,
-  Filter,
   ChevronLeft,
   ChevronRight,
   User,
@@ -31,7 +30,6 @@ export function EnterpriseList({
   pageSize = 9,
 }: EnterpriseListProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -45,17 +43,6 @@ export function EnterpriseList({
     }
   }, []);
 
-  // Extract unique categories (only non-empty ones)
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    initialArticles.forEach((a) => {
-      if (a.category && a.category.trim()) {
-        set.add(a.category.trim());
-      }
-    });
-    return Array.from(set);
-  }, [initialArticles]);
-
   // Filtered list
   const filtered = useMemo(() => {
     return initialArticles.filter((item) => {
@@ -64,21 +51,13 @@ export function EnterpriseList({
         (item.title && item.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (item.excerpt && item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      const matchCategory =
-        selectedCategory === "all" || item.category === selectedCategory;
-
-      return matchSearch && matchCategory;
+      return matchSearch;
     });
-  }, [initialArticles, searchTerm, selectedCategory]);
+  }, [initialArticles, searchTerm]);
 
-  // Reset page to 1 when search or category changes
+  // Reset page to 1 when search changes
   const handleSearchChange = (val: string) => {
     setSearchTerm(val);
-    setCurrentPage(1);
-  };
-
-  const handleCategorySelect = (cat: string) => {
-    setSelectedCategory(cat);
     setCurrentPage(1);
   };
 
@@ -118,23 +97,20 @@ export function EnterpriseList({
     if (item.slug) {
       return `${basePath}/${item.slug}`;
     }
-    return item.link || item.sourceUrl || "#";
+    return (item as { link?: string }).link || item.sourceUrl || "#";
   };
 
   return (
     <div className="enterprise-container" ref={containerRef}>
-      {/* Search and Filters Bar */}
+      {/* Search Bar */}
       <div
         style={{
           background: "#fff",
           border: "1px solid var(--line)",
           borderRadius: "16px",
-          padding: "20px 24px",
+          padding: "16px 20px",
           marginBottom: "32px",
           boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "16px",
         }}
       >
         <div
@@ -145,7 +121,7 @@ export function EnterpriseList({
             background: "#f8fafc",
             border: "1px solid var(--line)",
             borderRadius: "12px",
-            padding: "10px 16px",
+            padding: "12px 18px",
           }}
         >
           <Search size={18} color="#94a3b8" />
@@ -179,78 +155,6 @@ export function EnterpriseList({
             </button>
           )}
         </div>
-
-        {/* Category Pills (only if multiple categories exist) */}
-        {categories.length > 1 && (
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: 700,
-                color: "#64748b",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                marginRight: "4px",
-              }}
-            >
-              <Filter size={14} /> Chuyên mục:
-            </span>
-
-            <button
-              onClick={() => handleCategorySelect("all")}
-              style={{
-                padding: "7px 16px",
-                borderRadius: "999px",
-                fontSize: "13px",
-                fontWeight: 700,
-                cursor: "pointer",
-                transition: "all 0.2s ease",
-                border:
-                  selectedCategory === "all"
-                    ? "1px solid #d42027"
-                    : "1px solid var(--line)",
-                background: selectedCategory === "all" ? "#d42027" : "#fff",
-                color: selectedCategory === "all" ? "#fff" : "#334155",
-              }}
-            >
-              Tất cả ({initialArticles.length})
-            </button>
-
-            {categories.map((cat) => {
-              const count = initialArticles.filter((a) => a.category === cat).length;
-              const isSelected = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategorySelect(cat)}
-                  style={{
-                    padding: "7px 16px",
-                    borderRadius: "999px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    border: isSelected
-                      ? "1px solid #d42027"
-                      : "1px solid var(--line)",
-                    background: isSelected ? "#d42027" : "#fff",
-                    color: isSelected ? "#fff" : "#334155",
-                  }}
-                >
-                  {cat} ({count})
-                </button>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* Results Header Info */}
@@ -306,7 +210,7 @@ export function EnterpriseList({
             Không tìm thấy bài viết phù hợp
           </h4>
           <p style={{ color: "#64748b", fontSize: "14px", margin: 0 }}>
-            Thử tìm kiếm với từ khóa khác hoặc chuyển chuyên mục.
+            Thử tìm kiếm với từ khóa khác.
           </p>
         </div>
       )}

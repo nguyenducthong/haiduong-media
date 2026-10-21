@@ -35,6 +35,7 @@ import {
   Upload,
   FolderOpen,
   MapPin,
+  Handshake,
 } from "lucide-react";
 import type { EnterpriseArticle } from "@/lib/enterprises-types";
 import { getArticleTypes } from "@/lib/enterprises-types";
@@ -531,6 +532,8 @@ export function AdminEnterprises({
                 author: "Ban biên tập Hải Dương Media",
                 views: "1",
                 active: true,
+                organizer: "Hải Dương Media & Đối tác",
+                partner: "Hải Dương Media & Đối tác",
               })
             }
             style={{
@@ -2266,6 +2269,71 @@ export function AdminEnterprises({
                           background: "#fff",
                         }}
                       />
+                    </div>
+
+                    {/* Organizer & Partner */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "16px" }}>
+                      <div>
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            color: "#9a3412",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          <Building2 size={13} /> Đơn vị tổ chức
+                        </label>
+                        <input
+                          type="text"
+                          value={editingArticle.organizer || ""}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, organizer: e.target.value })}
+                          placeholder="vd: Hải Dương Media & Đối tác"
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "10px",
+                            border: "1px solid #fdba74",
+                            fontSize: "13px",
+                            background: "#fff",
+                          }}
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            color: "#9a3412",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          <Handshake size={13} /> Đơn vị đồng hành
+                        </label>
+                        <input
+                          type="text"
+                          value={editingArticle.partner || editingArticle.coOrganizer || ""}
+                          onChange={(e) => setEditingArticle({ ...editingArticle, partner: e.target.value, coOrganizer: e.target.value })}
+                          placeholder="vd: Hải Dương Media & Đối tác"
+                          style={{
+                            width: "100%",
+                            padding: "10px 14px",
+                            borderRadius: "10px",
+                            border: "1px solid #fdba74",
+                            fontSize: "13px",
+                            background: "#fff",
+                          }}
+                        />
+                      </div>
                     </div>
 
                     {/* Agenda */}

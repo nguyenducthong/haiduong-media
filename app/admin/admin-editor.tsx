@@ -51,15 +51,24 @@ import type {
 import { AdminRichEditor } from "@/components/admin-rich-editor";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { AdminEnterprises } from "@/components/admin-enterprises";
+import { AdminAccountsManager } from "@/components/admin-accounts-manager";
+import type { SafeAdminUser } from "@/lib/admin-auth";
 
 type Message = { type: "success" | "error"; text: string } | null;
 export type MainAdminTab =
   | "trang-chu"
   | "bai-viet"
   | "su-kien"
-  | "cau-hinh";
+  | "cau-hinh"
+  | "tai-khoan";
 
-export default function AdminEditor({ initialContent }: { initialContent: SiteContent }) {
+export default function AdminEditor({
+  initialContent,
+  currentUser,
+}: {
+  initialContent: SiteContent;
+  currentUser?: SafeAdminUser | null;
+}) {
   const [content, setContent] = useState<SiteContent>(initialContent);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<Message>(null);
@@ -278,6 +287,8 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
         "Gặp gỡ và kết nối đối tác B2B",
       ],
       contactPerson: "Hotline Ban Tổ Chức: 090 377 2086",
+      organizer: "Hải Dương Media & Đối tác",
+      partner: "Hải Dương Media & Đối tác",
       active: true,
     };
     setContent((current) => ({
@@ -678,7 +689,7 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
     { id: "events", name: "Danh mục sự kiện sắp diễn ra", enabled: true },
     { id: "services", name: "Dịch vụ & Sản phẩm chủ lực", enabled: true },
     { id: "news", name: "Tin mới & Kiến thức", enabled: true },
-    { id: "about", name: "Về chúng tôi (Giới thiệu Hải Dương Media)", enabled: true },
+    { id: "about", name: "Về chúng tôi (Giới thiệu công ty)", enabled: true },
     { id: "press", name: "Báo chí, Thương hiệu & Đối tác", enabled: true },
     { id: "process", name: "Quy trình triển khai 4 bước", enabled: true },
     { id: "cta", name: "Khối kêu gọi hợp tác (CTA)", enabled: true },
@@ -735,6 +746,26 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
           <div className="admin-nav-tab-info">
             <span className="admin-nav-tab-label">Cấu hình chung</span>
             <span className="admin-nav-tab-desc">Thông tin liên hệ & thương hiệu</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setMainTab("tai-khoan")}
+          className={`admin-nav-tab-item ${mainTab === "tai-khoan" ? "active" : ""}`}
+        >
+          <div
+            className="admin-nav-tab-icon"
+            style={{
+              background: mainTab === "tai-khoan" ? "#0f172a" : undefined,
+              color: mainTab === "tai-khoan" ? "#fff" : undefined,
+            }}
+          >
+            <Users size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Tài khoản</span>
+            <span className="admin-nav-tab-desc">Phân quyền & bảo mật truy cập</span>
           </div>
         </button>
       </nav>
@@ -830,9 +861,18 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
       )}
 
       {/* ========================================================
+          TAB QUẢN LÝ TẤT CẢ TÀI KHOẢN TRUY CẬP & BẢO MẬT HỆ THỐNG
+          ======================================================== */}
+      {mainTab === "tai-khoan" && (
+        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
+          <AdminAccountsManager currentUser={currentUser} />
+        </div>
+      )}
+
+      {/* ========================================================
           CÁC TAB SỬ DỤNG GIAO DIỆN CHỈNH SỬA VÀ LƯU FORM (CONTENT)
           ======================================================== */}
-      {mainTab !== "bai-viet" && !(mainTab === "su-kien" && eventAdminView === "articles") && (
+      {mainTab !== "bai-viet" && !(mainTab === "su-kien" && eventAdminView === "articles") && mainTab !== "tai-khoan" && (
         <div className="admin-layout">
           {/* SIDEBAR NAVIGATION TAILORED TO ACTIVE TAB */}
           <aside className="admin-nav">
@@ -1332,8 +1372,47 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
           id="vtv-commercials-admin"
           number="03"
           title="Phim Quảng Cáo & Phóng Sự Trên VTV/HTV"
-          description="Quản lý danh sách các TVC, phóng sự truyền hình phát sóng khung giờ vàng trên các kênh VTV1, VTV3, HTV9..."
+          description="Quản lý tiêu đề, nội dung giới thiệu và danh sách các TVC, phóng sự truyền hình phát sóng khung giờ vàng trên các kênh VTV1, VTV3, HTV9..."
         >
+          {/* Cấu hình tiêu đề & nội dung giới thiệu mục VTV */}
+          <div
+            style={{
+              padding: "18px 20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid var(--line)",
+              marginBottom: "24px",
+              display: "grid",
+              gap: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Tv size={18} color="#d42027" />
+              <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                Nội dung phần đầu mục VTV (Tiêu đề & Giới thiệu)
+              </strong>
+            </div>
+
+            <div className="field-row">
+              <Field
+                label="Dòng nhãn nhỏ (Eyebrow Badge)"
+                value={content.vtvBadge || ""}
+                onChange={(val) => update("vtvBadge", val)}
+              />
+              <Field
+                label="Tiêu đề chính mục VTV"
+                value={content.vtvTitle || ""}
+                onChange={(val) => update("vtvTitle", val)}
+              />
+            </div>
+
+            <Field
+              label="Đoạn văn mô tả / giới thiệu"
+              value={content.vtvDescription || ""}
+              onChange={(val) => update("vtvDescription", val)}
+              multiline
+            />
+          </div>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <span style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 700 }}>
@@ -2617,6 +2696,19 @@ export default function AdminEditor({ initialContent }: { initialContent: SiteCo
                           label="Hotline / Người phụ trách sự kiện"
                           value={event.contactPerson || "Hotline Ban Tổ Chức: 090 377 2086"}
                           onChange={(val) => updateEvent(index, "contactPerson", val)}
+                        />
+                      </div>
+
+                      <div className="field-row">
+                        <Field
+                          label="Đơn vị tổ chức sự kiện"
+                          value={event.organizer || ""}
+                          onChange={(val) => updateEvent(index, "organizer", val)}
+                        />
+                        <Field
+                          label="Đơn vị đồng hành sự kiện"
+                          value={event.partner || ""}
+                          onChange={(val) => updateEvent(index, "partner", val)}
                         />
                       </div>
 

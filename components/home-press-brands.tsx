@@ -75,8 +75,7 @@ export function HomePressBrands({
               <h2>Thương Hiệu Của Chúng Tôi</h2>
             </div>
             <p>
-              Các ấn phẩm tạp chí doanh nhân, trang tin chuyên ngành và nền tảng truyền thông trực thuộc hệ sinh thái
-              Hải Dương Media với sức lan tỏa rộng khắp.
+              Các ấn phẩm tạp chí doanh nhân, trang tin chuyên ngành và nền tảng truyền thông uy tín với sức lan tỏa rộng khắp.
             </p>
           </div>
 
@@ -136,7 +135,7 @@ export function HomePressBrands({
             <span className="eyebrow" style={{ color: "#d42027" }}>KHÁCH HÀNG & ĐỐI TÁC ĐỒNG HÀNH</span>
             <h2>Khách Hàng Nói Về Chúng Tôi</h2>
             <p className="section-subtitle">
-              Niềm tin của hàng ngàn thương hiệu hàng đầu Việt Nam chính là thước đo giá trị cao quý nhất cho sự tận tâm của Hải Dương Media.
+              Niềm tin của hàng ngàn thương hiệu hàng đầu Việt Nam chính là thước đo giá trị cao quý nhất cho sự tận tâm và chuyên nghiệp của chúng tôi.
             </p>
           </div>
 

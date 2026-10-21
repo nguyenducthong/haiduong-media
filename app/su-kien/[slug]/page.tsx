@@ -119,7 +119,7 @@ export default async function EventDetailPage({
                   <Building2 size={20} className="spec-icon" />
                   <div>
                     <small>Đơn vị đồng hành</small>
-                    <strong>Hải Dương Media & Đối tác</strong>
+                    <strong>{event.partner || event.coOrganizer || event.organizer || "Hải Dương Media & Đối tác"}</strong>
                   </div>
                 </div>
               </div>
@@ -186,8 +186,20 @@ export default async function EventDetailPage({
                   <div className="reg-info-list" style={{ padding: "0 0 20px", display: "grid", gap: "14px" }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <small style={{ color: "var(--muted)", fontSize: "12px" }}>Đơn vị tổ chức:</small>
-                      <strong style={{ fontSize: "14px", color: "#0f172a" }}>Hải Dương Media & Đối tác</strong>
+                      <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                        {event.organizer || "Hải Dương Media & Đối tác"}
+                      </strong>
                     </div>
+
+                    {(event.partner || event.coOrganizer) &&
+                      (event.partner || event.coOrganizer) !== (event.organizer || "Hải Dương Media & Đối tác") && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          <small style={{ color: "var(--muted)", fontSize: "12px" }}>Đơn vị đồng hành:</small>
+                          <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                            {event.partner || event.coOrganizer}
+                          </strong>
+                        </div>
+                      )}
 
                     <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
                       <small style={{ color: "var(--muted)", fontSize: "12px" }}>Thời gian tổ chức:</small>

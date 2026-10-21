@@ -4,6 +4,7 @@ import hostingConfig from "./.openai/hosting.json";
 import { readExecutionProfile } from "./scripts/execution-profile.mjs";
 import { sites } from "./build/sites-vite-plugin";
 import { connectorPreview } from "./build/connector-preview-plugin.mjs";
+import { mailDispatchPlugin } from "./build/mail-dispatch-plugin.mjs";
 
 const CLOUDFLARE_D1_DATABASE_ID =
   "ecd2a1de-c011-4f11-b88d-3e10145f0999";
@@ -78,6 +79,7 @@ export default defineConfig(async ({ command }) => {
     plugins: [
       vinext(),
       sites({ mockAuth: !managedLinux }),
+      mailDispatchPlugin(),
       connectorPreview(),
       cloudflare({
         viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },

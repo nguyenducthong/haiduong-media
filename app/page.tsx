@@ -45,7 +45,15 @@ export default async function Home() {
         </div>
       </section>
     ),
-    vtv: () => <HomeVtvSection key="vtv" commercials={content.vtvCommercials} />,
+    vtv: () => (
+      <HomeVtvSection
+        key="vtv"
+        commercials={content.vtvCommercials}
+        badge={content.vtvBadge}
+        title={content.vtvTitle}
+        description={content.vtvDescription}
+      />
+    ),
     events: () => <HomeEventsSection key="events" events={allEvents} />,
     services: () => (
       <section key="services" className="section services-section" id="dich-vu-chinh">

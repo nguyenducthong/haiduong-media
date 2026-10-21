@@ -52,6 +52,9 @@ export type EventItem = {
   agenda?: string[];
   benefits?: string[];
   contactPerson?: string;
+  organizer?: string;
+  partner?: string;
+  coOrganizer?: string;
   active?: boolean;
 };
 
@@ -138,6 +141,9 @@ export type SiteContent = {
   bannerSlides: BannerSlide[];
   upcomingEvents: EventItem[];
   vtvCommercials: VtvCommercial[];
+  vtvBadge?: string;
+  vtvTitle?: string;
+  vtvDescription?: string;
   knowledge: KnowledgeItem[];
   press: PressItem[];
   brands: BrandItem[];
@@ -323,6 +329,10 @@ export const defaultSiteContent: SiteContent = {
       description: "Chương trình tin tức có tỷ suất người xem cao nhất miền Nam, tiếp cận nhanh chóng hàng triệu người tiêu dùng năng động.",
     },
   ],
+  vtvBadge: "TRUYỀN HÌNH QUỐC GIA & ĐÀI LỚN",
+  vtvTitle: "Sản Xuất Phim Quảng Cáo Trên VTV",
+  vtvDescription:
+    "Hải Dương Media tự hào là đối tác chiến lược sản xuất TVC, phim tự giới thiệu doanh nghiệp và booking phát sóng các khung giờ vàng trên các kênh VTV1, VTV3, VTV6, HTV9, HTV7, HN1 và THVL.",
   knowledge: [
     {
       id: "know-1",
@@ -460,7 +470,7 @@ export const defaultSiteContent: SiteContent = {
     { id: "events", name: "Danh mục sự kiện sắp diễn ra", enabled: true },
     { id: "services", name: "Dịch vụ & Sản phẩm chủ lực", enabled: true },
     { id: "news", name: "Tin mới & Kiến thức", enabled: true },
-    { id: "about", name: "Về chúng tôi (Giới thiệu Hải Dương Media)", enabled: true },
+    { id: "about", name: "Về chúng tôi (Giới thiệu công ty)", enabled: true },
     { id: "press", name: "Báo chí, Thương hiệu & Đối tác", enabled: true },
     { id: "process", name: "Quy trình triển khai 4 bước", enabled: true },
     { id: "cta", name: "Khối kêu gọi hợp tác (CTA)", enabled: true },
@@ -583,6 +593,9 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
         agenda: (item?.agenda || defaultSiteContent.upcomingEvents[index]?.agenda || []).map(cleanBrandText),
         benefits: (item?.benefits || defaultSiteContent.upcomingEvents[index]?.benefits || []).map(cleanBrandText),
         contactPerson: cleanBrandText(item?.contactPerson || defaultSiteContent.upcomingEvents[index]?.contactPerson || "Hotline: 090 377 2086"),
+        organizer: cleanBrandText(item?.organizer || defaultSiteContent.upcomingEvents[index]?.organizer || "Hải Dương Media & Đối tác"),
+        partner: cleanBrandText(item?.partner || item?.coOrganizer || defaultSiteContent.upcomingEvents[index]?.partner || "Hải Dương Media & Đối tác"),
+        coOrganizer: cleanBrandText(item?.coOrganizer || item?.partner || defaultSiteContent.upcomingEvents[index]?.coOrganizer || "Hải Dương Media & Đối tác"),
         active: item?.active !== false,
       }))
     : defaultSiteContent.upcomingEvents;
@@ -713,6 +726,9 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
     bannerSlides,
     upcomingEvents,
     vtvCommercials,
+    vtvBadge: value.vtvBadge !== undefined ? cleanBrandText(value.vtvBadge) : (defaultSiteContent.vtvBadge || "TRUYỀN HÌNH QUỐC GIA & ĐÀI LỚN"),
+    vtvTitle: value.vtvTitle !== undefined ? cleanBrandText(value.vtvTitle) : (defaultSiteContent.vtvTitle || "Sản Xuất Phim Quảng Cáo Trên VTV"),
+    vtvDescription: value.vtvDescription !== undefined ? cleanBrandText(value.vtvDescription) : (defaultSiteContent.vtvDescription || "Hải Dương Media tự hào là đối tác chiến lược sản xuất TVC, phim tự giới thiệu doanh nghiệp và booking phát sóng các khung giờ vàng trên các kênh VTV1, VTV3, VTV6, HTV9, HTV7, HN1 và THVL."),
     knowledge,
     press,
     brands,

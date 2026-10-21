@@ -293,6 +293,9 @@ export function articleToEventItem(article: EnterpriseArticle): any {
       ? article.benefits.split("\n").map((s) => s.trim()).filter(Boolean)
       : [],
     contactPerson: article.contactPerson || "Hotline Ban Tổ Chức: 090 377 2086",
+    organizer: article.organizer || "Hải Dương Media & Đối tác",
+    partner: article.partner || article.coOrganizer || "Hải Dương Media & Đối tác",
+    coOrganizer: article.coOrganizer || article.partner || "Hải Dương Media & Đối tác",
     active: article.active !== false,
   };
 }

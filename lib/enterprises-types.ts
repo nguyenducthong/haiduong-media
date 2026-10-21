@@ -23,6 +23,9 @@ export type EnterpriseArticle = {
   location?: string;
   time?: string;
   contactPerson?: string;
+  organizer?: string;
+  partner?: string;
+  coOrganizer?: string;
   agenda?: string[] | string;
   benefits?: string[] | string;
 };

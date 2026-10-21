@@ -19,7 +19,7 @@ export function HomeEventsSection({ events }: { events: EventItem[] }) {
           <div>
             <p style={{ marginBottom: "8px" }}>
               Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế
-              do Hải Dương Media đồng hành tổ chức tại Việt Nam và các nước Châu Á.
+              được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.
             </p>
             <Link
               href="/su-kien"

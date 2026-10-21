@@ -68,15 +68,7 @@ export function SiteHeader({ content }: { content: SiteContent }) {
                   {label}
                 </Link>
               ))}
-              <Link href="/admin">Quản trị CMS</Link>
             </nav>
-            <a
-              className="mobile-phone-btn"
-              href={`tel:${content.hotlineHref}`}
-            >
-              <Phone size={15} />
-              <span>Hotline: {content.hotline}</span>
-            </a>
           </div>
         </details>
       </div>

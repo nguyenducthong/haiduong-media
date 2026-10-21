@@ -248,11 +248,11 @@ export const defaultSiteContent: SiteContent = {
       link: "/tin-tuc/hai-duong-media-dong-hanh-vimf-2026",
     },
   ],
-  hotline: "090 377 2086",
-  hotlineHref: "+84903772086",
-  email: "contact@haiduongmedia.com",
-  address: "64 Võ Thị Sáu, P. Tân Định, Quận 1, TP. Hồ Chí Minh | Chi nhánh: BT7-4 KĐT Văn Khê, Hà Đông, Hà Nội",
-  zaloUrl: "https://zalo.me/84903772086",
+  hotline: "0931 538 666",
+  hotlineHref: "0931538666",
+  email: "bantochuc.thuonghieu2009@gmail.com",
+  address: "89 Lê Đức Thọ, Mỹ Đình 2, Hà Nội",
+  zaloUrl: "https://zalo.me/0931538666",
   facebookUrl: "https://www.facebook.com/haiduongmedia",
   mapUrl: "https://maps.google.com/?q=64+Vo+Thi+Sau+Tan+Dinh+Quan+1+HCM",
   footerNote: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM - Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và booking báo đài uy tín hàng đầu Việt Nam.",
@@ -540,7 +540,7 @@ function cleanBrandText(text: string): string {
     .replace(/LENS GROUP/gi, "HẢI DƯƠNG MEDIA")
     .replace(/Lens Group/gi, "Hải Dương Media")
     .replace(/Lens Media/gi, "Hải Dương Media")
-    .replace(/lennguyenmedia@gmail\.com/gi, "contact@haiduongmedia.com")
+    .replace(/lennguyenmedia@gmail\.com/gi, "bantochuc.thuonghieu2009@gmail.com")
     .replace(/https:\/\/www\.facebook\.com\/lennguyenmedia/gi, "https://www.facebook.com/haiduongmedia")
     .replace(/Đang mở đăng ký/gi, "")
     .replace(/đang mở đăng ký/gi, "")

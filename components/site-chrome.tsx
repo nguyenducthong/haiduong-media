@@ -85,51 +85,121 @@ export function SiteHeader({ content }: { content: SiteContent }) {
 }
 
 export function SiteFooter({ content }: { content: SiteContent }) {
+  const brandName = content.brandName || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM";
+  const hotline = content.hotline || "0931 538 666";
+  const hotlineHref = content.hotlineHref || "0931538666";
+  const email = content.email || "bantochuc.thuonghieu2009@gmail.com";
+  const address = content.address || "89 Lê Đức Thọ, Mỹ Đình 2, Hà Nội";
+  const zaloUrl = content.zaloUrl || "https://zalo.me/0931538666";
+  const facebookUrl = content.facebookUrl || "https://www.facebook.com/haiduongmedia";
+
   return (
     <footer className="site-footer">
-      <div className="site-container footer-grid">
-        <div>
-          <div className="brand footer-brand">
-            <img
-              src="/images/logo.png"
-              alt={content.brandName}
-              className="brand-logo-img"
-              style={{ width: "42px", height: "42px", objectFit: "contain", borderRadius: "8px", flexShrink: 0 }}
-            />
-            <span>
-              <strong>{content.brandName}</strong>
-              <small style={{ color: "#94a3b8" }}>{content.brandKicker}</small>
-            </span>
+      <div className="site-container">
+        <div className="footer-card">
+          <div className="footer-main-grid">
+            {/* Cột 1: Thông tin thương hiệu */}
+            <div className="footer-col-brand">
+              <div className="footer-logo-badge">
+                <img
+                  src="/images/logo.png"
+                  alt={brandName}
+                  className="footer-logo-img"
+                />
+              </div>
+              <h3 className="footer-brand-title">{brandName}</h3>
+              <p className="footer-brand-desc">
+                Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và kết nối doanh nghiệp với các chương trình truyền hình, báo chí.
+              </p>
+              <div className="footer-brand-tagline">
+                Đồng hành cùng giá trị thương hiệu Việt
+              </div>
+            </div>
+
+            {/* Cột 2: VỀ CHÚNG TÔI */}
+            <div className="footer-col-nav">
+              <h4 className="footer-col-title">VỀ CHÚNG TÔI</h4>
+              <nav className="footer-links-list" aria-label="Về chúng tôi">
+                <Link href="/gioi-thieu">Giới thiệu</Link>
+                <Link href="/#vtv-commercials">Năng lực truyền thông</Link>
+                <Link href="/su-kien">Chương trình vinh danh</Link>
+                <Link href="/tin-tuc">Tin tức & hoạt động</Link>
+                <Link href="/doanh-nghiep">Đối tác doanh nghiệp</Link>
+              </nav>
+            </div>
+
+            {/* Cột 3: DỊCH VỤ */}
+            <div className="footer-col-nav">
+              <h4 className="footer-col-title">DỊCH VỤ</h4>
+              <nav className="footer-links-list" aria-label="Dịch vụ">
+                <Link href="/#vtv-commercials">Truyền thông VTV</Link>
+                <Link href="/#press-coverage">Báo chí & PR</Link>
+                <Link href="/#vtv-commercials">Sản xuất phim quảng cáo</Link>
+                <Link href="/su-kien">Vinh danh thương hiệu</Link>
+                <Link href="/lien-he">Tư vấn hợp tác</Link>
+              </nav>
+            </div>
+
+            {/* Cột 4: LIÊN HỆ */}
+            <div className="footer-col-contact">
+              <h4 className="footer-col-title">LIÊN HỆ</h4>
+              <div className="footer-contact-info">
+                <a href={`tel:${hotlineHref}`} className="footer-contact-link footer-contact-hotline">
+                  Hotline: {hotline}
+                </a>
+                <a href={`mailto:${email}`} className="footer-contact-link">
+                  {email}
+                </a>
+                <p className="footer-contact-address">
+                  {address}
+                </p>
+                <div className="footer-social-row">
+                  <a
+                    href={zaloUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="footer-social-btn footer-social-zalo"
+                    aria-label="Chat Zalo"
+                    title="Zalo"
+                  >
+                    <MessageCircle size={16} />
+                  </a>
+                  <a
+                    href={facebookUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="footer-social-btn footer-social-fb"
+                    aria-label="Facebook"
+                    title="Facebook"
+                  >
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                    </svg>
+                  </a>
+                  <a
+                    href={`tel:${hotlineHref}`}
+                    className="footer-social-btn footer-social-phone"
+                    aria-label="Gọi điện thoại"
+                    title="Hotline"
+                  >
+                    <Phone size={15} />
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-          <p>{content.footerNote}</p>
+
+          {/* Dòng phân cách và chân trang */}
+          <div className="footer-bottom-bar">
+            <div className="footer-bottom-left">
+              <div>© 2026 {brandName}. Bảo lưu mọi quyền.</div>
+              <div className="footer-bottom-sub">Chính sách bảo mật • Điều khoản sử dụng</div>
+            </div>
+            <div className="footer-bottom-right">
+              Kết nối giá trị – Nâng tầm thương hiệu
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>Khám phá</h3>
-          <Link href="/#vtv-commercials">Phim quảng cáo trên VTV</Link>
-          <Link href="/tin-tuc">Tin tức & Hoạt động</Link>
-          <Link href="/doanh-nghiep">Doanh nghiệp tiêu biểu</Link>
-          <Link href="/#press-coverage">Báo chí nói về chúng tôi</Link>
-          <Link href="/#our-brands">Thương hiệu của chúng tôi</Link>
-          <Link href="/#our-partners">Đối tác & Khách hàng</Link>
-        </div>
-        <div>
-          <h3>Liên hệ nhanh</h3>
-          <a href={`tel:${content.hotlineHref}`}>Hotline: {content.hotline}</a>
-          <a href={`mailto:${content.email}`}>{content.email}</a>
-          <span>{content.address}</span>
-        </div>
-        <div>
-          <h3>Quản lý website</h3>
-          <Link href="/admin" className="admin-link">
-            Mở trang quản trị <ArrowUpRight size={15} />
-          </Link>
-          <p style={{ marginTop: "12px", fontSize: "12px", color: "#64748b" }}>
-            Hệ thống CMS cập nhật nội dung tức thời.
-          </p>
-        </div>
-      </div>
-      <div className="site-container footer-bottom">
-        © 2026 {content.brandName}. Đối tác chiến lược truyền thông & sản xuất phim quảng cáo VTV.
       </div>
     </footer>
   );

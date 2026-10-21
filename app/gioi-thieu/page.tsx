@@ -4,6 +4,7 @@ import { loadSiteContent } from "@/lib/site-content";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
+  alternates: { canonical: "/gioi-thieu" },
   title: "Giới Thiệu Đơn Vị Truyền Thông",
   description:
     "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Đơn vị tư vấn chiến lược truyền thông, sản xuất TVC chuyên nghiệp và kết nối doanh nghiệp với truyền hình, báo chí.",

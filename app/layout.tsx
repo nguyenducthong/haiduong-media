@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { siteUrl, absoluteSiteUrl } from "@/lib/site-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,15 +19,11 @@ export const metadata: Metadata = {
     "vinh danh thương hiệu",
     "thuong hieu hang dau viet nam",
   ],
-  metadataBase: new URL("https://thuonghieuhangdauvn.com"),
-  alternates: {
-    canonical: "https://thuonghieuhangdauvn.com",
-  },
+  metadataBase: siteUrl,
   openGraph: {
     title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
     description:
       "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
-    url: "https://thuonghieuhangdauvn.com",
     siteName: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
     images: [
       {
@@ -65,11 +62,11 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "Organization",
-      "@id": "https://thuonghieuhangdauvn.com/#organization",
+      "@id": absoluteSiteUrl('/#organization'),
       name: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
       alternateName: ["thuonghieuhangdauvn", "Thương Hiệu Hàng Đầu VN"],
-      url: "https://thuonghieuhangdauvn.com",
-      logo: "https://thuonghieuhangdauvn.com/images/logo.png",
+      url: absoluteSiteUrl(),
+      logo: absoluteSiteUrl('/images/logo.png'),
       description:
         "Đơn vị tư vấn chiến lược truyền thông, sản xuất phim quảng cáo và kết nối doanh nghiệp với các chương trình truyền hình, báo chí.",
       telephone: "0931 538 666",
@@ -86,12 +83,12 @@ const jsonLd = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://thuonghieuhangdauvn.com/#website",
-      url: "https://thuonghieuhangdauvn.com",
+      "@id": absoluteSiteUrl('/#website'),
+      url: absoluteSiteUrl(),
       name: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
       alternateName: "thuonghieuhangdauvn",
       publisher: {
-        "@id": "https://thuonghieuhangdauvn.com/#organization",
+        "@id": absoluteSiteUrl('/#organization'),
       },
       inLanguage: "vi",
     },

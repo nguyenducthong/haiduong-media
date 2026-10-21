@@ -1,13 +1,10 @@
 import type { MetadataRoute } from "next";
+import { siteUrl } from "@/lib/site-url";
 import { loadSiteContent } from "@/lib/site-content";
 import { getEnterprises, getAllEvents } from "@/lib/enterprises";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    "https://thuonghieuhangdauvn.com"
-  ).replace(/\/$/, "");
+  const baseUrl = siteUrl.origin;
 
   const now = new Date();
 

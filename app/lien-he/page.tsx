@@ -5,6 +5,7 @@ import { loadSiteContent } from "@/lib/site-content";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
+  alternates: { canonical: "/lien-he" },
   title: "Liên Hệ Tư Vấn Chiến Lược Truyền Thông",
   description:
     "Liên hệ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Hotline: 0931 538 666. Tư vấn sản xuất phim quảng cáo, phát sóng VTV và booking báo chí toàn quốc.",

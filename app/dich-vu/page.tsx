@@ -6,6 +6,7 @@ import { loadSiteContent } from "@/lib/site-content";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
+  alternates: { canonical: "/dich-vu" },
   title: "Dịch Vụ Truyền Thông & Quảng Cáo VTV - Báo Chí",
   description:
     "Giải pháp truyền thông toàn diện từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn): Sản xuất phim quảng cáo, phát sóng VTV khung giờ vàng và booking báo chí uy tín.",

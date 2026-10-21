@@ -8,6 +8,7 @@ import { EnterpriseList } from "@/components/enterprise-list";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
+  alternates: { canonical: "/doanh-nghiep" },
   title: "Doanh Nghiệp & Thương Hiệu Tiêu Biểu",
   description:
     "Danh sách các doanh nghiệp, thương hiệu tiêu biểu được vinh danh và bảo trợ truyền thông bởi THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",

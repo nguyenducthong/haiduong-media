@@ -6,6 +6,7 @@ import { EnterpriseList } from "@/components/enterprise-list";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
+  alternates: { canonical: "/tin-tuc" },
   title: "Tin Tức & Hoạt Động Doanh Nghiệp",
   description:
     "Cập nhật tin tức kinh tế, hoạt động doanh nghiệp và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",

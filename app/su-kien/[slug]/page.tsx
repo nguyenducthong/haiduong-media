@@ -31,6 +31,7 @@ export async function generateMetadata({
   if (!event) return { title: "Không tìm thấy sự kiện" };
 
   return {
+    alternates: { canonical: `/su-kien/${encodeURIComponent(event.slug || slug)}` },
     title: event.title,
     description: event.summary || event.title,
     openGraph: {

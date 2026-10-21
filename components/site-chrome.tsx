@@ -95,9 +95,8 @@ export function SiteFooter({ content }: { content: SiteContent }) {
 
   return (
     <footer className="site-footer">
-      <div className="site-container">
-        <div className="footer-card">
-          <div className="footer-main-grid">
+      <div className="footer-container">
+        <div className="footer-main-grid">
             {/* Cột 1: Thông tin thương hiệu */}
             <div className="footer-col-brand">
               <div className="footer-logo-badge">
@@ -200,7 +199,6 @@ export function SiteFooter({ content }: { content: SiteContent }) {
             </div>
           </div>
         </div>
-      </div>
     </footer>
   );
 }

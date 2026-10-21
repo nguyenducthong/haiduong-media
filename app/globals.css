@@ -394,24 +394,22 @@ button, input, textarea { font: inherit; }
 .cta-inner h2 { max-width: 760px; }
 
 .site-footer {
-  padding: 40px 0 44px;
-  background: transparent;
+  width: 100%;
+  padding: 60px 0 28px;
+  background: #080f1d;
   color: #fff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.footer-card {
-  background: #080f1d;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 44px 44px 28px;
-  color: #fff;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+.footer-container {
+  width: min(1360px, calc(100% - 48px));
+  margin: 0 auto;
 }
 
 .footer-main-grid {
   display: grid;
-  grid-template-columns: 1.4fr 0.9fr 1fr 1.15fr;
-  gap: 40px;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 48px;
 }
 
 .footer-logo-badge {
@@ -2897,7 +2895,7 @@ button, input, textarea { font: inherit; }
   .story-grid { grid-template-columns: 1fr; }
   .process-grid { grid-template-columns: 1fr 1fr; }
   .footer-grid, .footer-main-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-  .footer-card { padding: 36px 30px 24px; }
+  .footer-container { width: min(100% - 40px, 1360px); }
   .about-grid,.contact-grid { grid-template-columns: 1fr; }
   .about-panel { position: static; }
   .article-list article { grid-template-columns: 280px 1fr; }
@@ -2938,7 +2936,8 @@ button, input, textarea { font: inherit; }
   .story-grid { gap: 40px; }
   .story-visual { min-height: 300px; }
   .footer-grid, .footer-main-grid { gap: 28px; }
-  .footer-card { padding: 28px 20px 20px; border-radius: 16px; }
+  .site-footer { padding: 44px 0 24px; }
+  .footer-container { width: min(100% - 32px, 1360px); }
   .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
   .floating-contact { right: 12px; bottom: 12px; flex-direction: row; }
   .floating-contact a { width: 43px; height: 43px; }

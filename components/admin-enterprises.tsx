@@ -1220,7 +1220,7 @@ export function AdminEnterprises({
             </p>
           </div>
         ) : (
-          <div style={{ display: "grid", divideY: "1px solid var(--line)" }}>
+          <div style={{ display: "grid" }}>
             {filteredArticles.map((art, index) => {
               const isActive = art.active !== false;
               const hasSource = !!art.sourceUrl;
@@ -1725,9 +1725,9 @@ export function AdminEnterprises({
             style={{
               background: "#fff",
               borderRadius: "20px",
-              maxWidth: "850px",
+              maxWidth: "980px",
               width: "100%",
-              maxHeight: "90vh",
+              maxHeight: "92vh",
               display: "flex",
               flexDirection: "column",
               boxShadow: "0 25px 60px rgba(0,0,0,0.3)",
@@ -1737,12 +1737,13 @@ export function AdminEnterprises({
             {/* Modal Header */}
             <div
               style={{
-                padding: "20px 28px",
+                padding: "18px 28px",
                 borderBottom: "1px solid var(--line)",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 background: "#f8fafc",
+                flexShrink: 0,
               }}
             >
               <div>
@@ -1763,8 +1764,25 @@ export function AdminEnterprises({
             </div>
 
             {/* Modal Body Form */}
-            <form onSubmit={handleSaveArticle} style={{ flex: 1, overflowY: "auto", padding: "28px" }}>
-              <div style={{ display: "grid", gap: "18px" }}>
+            <form
+              onSubmit={handleSaveArticle}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                flex: 1,
+                minHeight: 0,
+                overflow: "hidden",
+              }}
+            >
+              {/* Scrollable Form Body */}
+              <div
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  padding: "24px 28px",
+                }}
+              >
+                <div style={{ display: "grid", gap: "18px" }}>
                 {/* MULTI-SELECT TYPE SECTION */}
                 <div
                   style={{
@@ -2478,53 +2496,88 @@ export function AdminEnterprises({
                 </div>
               </div>
 
-              {/* Modal Actions */}
+              </div>
+              {/* End Scrollable Form Body */}
+
+              {/* Fixed Bottom Footer Bar - ALWAYS VISIBLE */}
               <div
                 style={{
-                  marginTop: "28px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "12px",
+                  padding: "14px 28px",
                   borderTop: "1px solid var(--line)",
-                  paddingTop: "20px",
+                  background: "#ffffff",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexShrink: 0,
+                  boxShadow: "0 -4px 16px rgba(0,0,0,0.06)",
+                  zIndex: 20,
+                  flexWrap: "wrap",
+                  gap: "12px",
                 }}
               >
-                <button
-                  type="button"
-                  onClick={() => setEditingArticle(null)}
-                  style={{
-                    padding: "10px 20px",
-                    borderRadius: "10px",
-                    background: "#f1f5f9",
-                    border: "none",
-                    fontWeight: 700,
-                    fontSize: "13px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Hủy
-                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "12px", color: "#64748b" }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "9px",
+                      height: "9px",
+                      borderRadius: "50%",
+                      background: editingArticle.slug ? "#10b981" : "#3b82f6",
+                      boxShadow: editingArticle.slug ? "0 0 8px rgba(16,185,129,0.5)" : "0 0 8px rgba(59,130,246,0.5)",
+                    }}
+                  />
+                  <span>
+                    {editingArticle.slug ? (
+                      <>
+                        Đang sửa: <strong style={{ color: "#0f172a" }}>{editingArticle.title ? (editingArticle.title.length > 40 ? editingArticle.title.slice(0, 40) + "..." : editingArticle.title) : "Bài viết"}</strong>
+                      </>
+                    ) : (
+                      <strong style={{ color: "#0f172a" }}>Tạo mới bài viết vào Database</strong>
+                    )}
+                  </span>
+                </div>
 
-                <button
-                  type="submit"
-                  disabled={savingEdit}
-                  style={{
-                    padding: "10px 24px",
-                    borderRadius: "10px",
-                    background: "#d42027",
-                    color: "#fff",
-                    border: "none",
-                    fontWeight: 800,
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  {savingEdit ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
-                  {savingEdit ? "Đang lưu..." : "Lưu vào Database"}
-                </button>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setEditingArticle(null)}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "10px",
+                      background: "#f1f5f9",
+                      border: "1px solid #e2e8f0",
+                      fontWeight: 700,
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      color: "#475569",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    Hủy
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={savingEdit}
+                    style={{
+                      padding: "10px 24px",
+                      borderRadius: "10px",
+                      background: "#d42027",
+                      color: "#fff",
+                      border: "none",
+                      fontWeight: 800,
+                      fontSize: "13px",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      boxShadow: "0 2px 10px rgba(212,32,39,0.3)",
+                    }}
+                  >
+                    {savingEdit ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
+                    {savingEdit ? "Đang lưu..." : "Lưu vào Database"}
+                  </button>
+                </div>
               </div>
             </form>
           </div>

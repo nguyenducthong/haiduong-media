@@ -33,7 +33,28 @@ import {
   FileDown,
   Paperclip,
   FileUp,
+  Type,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+
+const FONT_SIZES = [
+  { label: "Cỡ chữ chuẩn (15px)", value: "" },
+  { label: "12px - Rất nhỏ", value: "12px" },
+  { label: "13px - Chú thích / Nhỏ", value: "13px" },
+  { label: "14px - Nhỏ vừa", value: "14px" },
+  { label: "15px - Chuẩn bài viết", value: "15px" },
+  { label: "16px - Rõ nét", value: "16px" },
+  { label: "18px - Điểm nhấn / Lớn", value: "18px" },
+  { label: "20px - Tiêu đề nhỏ (H4)", value: "20px" },
+  { label: "22px - Tiêu đề phụ", value: "22px" },
+  { label: "24px - Tiêu đề vừa (H3)", value: "24px" },
+  { label: "28px - Tiêu đề lớn (H2)", value: "28px" },
+  { label: "32px - Tiêu đề rất lớn", value: "32px" },
+  { label: "36px - Cỡ chữ đặc biệt", value: "36px" },
+];
+
+const FONT_SIZE_STEPS = ["12px", "13px", "14px", "15px", "16px", "18px", "20px", "22px", "24px", "28px", "32px", "36px"];
 
 interface EnterpriseContentEditorProps {
   value: string;
@@ -112,6 +133,10 @@ export function EnterpriseContentEditor({
   const [isConvertingWord, setIsConvertingWord] = useState(false);
   const [wordConvertError, setWordConvertError] = useState("");
 
+  // Font Size & View State
+  const [selectedFontSize, setSelectedFontSize] = useState<string>("");
+  const [isExpandedView, setIsExpandedView] = useState<boolean>(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docFileInputRef = useRef<HTMLInputElement>(null);
   const wordFileInputRef = useRef<HTMLInputElement>(null);
@@ -136,6 +161,20 @@ export function EnterpriseContentEditor({
         editorRef.current.contains(sel.anchorNode)
       ) {
         savedRangeRef.current = sel.getRangeAt(0).cloneRange();
+
+        // Sync font-size dropdown with active selection if available
+        try {
+          let node: Node | null = sel.anchorNode;
+          if (node && node.nodeType === Node.TEXT_NODE) {
+            node = node.parentElement;
+          }
+          if (node && node instanceof HTMLElement && editorRef.current.contains(node)) {
+            const inlineFs = node.style?.fontSize;
+            if (inlineFs && FONT_SIZE_STEPS.includes(inlineFs)) {
+              setSelectedFontSize(inlineFs);
+            }
+          }
+        } catch {}
       }
     };
 
@@ -175,6 +214,104 @@ export function EnterpriseContentEditor({
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
     }
+  };
+
+  const applyFontSize = (sizePx: string) => {
+    if (activeTab !== "visual") setActiveTab("visual");
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+
+    const sel = window.getSelection();
+    const range = savedRangeRef.current;
+    if (range && editorRef.current && editorRef.current.contains(range.commonAncestorContainer)) {
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+
+    if (!sel || sel.rangeCount === 0) return;
+
+    if (sel.isCollapsed) {
+      if (!sizePx) return;
+      try {
+        const curRange = sel.getRangeAt(0);
+        const span = document.createElement("span");
+        span.style.fontSize = sizePx;
+        const zws = document.createTextNode("\u200B");
+        span.appendChild(zws);
+        curRange.insertNode(span);
+        curRange.setStart(zws, 1);
+        curRange.setEnd(zws, 1);
+        sel.removeAllRanges();
+        sel.addRange(curRange);
+        saveSelection();
+        if (editorRef.current) onChange(editorRef.current.innerHTML);
+      } catch (e) {
+        console.warn("Could not set font size at collapsed cursor", e);
+      }
+      return;
+    }
+
+    if (!sizePx) {
+      document.execCommand("removeFormat", false);
+      if (editorRef.current) onChange(editorRef.current.innerHTML);
+      return;
+    }
+
+    // Execute fontSize with unique marker size 7
+    document.execCommand("styleWithCSS", false, "false");
+    document.execCommand("fontSize", false, "7");
+
+    if (editorRef.current) {
+      // Replace <font size="7"> with <span style="font-size: ${sizePx}">
+      const fontNodes = Array.from(editorRef.current.querySelectorAll("font[size='7']"));
+      fontNodes.forEach((font) => {
+        const span = document.createElement("span");
+        span.style.fontSize = sizePx;
+
+        // Clean up child spans with font-size so new font size applies cleanly
+        const innerSpans = font.querySelectorAll('span[style*="font-size"]');
+        innerSpans.forEach((inner) => {
+          (inner as HTMLElement).style.removeProperty("font-size");
+        });
+
+        while (font.firstChild) {
+          span.appendChild(font.firstChild);
+        }
+        font.parentNode?.replaceChild(span, font);
+      });
+
+      // Also clean up browser styled spans if any
+      const styledSpans = Array.from(
+        editorRef.current.querySelectorAll('span[style*="xxx-large"], span[style*="xx-large"]')
+      );
+      styledSpans.forEach((s) => {
+        (s as HTMLElement).style.fontSize = sizePx;
+      });
+
+      saveSelection();
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const stepFontSizeUp = () => {
+    const current = selectedFontSize || "15px";
+    let idx = FONT_SIZE_STEPS.indexOf(current);
+    if (idx === -1) idx = 3; // default 15px
+    const nextIdx = Math.min(FONT_SIZE_STEPS.length - 1, idx + 1);
+    const nextSize = FONT_SIZE_STEPS[nextIdx];
+    setSelectedFontSize(nextSize);
+    applyFontSize(nextSize);
+  };
+
+  const stepFontSizeDown = () => {
+    const current = selectedFontSize || "15px";
+    let idx = FONT_SIZE_STEPS.indexOf(current);
+    if (idx === -1) idx = 3; // default 15px
+    const prevIdx = Math.max(0, idx - 1);
+    const prevSize = FONT_SIZE_STEPS[prevIdx];
+    setSelectedFontSize(prevSize);
+    applyFontSize(prevSize);
   };
 
   const handleFormatBlock = (tag: string) => {
@@ -639,336 +776,476 @@ export function EnterpriseContentEditor({
       style={{
         border: "1px solid var(--line)",
         borderRadius: "12px",
-        overflow: "hidden",
         background: "#fff",
         boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
       }}
     >
-      {/* Top Header: Tabs & Mode Switcher */}
+      {/* STICKY TOP TOOLBAR & CONTROLS CONTAINER */}
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "8px 12px",
-          background: "#f8fafc",
+          position: "sticky",
+          top: 0,
+          zIndex: 35,
+          background: "#fff",
+          borderTopLeftRadius: "12px",
+          borderTopRightRadius: "12px",
           borderBottom: "1px solid var(--line)",
-          flexWrap: "wrap",
-          gap: "8px",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
         }}
       >
-        {/* Mode Tabs */}
-        <div style={{ display: "flex", gap: "4px" }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab("visual")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 14px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: 700,
-              border: activeTab === "visual" ? "1px solid #d42027" : "1px solid transparent",
-              background: activeTab === "visual" ? "#fff" : "transparent",
-              color: activeTab === "visual" ? "#d42027" : "#64748b",
-              cursor: "pointer",
-              boxShadow: activeTab === "visual" ? "0 1px 4px rgba(212,32,39,0.12)" : "none",
-            }}
-          >
-            <PenTool size={13} /> Soạn thảo trực quan (Word)
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("preview")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 14px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: 700,
-              border: activeTab === "preview" ? "1px solid #0284c7" : "1px solid transparent",
-              background: activeTab === "preview" ? "#fff" : "transparent",
-              color: activeTab === "preview" ? "#0284c7" : "#64748b",
-              cursor: "pointer",
-            }}
-          >
-            <Eye size={13} /> Xem trước
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("code")}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "6px",
-              padding: "6px 14px",
-              borderRadius: "8px",
-              fontSize: "12px",
-              fontWeight: 700,
-              border: activeTab === "code" ? "1px solid #475569" : "1px solid transparent",
-              background: activeTab === "code" ? "#fff" : "transparent",
-              color: activeTab === "code" ? "#0f172a" : "#64748b",
-              cursor: "pointer",
-            }}
-          >
-            <Code size={13} /> Mã HTML
-          </button>
-        </div>
-
-        <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 600 }}>
-          {activeTab === "visual" && "Đặt con trỏ vào chữ và bấm 'Chèn ảnh' hoặc 'Đính kèm PDF/Word'"}
-          {activeTab === "preview" && "Cách bài viết hiển thị trên website"}
-          {activeTab === "code" && "Chế độ sửa mã nguồn HTML"}
-        </span>
-      </div>
-
-      {/* Formatting Toolbar (Only in visual mode) */}
-      {activeTab === "visual" && (
+        {/* Top Header: Tabs & Mode Switcher */}
         <div
           style={{
             display: "flex",
+            justifyContent: "space-between",
             alignItems: "center",
-            gap: "4px",
             padding: "8px 12px",
-            background: "#fff",
+            background: "#f8fafc",
+            borderTopLeftRadius: "12px",
+            borderTopRightRadius: "12px",
             borderBottom: "1px solid var(--line)",
             flexWrap: "wrap",
+            gap: "8px",
           }}
         >
-          {/* Headings */}
-          <button
-            type="button"
-            title="Đoạn văn thường (P)"
-            onMouseDown={saveSelection}
-            onClick={() => handleFormatBlock("<p>")}
-            style={btnStyle}
-          >
-            <Pilcrow size={14} />
-          </button>
-          <button
-            type="button"
-            title="Tiêu đề mục lớn (H2)"
-            onMouseDown={saveSelection}
-            onClick={() => handleFormatBlock("<h2>")}
-            style={btnStyle}
-          >
-            <Heading2 size={14} />
-          </button>
-          <button
-            type="button"
-            title="Tiêu đề mục nhỏ (H3)"
-            onMouseDown={saveSelection}
-            onClick={() => handleFormatBlock("<h3>")}
-            style={btnStyle}
-          >
-            <Heading3 size={14} />
-          </button>
+          {/* Mode Tabs */}
+          <div style={{ display: "flex", gap: "4px" }}>
+            <button
+              type="button"
+              onClick={() => setActiveTab("visual")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 14px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 700,
+                border: activeTab === "visual" ? "1px solid #d42027" : "1px solid transparent",
+                background: activeTab === "visual" ? "#fff" : "transparent",
+                color: activeTab === "visual" ? "#d42027" : "#64748b",
+                cursor: "pointer",
+                boxShadow: activeTab === "visual" ? "0 1px 4px rgba(212,32,39,0.12)" : "none",
+              }}
+            >
+              <PenTool size={13} /> Soạn thảo trực quan (Word)
+            </button>
 
-          <div style={separatorStyle} />
+            <button
+              type="button"
+              onClick={() => setActiveTab("preview")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 14px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 700,
+                border: activeTab === "preview" ? "1px solid #0284c7" : "1px solid transparent",
+                background: activeTab === "preview" ? "#fff" : "transparent",
+                color: activeTab === "preview" ? "#0284c7" : "#64748b",
+                cursor: "pointer",
+              }}
+            >
+              <Eye size={13} /> Xem trước
+            </button>
 
-          {/* Text Styles */}
-          <button
-            type="button"
-            title="In đậm (Ctrl+B)"
-            onMouseDown={saveSelection}
-            onClick={() => exec("bold")}
-            style={btnStyle}
-          >
-            <Bold size={14} />
-          </button>
-          <button
-            type="button"
-            title="In nghiêng (Ctrl+I)"
-            onMouseDown={saveSelection}
-            onClick={() => exec("italic")}
-            style={btnStyle}
-          >
-            <Italic size={14} />
-          </button>
-          <button
-            type="button"
-            title="Gạch chân (Ctrl+U)"
-            onMouseDown={saveSelection}
-            onClick={() => exec("underline")}
-            style={btnStyle}
-          >
-            <Underline size={14} />
-          </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("code")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 14px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 700,
+                border: activeTab === "code" ? "1px solid #475569" : "1px solid transparent",
+                background: activeTab === "code" ? "#fff" : "transparent",
+                color: activeTab === "code" ? "#0f172a" : "#64748b",
+                cursor: "pointer",
+              }}
+            >
+              <Code size={13} /> Mã HTML
+            </button>
+          </div>
 
-          <div style={separatorStyle} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "11px", color: "#94a3b8", fontWeight: 600 }}>
+              {activeTab === "visual" && "Đặt con trỏ vào chữ và bấm 'Chèn ảnh' hoặc 'Đính kèm PDF/Word'"}
+              {activeTab === "preview" && "Cách bài viết hiển thị trên website"}
+              {activeTab === "code" && "Chế độ sửa mã nguồn HTML"}
+            </span>
 
-          {/* Lists */}
-          <button
-            type="button"
-            title="Danh sách dấu chấm"
-            onMouseDown={saveSelection}
-            onClick={() => exec("insertUnorderedList")}
-            style={btnStyle}
-          >
-            <List size={14} />
-          </button>
-          <button
-            type="button"
-            title="Danh sách số thứ tự"
-            onMouseDown={saveSelection}
-            onClick={() => exec("insertOrderedList")}
-            style={btnStyle}
-          >
-            <ListOrdered size={14} />
-          </button>
-          <button
-            type="button"
-            title="Trích dẫn (Quote)"
-            onMouseDown={saveSelection}
-            onClick={() => handleFormatBlock("<blockquote>")}
-            style={btnStyle}
-          >
-            <Quote size={14} />
-          </button>
-
-          <div style={separatorStyle} />
-
-          {/* Alignment */}
-          <button
-            type="button"
-            title="Căn trái"
-            onMouseDown={saveSelection}
-            onClick={() => exec("justifyLeft")}
-            style={btnStyle}
-          >
-            <AlignLeft size={14} />
-          </button>
-          <button
-            type="button"
-            title="Căn giữa"
-            onMouseDown={saveSelection}
-            onClick={() => exec("justifyCenter")}
-            style={btnStyle}
-          >
-            <AlignCenter size={14} />
-          </button>
-          <button
-            type="button"
-            title="Căn phải"
-            onMouseDown={saveSelection}
-            onClick={() => exec("justifyRight")}
-            style={btnStyle}
-          >
-            <AlignRight size={14} />
-          </button>
-          <button
-            type="button"
-            title="Căn đều hai bên"
-            onMouseDown={saveSelection}
-            onClick={() => exec("justifyFull")}
-            style={btnStyle}
-          >
-            <AlignJustify size={14} />
-          </button>
-
-          <div style={separatorStyle} />
-
-          {/* ACTION: Chèn ảnh trực quan */}
-          <button
-            type="button"
-            title="Chèn ảnh vào vị trí con trỏ chuột"
-            onMouseDown={saveSelection}
-            onClick={openImageModal}
-            style={{
-              ...btnStyle,
-              background: "#fee2e2",
-              color: "#d42027",
-              fontWeight: 700,
-              padding: "5px 11px",
-              border: "1px solid #fecaca",
-            }}
-          >
-            <ImageIcon size={15} /> Chèn ảnh
-          </button>
-
-          {/* ACTION: ĐÍNH KÈM TÀI LIỆU PDF / WORD */}
-          <button
-            type="button"
-            title="Đính kèm file PDF hoặc file Word vào bài viết"
-            onMouseDown={saveSelection}
-            onClick={openDocModal}
-            style={{
-              ...btnStyle,
-              background: "#eff6ff",
-              color: "#1d4ed8",
-              fontWeight: 700,
-              padding: "5px 11px",
-              border: "1px solid #bfdbfe",
-            }}
-          >
-            <FileText size={15} /> Đính kèm PDF / Word
-          </button>
-
-          {/* ACTION: NHẬP BÀI VIẾT TỪ FILE WORD (.DOCX) */}
-          <button
-            type="button"
-            title="Đọc toàn bộ nội dung từ file Word (.docx) đưa thẳng vào bài viết"
-            onMouseDown={saveSelection}
-            onClick={() => {
-              setSelectedWordFile(null);
-              setWordConvertError("");
-              setWordImportMode(value && value.trim() !== "<p><br></p>" && value.trim() !== "" ? "replace" : "replace");
-              setIsWordImportOpen(true);
-            }}
-            style={{
-              ...btnStyle,
-              background: "#f0fdf4",
-              color: "#15803d",
-              fontWeight: 700,
-              padding: "5px 11px",
-              border: "1px solid #bbf7d0",
-            }}
-          >
-            <FileUp size={15} /> Nhập từ Word (.docx)
-          </button>
-
-          <button
-            type="button"
-            title="Chèn liên kết (Link)"
-            onMouseDown={saveSelection}
-            onClick={handleInsertLink}
-            style={btnStyle}
-          >
-            <LinkIcon size={14} /> Link
-          </button>
-
-          <div style={separatorStyle} />
-
-          {/* Clear format & Undo */}
-          <button
-            type="button"
-            title="Xóa định dạng"
-            onMouseDown={saveSelection}
-            onClick={() => exec("removeFormat")}
-            style={btnStyle}
-          >
-            <Eraser size={14} />
-          </button>
-          <button
-            type="button"
-            title="Hoàn tác (Undo)"
-            onMouseDown={saveSelection}
-            onClick={() => exec("undo")}
-            style={btnStyle}
-          >
-            <RotateCcw size={14} />
-          </button>
+            {/* Toggle Scroll / Expand view */}
+            <button
+              type="button"
+              onClick={() => setIsExpandedView(!isExpandedView)}
+              title={isExpandedView ? "Thu gọn lại khung cuộn (540px) để thanh công cụ luôn cố định trên đầu" : "Mở rộng toàn bộ chiều dài bài viết"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "4px 10px",
+                borderRadius: "6px",
+                fontSize: "11px",
+                fontWeight: 700,
+                border: "1px solid #cbd5e1",
+                background: isExpandedView ? "#f1f5f9" : "#fff",
+                color: isExpandedView ? "#0f172a" : "#475569",
+                cursor: "pointer",
+              }}
+            >
+              {isExpandedView ? (
+                <>
+                  <Minimize2 size={12} /> Thu gọn cuộn (540px)
+                </>
+              ) : (
+                <>
+                  <Maximize2 size={12} /> Mở rộng chiều cao
+                </>
+              )}
+            </button>
+          </div>
         </div>
-      )}
+
+        {/* Formatting Toolbar (Only in visual mode) */}
+        {activeTab === "visual" && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              padding: "8px 12px",
+              background: "#fff",
+              flexWrap: "wrap",
+            }}
+          >
+            {/* Headings */}
+            <button
+              type="button"
+              title="Đoạn văn thường (P)"
+              onMouseDown={saveSelection}
+              onClick={() => handleFormatBlock("<p>")}
+              style={btnStyle}
+            >
+              <Pilcrow size={14} />
+            </button>
+            <button
+              type="button"
+              title="Tiêu đề mục lớn (H2)"
+              onMouseDown={saveSelection}
+              onClick={() => handleFormatBlock("<h2>")}
+              style={btnStyle}
+            >
+              <Heading2 size={14} />
+            </button>
+            <button
+              type="button"
+              title="Tiêu đề mục nhỏ (H3)"
+              onMouseDown={saveSelection}
+              onClick={() => handleFormatBlock("<h3>")}
+              style={btnStyle}
+            >
+              <Heading3 size={14} />
+            </button>
+
+            <div style={separatorStyle} />
+
+            {/* CỠ CHỮ (FONT SIZE CONTROLS) */}
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+                background: "#f8fafc",
+                padding: "2px 5px",
+                borderRadius: "7px",
+                border: "1px solid #e2e8f0",
+              }}
+            >
+              <Type size={13} style={{ color: "#64748b" }} />
+              <select
+                title="Chọn cỡ chữ cho đoạn văn bản đã bôi đen"
+                value={selectedFontSize}
+                onMouseDown={saveSelection}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSelectedFontSize(val);
+                  applyFontSize(val);
+                }}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#1e293b",
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "5px",
+                  padding: "3px 6px",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
+              >
+                {FONT_SIZES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                title="Giảm cỡ chữ (A-)"
+                onMouseDown={saveSelection}
+                onClick={stepFontSizeDown}
+                style={{
+                  ...btnStyle,
+                  padding: "2px 5px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  color: "#475569",
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "4px",
+                  height: "22px",
+                }}
+              >
+                A-
+              </button>
+
+              <button
+                type="button"
+                title="Tăng cỡ chữ (A+)"
+                onMouseDown={saveSelection}
+                onClick={stepFontSizeUp}
+                style={{
+                  ...btnStyle,
+                  padding: "2px 5px",
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  color: "#475569",
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "4px",
+                  height: "22px",
+                }}
+              >
+                A+
+              </button>
+            </div>
+
+            <div style={separatorStyle} />
+
+            {/* Text Styles */}
+            <button
+              type="button"
+              title="In đậm (Ctrl+B)"
+              onMouseDown={saveSelection}
+              onClick={() => exec("bold")}
+              style={btnStyle}
+            >
+              <Bold size={14} />
+            </button>
+            <button
+              type="button"
+              title="In nghiêng (Ctrl+I)"
+              onMouseDown={saveSelection}
+              onClick={() => exec("italic")}
+              style={btnStyle}
+            >
+              <Italic size={14} />
+            </button>
+            <button
+              type="button"
+              title="Gạch chân (Ctrl+U)"
+              onMouseDown={saveSelection}
+              onClick={() => exec("underline")}
+              style={btnStyle}
+            >
+              <Underline size={14} />
+            </button>
+
+            <div style={separatorStyle} />
+
+            {/* Lists */}
+            <button
+              type="button"
+              title="Danh sách dấu chấm"
+              onMouseDown={saveSelection}
+              onClick={() => exec("insertUnorderedList")}
+              style={btnStyle}
+            >
+              <List size={14} />
+            </button>
+            <button
+              type="button"
+              title="Danh sách số thứ tự"
+              onMouseDown={saveSelection}
+              onClick={() => exec("insertOrderedList")}
+              style={btnStyle}
+            >
+              <ListOrdered size={14} />
+            </button>
+            <button
+              type="button"
+              title="Trích dẫn (Quote)"
+              onMouseDown={saveSelection}
+              onClick={() => handleFormatBlock("<blockquote>")}
+              style={btnStyle}
+            >
+              <Quote size={14} />
+            </button>
+
+            <div style={separatorStyle} />
+
+            {/* Alignment */}
+            <button
+              type="button"
+              title="Căn trái"
+              onMouseDown={saveSelection}
+              onClick={() => exec("justifyLeft")}
+              style={btnStyle}
+            >
+              <AlignLeft size={14} />
+            </button>
+            <button
+              type="button"
+              title="Căn giữa"
+              onMouseDown={saveSelection}
+              onClick={() => exec("justifyCenter")}
+              style={btnStyle}
+            >
+              <AlignCenter size={14} />
+            </button>
+            <button
+              type="button"
+              title="Căn phải"
+              onMouseDown={saveSelection}
+              onClick={() => exec("justifyRight")}
+              style={btnStyle}
+            >
+              <AlignRight size={14} />
+            </button>
+            <button
+              type="button"
+              title="Căn đều hai bên"
+              onMouseDown={saveSelection}
+              onClick={() => exec("justifyFull")}
+              style={btnStyle}
+            >
+              <AlignJustify size={14} />
+            </button>
+
+            <div style={separatorStyle} />
+
+            {/* ACTION: Chèn ảnh trực quan */}
+            <button
+              type="button"
+              title="Chèn ảnh vào vị trí con trỏ chuột"
+              onMouseDown={saveSelection}
+              onClick={openImageModal}
+              style={{
+                ...btnStyle,
+                background: "#fee2e2",
+                color: "#d42027",
+                fontWeight: 700,
+                padding: "5px 11px",
+                border: "1px solid #fecaca",
+              }}
+            >
+              <ImageIcon size={15} /> Chèn ảnh
+            </button>
+
+            {/* ACTION: ĐÍNH KÈM TÀI LIỆU PDF / WORD */}
+            <button
+              type="button"
+              title="Đính kèm file PDF hoặc file Word vào bài viết"
+              onMouseDown={saveSelection}
+              onClick={openDocModal}
+              style={{
+                ...btnStyle,
+                background: "#eff6ff",
+                color: "#1d4ed8",
+                fontWeight: 700,
+                padding: "5px 11px",
+                border: "1px solid #bfdbfe",
+              }}
+            >
+              <FileText size={15} /> Đính kèm PDF / Word
+            </button>
+
+            {/* ACTION: NHẬP BÀI VIẾT TỪ FILE WORD (.DOCX) */}
+            <button
+              type="button"
+              title="Đọc toàn bộ nội dung từ file Word (.docx) đưa thẳng vào bài viết"
+              onMouseDown={saveSelection}
+              onClick={() => {
+                setSelectedWordFile(null);
+                setWordConvertError("");
+                setWordImportMode(value && value.trim() !== "<p><br></p>" && value.trim() !== "" ? "replace" : "replace");
+                setIsWordImportOpen(true);
+              }}
+              style={{
+                ...btnStyle,
+                background: "#f0fdf4",
+                color: "#15803d",
+                fontWeight: 700,
+                padding: "5px 11px",
+                border: "1px solid #bbf7d0",
+              }}
+            >
+              <FileUp size={15} /> Nhập từ Word (.docx)
+            </button>
+
+            <button
+              type="button"
+              title="Chèn liên kết (Link)"
+              onMouseDown={saveSelection}
+              onClick={handleInsertLink}
+              style={btnStyle}
+            >
+              <LinkIcon size={14} /> Link
+            </button>
+
+            <div style={separatorStyle} />
+
+            {/* Clear format & Undo */}
+            <button
+              type="button"
+              title="Xóa định dạng"
+              onMouseDown={saveSelection}
+              onClick={() => exec("removeFormat")}
+              style={btnStyle}
+            >
+              <Eraser size={14} />
+            </button>
+            <button
+              type="button"
+              title="Hoàn tác (Undo)"
+              onMouseDown={saveSelection}
+              onClick={() => exec("undo")}
+              style={btnStyle}
+            >
+              <RotateCcw size={14} />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Editor Body */}
-      <div style={{ position: "relative", minHeight }}>
+      <div
+        style={{
+          position: "relative",
+          maxHeight: isExpandedView ? "none" : "540px",
+          minHeight,
+          overflowY: isExpandedView ? "visible" : "auto",
+          scrollbarWidth: "thin",
+          scrollbarColor: "#cbd5e1 #f8fafc",
+          background: "#fff",
+        }}
+      >
         {/* 1. Visual WYSIWYG Mode */}
         <div
           style={{
@@ -1047,7 +1324,7 @@ export function EnterpriseContentEditor({
       {/* Editor Footer Help */}
       <div
         style={{
-          padding: "8px 12px",
+          padding: "8px 14px",
           background: "#f8fafc",
           borderTop: "1px solid var(--line)",
           fontSize: "12px",
@@ -1057,10 +1334,15 @@ export function EnterpriseContentEditor({
           alignItems: "center",
           flexWrap: "wrap",
           gap: "8px",
+          borderBottomLeftRadius: "12px",
+          borderBottomRightRadius: "12px",
         }}
       >
         <span>
           💡 <strong>Tính năng:</strong> Bấm <strong>&quot;Chèn ảnh&quot;</strong> để thêm ảnh hoặc <strong>&quot;Đính kèm PDF / Word&quot;</strong> để người đọc xem online và tải tài liệu về máy. Hỗ trợ <strong>Ctrl+V</strong> dán ảnh và kéo thả file trực tiếp.
+        </span>
+        <span style={{ fontSize: "11px", color: "#64748b", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+          📌 <em>Thanh công cụ luôn ghim ở trên đầu khi cuộn bài viết</em>
         </span>
       </div>
 

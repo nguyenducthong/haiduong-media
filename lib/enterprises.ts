@@ -336,3 +336,13 @@ export const getAllArticles = getEnterprises;
 export const getArticlesByType = getEnterprisesByType;
 export const getArticleBySlug = getEnterpriseBySlug;
 
+export async function getPopupArticle(): Promise<EnterpriseArticle | null> {
+  const articles = await getEnterprises();
+  const found = articles.find(
+    (a) => a.active !== false && getArticleTypes(a).includes("popup")
+  );
+  return found || null;
+}
+
+export { getArticleViewUrl } from "./enterprises-types";
+

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { siteUrl, absoluteSiteUrl } from "@/lib/site-url";
+import { AutoPopupModal } from "@/components/auto-popup-modal";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -108,7 +109,11 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        {children}
+        <AutoPopupModal />
+      </body>
     </html>
   );
 }
+

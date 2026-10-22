@@ -7,6 +7,7 @@ import {
   loadCurrentEnterprises,
 } from "@/lib/crawler";
 import { localizeArticleImages } from "@/lib/image-downloader";
+import { getArticleTypes } from "@/lib/enterprises-types";
 
 export const dynamic = "force-dynamic";
 
@@ -228,6 +229,24 @@ export async function POST(req: Request) {
         updatedList = [localizedArticle, ...current];
       }
 
+      // Enforce: ONLY 1 ARTICLE IN SYSTEM CAN HAVE TYPE "popup"
+      if (type.includes("popup")) {
+        updatedList = updatedList.map((a: any) => {
+          if (a.slug === slug || (article.id && a.id === article.id)) {
+            return a;
+          }
+          const aTypes = getArticleTypes(a);
+          if (aTypes.includes("popup")) {
+            const filtered = aTypes.filter((t: string) => t !== "popup");
+            return {
+              ...a,
+              type: filtered.length > 0 ? filtered : ["doanh-nghiep"],
+            };
+          }
+          return a;
+        });
+      }
+
       await saveEnterprises(updatedList, "overwrite");
       return NextResponse.json({
         success: true,
@@ -237,7 +256,41 @@ export async function POST(req: Request) {
       });
     }
 
-    // 7. Bật / Tắt trạng thái hiển thị nhanh
+    // 7. Đặt / Hủy bài viết làm Popup nổi bật duy nhất toàn hệ thống
+    if (action === "set-popup") {
+      const { slug } = body;
+      const current = await loadCurrentEnterprises();
+      const target = current.find((a: any) => a.slug === slug || a.id === slug);
+      if (!target) {
+        return NextResponse.json({ success: false, error: "Không tìm thấy bài viết." }, { status: 404 });
+      }
+
+      const isCurrentlyPopup = getArticleTypes(target).includes("popup");
+      const updatedList = current.map((a: any) => {
+        const aTypes = getArticleTypes(a);
+        if (a.slug === slug || a.id === slug) {
+          const next = isCurrentlyPopup
+            ? aTypes.filter((t: string) => t !== "popup")
+            : [...aTypes.filter((t: string) => t !== "popup"), "popup"];
+          return { ...a, type: next.length > 0 ? next : ["doanh-nghiep"] };
+        } else {
+          // Remove popup from all other articles
+          const filtered = aTypes.filter((t: string) => t !== "popup");
+          return { ...a, type: filtered.length > 0 ? filtered : ["doanh-nghiep"] };
+        }
+      });
+
+      await saveEnterprises(updatedList, "overwrite");
+      return NextResponse.json({
+        success: true,
+        isPopup: !isCurrentlyPopup,
+        message: !isCurrentlyPopup
+          ? `Đã kích hoạt "${target.title}" làm Popup nổi bật duy nhất trên website!`
+          : `Đã hủy kích hoạt Popup cho bài viết này.`,
+      });
+    }
+
+    // 8. Bật / Tắt trạng thái hiển thị nhanh
     if (action === "toggle-active") {
       const { slug } = body;
       const current = await loadCurrentEnterprises();

@@ -53,3 +53,12 @@ export function balanceHtmlTags(html: string): string {
   }
   return balanced;
 }
+
+export function getArticleViewUrl(art?: EnterpriseArticle | Partial<EnterpriseArticle> | null): string {
+  if (!art || !art.slug) return "#";
+  const types = getArticleTypes(art);
+  if (types.includes("su-kien")) return `/su-kien/${art.slug}`;
+  if (types.includes("tin-tuc")) return `/tin-tuc/${art.slug}`;
+  return `/doanh-nghiep/${art.slug}`;
+}
+

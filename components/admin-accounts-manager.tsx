@@ -111,7 +111,7 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
         setSmtpFrom(data.config.from || "");
         setSmtpConfigured(Boolean(data.config.user && data.config.pass));
       }
-    } catch {}
+    } catch { }
   };
 
   useEffect(() => {
@@ -998,7 +998,7 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
                   required
                   value={smtpUser}
                   onChange={(e) => setSmtpUser(e.target.value)}
-                  placeholder="vd: nguyenducthongtn1998@gmail.com"
+                  placeholder="example@gmail.com"
                   style={{
                     width: "100%",
                     padding: "10px 14px",

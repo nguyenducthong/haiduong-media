@@ -36,9 +36,11 @@ import {
   FolderOpen,
   MapPin,
   Handshake,
+  Megaphone,
+  Flame,
 } from "lucide-react";
 import type { EnterpriseArticle } from "@/lib/enterprises-types";
-import { getArticleTypes } from "@/lib/enterprises-types";
+import { getArticleTypes, getArticleViewUrl } from "@/lib/enterprises-types";
 import { AdminCrawler } from "@/components/admin-crawler";
 import { EnterpriseContentEditor } from "@/components/enterprise-content-editor";
 
@@ -48,6 +50,7 @@ export const ARTICLE_TYPES = [
   { id: "san-pham", label: "Sản phẩm", icon: Package, color: "#16a34a", bg: "rgba(22,163,74,0.08)", border: "rgba(22,163,74,0.2)" },
   { id: "tin-tuc", label: "Tin tức", icon: Newspaper, color: "#9333ea", bg: "rgba(147,51,234,0.08)", border: "rgba(147,51,234,0.2)" },
   { id: "su-kien", label: "Sự kiện", icon: Calendar, color: "#ea580c", bg: "rgba(234,88,12,0.08)", border: "rgba(234,88,12,0.2)" },
+  { id: "popup", label: "Popup Nổi Bật (Duy nhất 1 bài)", icon: Megaphone, color: "#e11d48", bg: "rgba(225,29,72,0.08)", border: "rgba(225,29,72,0.2)" },
 ];
 
 const CATEGORIES = [
@@ -65,18 +68,13 @@ const CATEGORIES = [
 ];
 
 interface AdminArticlesProps {
-  defaultType?: "all" | "doanh-nghiep" | "doanh-nhan" | "san-pham" | "tin-tuc" | "su-kien";
+  defaultType?: "all" | "doanh-nghiep" | "doanh-nhan" | "san-pham" | "tin-tuc" | "su-kien" | "popup";
   title?: string;
   subtitle?: string;
 }
 
-export function getArticleViewUrl(art?: EnterpriseArticle | Partial<EnterpriseArticle> | null): string {
-  if (!art || !art.slug) return "#";
-  const types = getArticleTypes(art);
-  if (types.includes("su-kien")) return `/su-kien/${art.slug}`;
-  if (types.includes("tin-tuc")) return `/tin-tuc/${art.slug}`;
-  return `/doanh-nghiep/${art.slug}`;
-}
+export { getArticleViewUrl };
+
 
 export function AdminEnterprises({
   defaultType = "doanh-nghiep",
@@ -172,9 +170,9 @@ export function AdminEnterprises({
   };
 
   // Notification
-  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [toast, setToast] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
 
-  const showToast = (type: "success" | "error", message: string) => {
+  const showToast = (type: "success" | "error" | "info", message: string) => {
     setToast({ type, message });
     setTimeout(() => setToast(null), 4000);
   };
@@ -242,10 +240,32 @@ export function AdminEnterprises({
     const spCount = articles.filter((a) => getArticleTypes(a).includes("san-pham")).length;
     const ttCount = articles.filter((a) => getArticleTypes(a).includes("tin-tuc")).length;
     const skCount = articles.filter((a) => getArticleTypes(a).includes("su-kien")).length;
+    const popupCount = articles.filter((a) => getArticleTypes(a).includes("popup")).length;
     const crawled = articles.filter((a) => !!a.sourceUrl).length;
     const active = articles.filter((a) => a.active !== false).length;
-    return { total, dnCount, dnhanCount, spCount, ttCount, skCount, crawled, active };
+    return { total, dnCount, dnhanCount, spCount, ttCount, skCount, popupCount, crawled, active };
   }, [articles]);
+
+  // Quick Toggle Popup (Duy nhất 1 bài trong toàn hệ thống)
+  const handleQuickTogglePopup = async (slug: string) => {
+    try {
+      const res = await fetch("/api/crawl-doanh-nghiep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "set-popup", slug }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("success", data.message);
+        fetchArticles();
+      } else {
+        showToast("error", data.error || "Lỗi thao tác.");
+      }
+    } catch {
+      showToast("error", "Lỗi kết nối máy chủ.");
+    }
+  };
+
 
   // Toggle quick active status
   const handleToggleActive = async (slug: string) => {
@@ -407,9 +427,29 @@ export function AdminEnterprises({
   const handleToggleType = (typeId: string) => {
     if (!editingArticle) return;
     const currentTypes = getArticleTypes(editingArticle);
-    const nextTypes = currentTypes.includes(typeId)
-      ? currentTypes.filter((t) => t !== typeId)
-      : [...currentTypes, typeId];
+    let nextTypes: string[];
+
+    if (typeId === "popup") {
+      if (currentTypes.includes("popup")) {
+        nextTypes = currentTypes.filter((t) => t !== "popup");
+      } else {
+        nextTypes = [...currentTypes, "popup"];
+        const existingPopup = articles.find(
+          (a) => a.slug !== editingArticle.slug && getArticleTypes(a).includes("popup")
+        );
+        if (existingPopup) {
+          showToast(
+            "info",
+            `⭐ Bài viết này sẽ trở thành Popup duy nhất trên web. Bài "${existingPopup.title.slice(0, 35)}..." sẽ tự động nhường vị trí khi lưu.`
+          );
+        }
+      }
+    } else {
+      nextTypes = currentTypes.includes(typeId)
+        ? currentTypes.filter((t) => t !== typeId)
+        : [...currentTypes, typeId];
+    }
+
     setEditingArticle({ ...editingArticle, type: nextTypes });
   };
 
@@ -435,7 +475,7 @@ export function AdminEnterprises({
             top: "24px",
             right: "24px",
             zIndex: 99999,
-            background: toast.type === "success" ? "#0f766e" : "#b91c1c",
+            background: toast.type === "success" ? "#0f766e" : toast.type === "info" ? "#0284c7" : "#b91c1c",
             color: "#fff",
             padding: "14px 22px",
             borderRadius: "12px",
@@ -448,7 +488,13 @@ export function AdminEnterprises({
             animation: "fadeIn 0.2s ease-out",
           }}
         >
-          {toast.type === "success" ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+          {toast.type === "success" ? (
+            <CheckCircle2 size={18} />
+          ) : toast.type === "info" ? (
+            <Sparkles size={18} />
+          ) : (
+            <AlertCircle size={18} />
+          )}
           {toast.message}
         </div>
       )}
@@ -837,6 +883,55 @@ export function AdminEnterprises({
             }}
           >
             {stats.skCount}
+          </span>
+        </div>
+
+        {/* Popup Nổi Bật (Duy nhất 1 bài) */}
+        <div
+          onClick={() => setActiveTypeTab("popup")}
+          style={{
+            background: "#fff",
+            padding: "18px 20px",
+            borderRadius: "16px",
+            border: activeTypeTab === "popup" ? "2px solid #e11d48" : "1px solid var(--line)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            boxShadow: activeTypeTab === "popup" ? "0 8px 20px rgba(225,29,72,0.15)" : "none",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div
+              style={{
+                width: "42px",
+                height: "42px",
+                borderRadius: "10px",
+                background: "rgba(225,29,72,0.1)",
+                color: "#e11d48",
+                display: "grid",
+                placeItems: "center",
+              }}
+            >
+              <Megaphone size={20} />
+            </div>
+            <div>
+              <div style={{ fontSize: "12px", color: "#e11d48", fontWeight: 700 }}>Popup Toàn Web (10s)</div>
+              <div style={{ fontSize: "15px", fontWeight: 900, color: "#0f172a" }}>Popup Nổi Bật</div>
+            </div>
+          </div>
+          <span
+            style={{
+              background: activeTypeTab === "popup" ? "#e11d48" : (stats.popupCount > 0 ? "rgba(225,29,72,0.12)" : "#f1f5f9"),
+              color: activeTypeTab === "popup" ? "#fff" : (stats.popupCount > 0 ? "#e11d48" : "#475569"),
+              fontSize: "14px",
+              fontWeight: 900,
+              padding: "4px 10px",
+              borderRadius: "8px",
+            }}
+          >
+            {stats.popupCount}
           </span>
         </div>
 
@@ -1513,6 +1608,35 @@ export function AdminEnterprises({
                         }}
                       />
                       {isActive ? "Hiển thị" : "Đã ẩn"}
+                    </button>
+
+                    {/* Quick Toggle Popup Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleQuickTogglePopup(art.slug)}
+                      style={{
+                        padding: "6px 12px",
+                        borderRadius: "8px",
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        border: "1px solid",
+                        cursor: "pointer",
+                        background: artTypes.includes("popup") ? "#fff1f2" : "#f8fafc",
+                        borderColor: artTypes.includes("popup") ? "#fecdd3" : "var(--line)",
+                        color: artTypes.includes("popup") ? "#e11d48" : "#64748b",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "5px",
+                        transition: "all 0.15s ease",
+                      }}
+                      title={
+                        artTypes.includes("popup")
+                          ? "Bài này đang là Popup duy nhất trên web (Bấm để hủy)"
+                          : "Bấm để đặt bài này làm Popup nổi bật duy nhất trên website (Tự động thay thế bài cũ)"
+                      }
+                    >
+                      <Megaphone size={13} color={artTypes.includes("popup") ? "#e11d48" : "#94a3b8"} />
+                      {artTypes.includes("popup") ? "Đang là Popup" : "Đặt làm Popup"}
                     </button>
 
                     {/* Preview Button */}

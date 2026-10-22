@@ -25,6 +25,8 @@ import {
   ChevronUp,
   Send,
   Pencil,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { AdminRole, SafeAdminUser } from "@/lib/admin-auth";
 
@@ -37,6 +39,12 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Toggle ẩn/hiện mật khẩu
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSmtpPass, setShowSmtpPass] = useState(false);
 
   // Modal thêm tài khoản mới
   const [showAddModal, setShowAddModal] = useState(false);
@@ -1014,21 +1022,41 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 700, color: "#475569", marginBottom: "6px" }}>
                   Mật khẩu ứng dụng (App Password):
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={smtpPass}
-                  onChange={(e) => setSmtpPass(e.target.value)}
-                  placeholder="Mật khẩu ứng dụng 16 ký tự..."
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "8px",
-                    border: "1px solid var(--line)",
-                    fontSize: "14px",
-                    outline: "none",
-                  }}
-                />
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <input
+                    type={showSmtpPass ? "text" : "password"}
+                    required
+                    value={smtpPass}
+                    onChange={(e) => setSmtpPass(e.target.value)}
+                    placeholder="Mật khẩu ứng dụng 16 ký tự..."
+                    style={{
+                      width: "100%",
+                      padding: "10px 42px 10px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid var(--line)",
+                      fontSize: "14px",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowSmtpPass(!showSmtpPass)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#94a3b8",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "4px",
+                    }}
+                    title={showSmtpPass ? "Ẩn mật khẩu ứng dụng" : "Hiện mật khẩu ứng dụng"}
+                  >
+                    {showSmtpPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1213,20 +1241,41 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "6px" }}>
                   Mật khẩu khởi tạo * (tối thiểu 6 ký tự)
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nhập mật khẩu ban đầu..."
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    border: "1px solid var(--line)",
-                    fontSize: "14px",
-                  }}
-                />
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <input
+                    type={showNewPassword ? "text" : "password"}
+                    required
+                    placeholder="Nhập mật khẩu ban đầu..."
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 42px 10px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid var(--line)",
+                      fontSize: "14px",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#94a3b8",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "4px",
+                    }}
+                    title={showNewPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -1370,40 +1419,82 @@ export function AdminAccountsManager({ currentUser }: AdminAccountsManagerProps)
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "6px" }}>
                   Mật khẩu mới (tối thiểu 6 ký tự) *
                 </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Nhập mật khẩu mới..."
-                  value={resetPasswordVal}
-                  onChange={(e) => setResetPasswordVal(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    border: "1px solid var(--line)",
-                    fontSize: "14px",
-                  }}
-                />
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <input
+                    type={showResetPassword ? "text" : "password"}
+                    required
+                    placeholder="Nhập mật khẩu mới..."
+                    value={resetPasswordVal}
+                    onChange={(e) => setResetPasswordVal(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 42px 10px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid var(--line)",
+                      fontSize: "14px",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowResetPassword(!showResetPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#94a3b8",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "4px",
+                    }}
+                    title={showResetPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showResetPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "6px" }}>
                   Nhập lại mật khẩu mới *
                 </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Xác nhận lại mật khẩu mới..."
-                  value={confirmPasswordVal}
-                  onChange={(e) => setConfirmPasswordVal(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "10px",
-                    border: "1px solid var(--line)",
-                    fontSize: "14px",
-                  }}
-                />
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    required
+                    placeholder="Xác nhận lại mật khẩu mới..."
+                    value={confirmPasswordVal}
+                    onChange={(e) => setConfirmPasswordVal(e.target.value)}
+                    style={{
+                      width: "100%",
+                      padding: "10px 42px 10px 14px",
+                      borderRadius: "10px",
+                      border: "1px solid var(--line)",
+                      fontSize: "14px",
+                      outline: "none",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={{
+                      position: "absolute",
+                      right: "12px",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      color: "#94a3b8",
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "4px",
+                    }}
+                    title={showConfirmPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
 
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>

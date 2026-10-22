@@ -377,46 +377,19 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
 
               {/* Password */}
               <div>
-                <div
+                <label
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    display: "block",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    color: "#cbd5e1",
                     marginBottom: "8px",
                   }}
                 >
-                  <label
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: 800,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      color: "#cbd5e1",
-                    }}
-                  >
-                    Mật khẩu
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode("forgot");
-                      setErrorMsg(null);
-                      setSuccessMsg(null);
-                      if (usernameOrEmail) setForgotIdentifier(usernameOrEmail);
-                    }}
-                    style={{
-                      border: "none",
-                      background: "none",
-                      color: "#ff6b70",
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      padding: 0,
-                    }}
-                  >
-                    Quên mật khẩu?
-                  </button>
-                </div>
+                  Mật khẩu
+                </label>
 
                 <div
                   style={{
@@ -460,6 +433,39 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
                     title={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                {/* Quên mật khẩu (nằm dưới ô nhập mật khẩu) */}
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginTop: "8px",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMode("forgot");
+                      setErrorMsg(null);
+                      setSuccessMsg(null);
+                      if (usernameOrEmail) setForgotIdentifier(usernameOrEmail);
+                    }}
+                    style={{
+                      border: "none",
+                      background: "none",
+                      color: "#ff6b70",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      padding: 0,
+                      transition: "color 0.15s ease",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#ff858a")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#ff6b70")}
+                  >
+                    Quên mật khẩu?
                   </button>
                 </div>
               </div>

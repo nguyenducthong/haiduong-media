@@ -1,16 +1,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { getDb } from "@/db";
+import { siteContent } from "@/db/schema";
 
 const UPLOADS_SUBDIR = path.join("public", "uploads", "articles");
 
 const FALLBACK_IMAGES = [
-  "/images/posts/post-thuong-hieu-manh.png",
-  "/images/posts/post-ceo-branding.png",
-  "/images/posts/post-thoi-su-vtv.png",
-  "/images/posts/post-tet-3-mien.png",
-  "/images/posts/post-lens-11-nam.png",
-  "/images/posts/post-marketing-trend.jpeg",
+  "/images/news-placeholder.jpg",
 ];
 
 // Track unreachable hosts during execution to fail-fast
@@ -27,13 +24,7 @@ function ensureDirSync(dirPath: string) {
 }
 
 export function getDeterministicFallback(seed: string): string {
-  let hashVal = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hashVal = (hashVal << 5) - hashVal + seed.charCodeAt(i);
-    hashVal |= 0;
-  }
-  const idx = Math.abs(hashVal) % FALLBACK_IMAGES.length;
-  return FALLBACK_IMAGES[idx];
+  return "/images/news-placeholder.jpg";
 }
 
 export async function downloadAndSaveImage(
@@ -41,12 +32,15 @@ export async function downloadAndSaveImage(
   articleSlug = ""
 ): Promise<string> {
   if (!urlOrData || typeof urlOrData !== "string") {
-    return getDeterministicFallback(articleSlug || "default");
+    return "/images/news-placeholder.jpg";
   }
 
   const trimmed = urlOrData.trim();
+  if (!trimmed) {
+    return "/images/news-placeholder.jpg";
+  }
 
-  // Already a local path
+  // Already a local path or media streaming route
   if (trimmed.startsWith("/") || trimmed.startsWith("./")) {
     return trimmed;
   }
@@ -57,34 +51,82 @@ export async function downloadAndSaveImage(
     ensureDirSync(targetDir);
   } catch {}
 
-  // Handle Base64 Data URI: data:image/jpeg;base64,...
+  // 1. Handle Base64 Data URI: data:image/jpeg;base64,...
   if (trimmed.startsWith("data:image/")) {
     try {
-      const match = trimmed.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
-      if (match && targetDir) {
+      const match = trimmed.match(/^data:image\/([a-zA-Z0-9+.-]+);base64,([\s\S]+)$/i);
+      if (match) {
         const rawExt = match[1].toLowerCase();
-        const ext = rawExt === "jpeg" ? ".jpg" : `.${rawExt.split("+")[0]}`;
-        const base64Data = match[2];
+        const ext = rawExt.includes("png")
+          ? ".png"
+          : rawExt.includes("webp")
+          ? ".webp"
+          : rawExt.includes("gif")
+          ? ".gif"
+          : ".jpg";
+        const base64Data = match[2].trim().replace(/\s/g, "");
         const hash = createHash("sha256").update(base64Data.slice(0, 1000)).digest("hex").slice(0, 16);
         const fileName = `b64_${hash}${ext}`;
-        const filePath = path.join(targetDir, fileName);
+        const mimeType = match[1].toLowerCase().startsWith("image/") ? match[1].toLowerCase() : `image/${rawExt}`;
 
+        // 1.1 First: Try saving to Cloudflare D1 Database (works everywhere, local + cloud)
         try {
-          if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
-            fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
-          }
-          return `/uploads/articles/${fileName}`;
+          const db = getDb();
+          const fileData = {
+            fileName,
+            originalName: fileName,
+            mimeType,
+            size: Math.round((base64Data.length * 3) / 4),
+            base64: base64Data,
+            createdAt: Date.now(),
+          };
+
+          await db
+            .insert(siteContent)
+            .values({
+              key: `media:${fileName}`,
+              data: JSON.stringify(fileData),
+              updatedBy: "system",
+              updatedAt: new Date(),
+            })
+            .onConflictDoUpdate({
+              target: siteContent.key,
+              set: {
+                data: JSON.stringify(fileData),
+                updatedAt: new Date(),
+              },
+            });
+
+          return `/api/media?name=${encodeURIComponent(fileName)}`;
         } catch {
-          return getDeterministicFallback(articleSlug || "b64");
+          // D1 not available in current environment, try local disk
         }
+
+        // 1.2 Second: Try saving to local disk if target directory is writable
+        if (targetDir) {
+          try {
+            const filePath = path.join(targetDir, fileName);
+            if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
+              fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
+            }
+            return `/uploads/articles/${fileName}`;
+          } catch {
+            // Read-only filesystem in serverless/workers
+          }
+        }
+
+        // 1.3 Safe fallback: NEVER replace user's image with a stock banner! Return original base64
+        return trimmed;
       }
     } catch (err: any) {
-      console.warn("Lỗi lưu ảnh base64:", err.message);
-      return getDeterministicFallback(articleSlug || "b64");
+      console.warn("Lỗi xử lý ảnh base64:", err?.message);
+      return trimmed;
     }
+
+    return trimmed;
   }
 
-  // Handle Remote HTTP / HTTPS URL
+  // 2. Handle Remote HTTP / HTTPS URL
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
     let hostname = "";
     let ext = ".jpg";
@@ -102,7 +144,7 @@ export async function downloadAndSaveImage(
     const fileName = `img_${urlHash}${ext}`;
     const filePath = targetDir ? path.join(targetDir, fileName) : "";
 
-    // If already downloaded and valid, return local path immediately
+    // If already downloaded and valid on disk
     if (filePath) {
       try {
         if (fs.existsSync(filePath) && fs.statSync(filePath).size > 200) {
@@ -133,32 +175,54 @@ export async function downloadAndSaveImage(
 
       if (res.ok) {
         const buffer = Buffer.from(await res.arrayBuffer());
-        if (buffer.length > 100 && filePath) {
+        if (buffer.length > 100) {
+          // Try saving to D1
           try {
-            fs.writeFileSync(filePath, buffer);
-            return `/uploads/articles/${fileName}`;
-          } catch {
-            // Filesystem read-only in Cloudflare Workerd edge runtime: safely keep original remote URL!
-            return trimmed;
+            const db = getDb();
+            const b64 = buffer.toString("base64");
+            const fileData = {
+              fileName,
+              originalName: fileName,
+              mimeType: `image/${ext.replace(".", "")}`,
+              size: buffer.length,
+              base64: b64,
+              createdAt: Date.now(),
+            };
+            await db
+              .insert(siteContent)
+              .values({
+                key: `media:${fileName}`,
+                data: JSON.stringify(fileData),
+                updatedBy: "system",
+                updatedAt: new Date(),
+              })
+              .onConflictDoUpdate({
+                target: siteContent.key,
+                set: {
+                  data: JSON.stringify(fileData),
+                  updatedAt: new Date(),
+                },
+              });
+            return `/api/media?name=${encodeURIComponent(fileName)}`;
+          } catch {}
+
+          if (filePath) {
+            try {
+              fs.writeFileSync(filePath, buffer);
+              return `/uploads/articles/${fileName}`;
+            } catch {
+              return trimmed;
+            }
           }
         }
       } else {
         if (hostname) failedHosts.add(hostname);
       }
-    } catch (err: any) {
+    } catch {
       if (hostname) failedHosts.add(hostname);
     }
 
-    // If existing file is valid
-    if (filePath) {
-      try {
-        if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) {
-          return `/uploads/articles/${fileName}`;
-        }
-      } catch {}
-    }
-
-    // Keep remote URL safely
+    // Keep remote URL safely: NEVER replace with a stock banner!
     return trimmed;
   }
 
@@ -183,14 +247,19 @@ export async function localizeArticleContentImages(
 
   await Promise.all(
     uniqueSrcs.map(async (src) => {
-      if (src.startsWith("/uploads/") || src.startsWith("/images/")) {
+      // If already a local media or uploads URL, leave unchanged
+      if (src.startsWith("/uploads/") || src.startsWith("/images/") || src.startsWith("/api/media")) {
         replacementMap.set(src, src);
         return;
       }
       try {
         const localUrl = await downloadAndSaveImage(src, articleSlug);
-        if (localUrl) {
+        // Only replace if localUrl is valid and NOT a generic placeholder / banner!
+        if (localUrl && !localUrl.includes("placeholder") && !FALLBACK_IMAGES.includes(localUrl)) {
           replacementMap.set(src, localUrl);
+        } else {
+          // Keep original src so user's image is NEVER lost
+          replacementMap.set(src, src);
         }
       } catch {
         replacementMap.set(src, src);
@@ -218,8 +287,20 @@ export async function localizeArticleImages(article: any): Promise<any> {
 
   const slug = article.slug || article.id || "art";
 
-  // 1. Localize featured thumbnail
-  const localImage = await downloadAndSaveImage(article.image, slug);
+  // 1. Localize featured thumbnail (preserve user's image, never overwrite with stock banner)
+  let localImage = article.image;
+  if (article.image) {
+    try {
+      const resImg = await downloadAndSaveImage(article.image, slug);
+      if (resImg && !FALLBACK_IMAGES.includes(resImg) && !resImg.includes("news-placeholder")) {
+        localImage = resImg;
+      }
+    } catch {
+      // Keep original article.image
+    }
+  } else {
+    localImage = "/images/news-placeholder.jpg";
+  }
 
   // 2. Localize all inline content images
   const localContent = await localizeArticleContentImages(article.content || "", slug);

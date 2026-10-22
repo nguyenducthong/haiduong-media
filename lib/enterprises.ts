@@ -127,7 +127,6 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
     const candidates = [
       path.join(process.cwd(), "data", "enterprises.json"),
       path.resolve("data", "enterprises.json"),
-      "F:/project/haiduong-media/data/enterprises.json",
     ];
     for (const dataFilePath of candidates) {
       if (fs.existsSync(dataFilePath)) {
@@ -171,7 +170,6 @@ export async function saveEnterprisesToDb(articles: EnterpriseArticle[]): Promis
     const candidates = [
       path.join(process.cwd(), "data", "enterprises.json"),
       path.resolve("data", "enterprises.json"),
-      "f:/project/haiduong-media/data/enterprises.json",
     ];
     for (const p of candidates) {
       try {

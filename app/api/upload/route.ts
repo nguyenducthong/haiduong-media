@@ -231,10 +231,10 @@ export async function GET() {
 
     // 2. Scan disk files (public/uploads and public/uploads/articles)
     const scanDirs = [
-      { dir: new URL("file:///F:/project/haiduong-media/public/uploads/articles"), prefix: "/uploads/articles" },
-      { dir: new URL("file:///F:/project/haiduong-media/public/uploads"), prefix: "/uploads" },
       { dir: path.join(process.cwd(), "public/uploads/articles"), prefix: "/uploads/articles" },
       { dir: path.join(process.cwd(), "public/uploads"), prefix: "/uploads" },
+      { dir: path.resolve("public/uploads/articles"), prefix: "/uploads/articles" },
+      { dir: path.resolve("public/uploads"), prefix: "/uploads" },
     ];
 
     for (const { dir, prefix } of scanDirs) {

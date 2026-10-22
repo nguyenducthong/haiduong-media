@@ -51,7 +51,7 @@ export async function GET(req: Request) {
         const mimeType = fileInfo.mimeType || "application/octet-stream";
         const filename = fileInfo.originalName || name;
 
-        return new Response(buffer, {
+        return new Response(new Uint8Array(buffer), {
           headers: {
             "Content-Type": mimeType,
             "Content-Disposition": isDownload
@@ -67,10 +67,10 @@ export async function GET(req: Request) {
 
     // 2. Try reading from disk (public/uploads or public/uploads/articles)
     const diskCandidates = [
-      path.join("F:/project/haiduong-media/public/uploads", name),
-      path.join("F:/project/haiduong-media/public/uploads/articles", name),
       path.join(process.cwd(), "public/uploads", name),
       path.join(process.cwd(), "public/uploads/articles", name),
+      path.resolve("public/uploads", name),
+      path.resolve("public/uploads/articles", name),
     ];
 
     for (const diskPath of diskCandidates) {
@@ -93,7 +93,7 @@ export async function GET(req: Request) {
           };
           const mimeType = mimeTypes[ext] || "application/octet-stream";
 
-          return new Response(buffer, {
+          return new Response(new Uint8Array(buffer), {
             headers: {
               "Content-Type": mimeType,
               "Content-Disposition": isDownload

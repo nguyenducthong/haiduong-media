@@ -10,9 +10,6 @@ const FALLBACK_IMAGES = [
   "/images/news-placeholder.jpg",
 ];
 
-// Track unreachable hosts during execution to fail-fast
-const failedHosts = new Set<string>();
-
 function ensureDirSync(dirPath: string) {
   try {
     if (!fs.existsSync(dirPath)) {
@@ -20,6 +17,106 @@ function ensureDirSync(dirPath: string) {
     }
   } catch {
     // Edge runtime filesystem is read-only
+  }
+}
+
+// Helper to save buffer or base64 to D1 with chunking support
+async function saveMediaToD1(
+  fileName: string,
+  buffer: Buffer,
+  mimeType: string,
+  originalName = fileName
+): Promise<boolean> {
+  try {
+    const db = getDb();
+    const base64 = buffer.toString("base64");
+    const CHUNK_SIZE = 50 * 1024; // 50KB base64 chunk (safely under D1 100KB statement limit)
+
+    if (base64.length <= CHUNK_SIZE) {
+      const fileData = {
+        fileName,
+        originalName,
+        mimeType,
+        size: buffer.length,
+        base64,
+        createdAt: Date.now(),
+      };
+
+      await db
+        .insert(siteContent)
+        .values({
+          key: `media:${fileName}`,
+          data: JSON.stringify(fileData),
+          updatedBy: "system",
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: siteContent.key,
+          set: {
+            data: JSON.stringify(fileData),
+            updatedAt: new Date(),
+          },
+        });
+      return true;
+    }
+
+    // Chunked save for large images
+    const chunks: string[] = [];
+    for (let i = 0; i < base64.length; i += CHUNK_SIZE) {
+      chunks.push(base64.slice(i, i + CHUNK_SIZE));
+    }
+
+    // Write all chunks
+    await Promise.all(
+      chunks.map((chunk, i) =>
+        db
+          .insert(siteContent)
+          .values({
+            key: `media_chunk:${fileName}:${i}`,
+            data: chunk,
+            updatedBy: "system",
+            updatedAt: new Date(),
+          })
+          .onConflictDoUpdate({
+            target: siteContent.key,
+            set: {
+              data: chunk,
+              updatedAt: new Date(),
+            },
+          })
+      )
+    );
+
+    // Write index row
+    const indexData = {
+      fileName,
+      originalName,
+      mimeType,
+      size: buffer.length,
+      chunkCount: chunks.length,
+      createdAt: Date.now(),
+    };
+
+    await db
+      .insert(siteContent)
+      .values({
+        key: `media:${fileName}`,
+        data: JSON.stringify(indexData),
+        updatedBy: "system",
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: siteContent.key,
+        set: {
+          data: JSON.stringify(indexData),
+          updatedAt: new Date(),
+        },
+      });
+
+    return true;
+  } catch (err: any) {
+    console.warn("Lỗi lưu ảnh vào D1:", err?.message);
+    return false;
   }
 }
 
@@ -68,38 +165,12 @@ export async function downloadAndSaveImage(
         const hash = createHash("sha256").update(base64Data.slice(0, 1000)).digest("hex").slice(0, 16);
         const fileName = `b64_${hash}${ext}`;
         const mimeType = match[1].toLowerCase().startsWith("image/") ? match[1].toLowerCase() : `image/${rawExt}`;
+        const buffer = Buffer.from(base64Data, "base64");
 
         // 1.1 First: Try saving to Cloudflare D1 Database (works everywhere, local + cloud)
-        try {
-          const db = getDb();
-          const fileData = {
-            fileName,
-            originalName: fileName,
-            mimeType,
-            size: Math.round((base64Data.length * 3) / 4),
-            base64: base64Data,
-            createdAt: Date.now(),
-          };
-
-          await db
-            .insert(siteContent)
-            .values({
-              key: `media:${fileName}`,
-              data: JSON.stringify(fileData),
-              updatedBy: "system",
-              updatedAt: new Date(),
-            })
-            .onConflictDoUpdate({
-              target: siteContent.key,
-              set: {
-                data: JSON.stringify(fileData),
-                updatedAt: new Date(),
-              },
-            });
-
+        const savedToD1 = await saveMediaToD1(fileName, buffer, mimeType);
+        if (savedToD1) {
           return `/api/media?name=${encodeURIComponent(fileName)}`;
-        } catch {
-          // D1 not available in current environment, try local disk
         }
 
         // 1.2 Second: Try saving to local disk if target directory is writable
@@ -107,7 +178,7 @@ export async function downloadAndSaveImage(
           try {
             const filePath = path.join(targetDir, fileName);
             if (!fs.existsSync(filePath) || fs.statSync(filePath).size === 0) {
-              fs.writeFileSync(filePath, Buffer.from(base64Data, "base64"));
+              fs.writeFileSync(filePath, buffer);
             }
             return `/uploads/articles/${fileName}`;
           } catch {
@@ -115,7 +186,7 @@ export async function downloadAndSaveImage(
           }
         }
 
-        // 1.3 Safe fallback: NEVER replace user's image with a stock banner! Return original base64
+        // 1.3 Safe fallback
         return trimmed;
       }
     } catch (err: any) {
@@ -128,11 +199,9 @@ export async function downloadAndSaveImage(
 
   // 2. Handle Remote HTTP / HTTPS URL
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-    let hostname = "";
     let ext = ".jpg";
     try {
       const urlObj = new URL(trimmed);
-      hostname = urlObj.hostname;
       const pathname = urlObj.pathname;
       const detectedExt = path.extname(pathname).toLowerCase();
       if ([".jpg", ".jpeg", ".png", ".webp", ".gif", ".svg"].includes(detectedExt)) {
@@ -153,76 +222,54 @@ export async function downloadAndSaveImage(
       } catch {}
     }
 
-    // Fail-fast if hostname is already known to be down/unreachable
-    if (hostname && failedHosts.has(hostname)) {
-      return trimmed;
-    }
+    // Try downloading with 15-second timeout and 1 retry
+    const maxRetries = 2;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-    // Try downloading with 3-second timeout
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+        const res = await fetch(trimmed, {
+          signal: controller.signal,
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+          },
+        });
+        clearTimeout(timeoutId);
 
-      const res = await fetch(trimmed, {
-        signal: controller.signal,
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-          Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-        },
-      });
-      clearTimeout(timeoutId);
+        if (res.ok) {
+          const buffer = Buffer.from(await res.arrayBuffer());
+          if (buffer.length > 50) {
+            const mimeType = `image/${ext.replace(".", "")}`;
 
-      if (res.ok) {
-        const buffer = Buffer.from(await res.arrayBuffer());
-        if (buffer.length > 100) {
-          // Try saving to D1
-          try {
-            const db = getDb();
-            const b64 = buffer.toString("base64");
-            const fileData = {
-              fileName,
-              originalName: fileName,
-              mimeType: `image/${ext.replace(".", "")}`,
-              size: buffer.length,
-              base64: b64,
-              createdAt: Date.now(),
-            };
-            await db
-              .insert(siteContent)
-              .values({
-                key: `media:${fileName}`,
-                data: JSON.stringify(fileData),
-                updatedBy: "system",
-                updatedAt: new Date(),
-              })
-              .onConflictDoUpdate({
-                target: siteContent.key,
-                set: {
-                  data: JSON.stringify(fileData),
-                  updatedAt: new Date(),
-                },
-              });
-            return `/api/media?name=${encodeURIComponent(fileName)}`;
-          } catch {}
+            // 2.1 First: Save to Cloudflare D1
+            const savedD1 = await saveMediaToD1(fileName, buffer, mimeType);
+            if (savedD1) {
+              return `/api/media?name=${encodeURIComponent(fileName)}`;
+            }
 
-          if (filePath) {
-            try {
-              fs.writeFileSync(filePath, buffer);
-              return `/uploads/articles/${fileName}`;
-            } catch {
-              return trimmed;
+            // 2.2 Second: Save to local disk if writable
+            if (filePath) {
+              try {
+                fs.writeFileSync(filePath, buffer);
+                return `/uploads/articles/${fileName}`;
+              } catch {
+                return trimmed;
+              }
             }
           }
         }
-      } else {
-        if (hostname) failedHosts.add(hostname);
+      } catch (err: any) {
+        if (attempt < maxRetries) {
+          await new Promise((r) => setTimeout(r, 600));
+          continue;
+        }
       }
-    } catch {
-      if (hostname) failedHosts.add(hostname);
     }
 
-    // Keep remote URL safely: NEVER replace with a stock banner!
+    // If download really failed after retries, keep remote URL
     return trimmed;
   }
 

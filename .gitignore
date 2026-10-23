@@ -64,3 +64,9 @@ next-env.d.ts
 __pycache__/
 *.pyc
 /seo-reports/
+
+# Migration scratch & temporary data
+/scratch/
+data_enterprises_*.json
+backup_*.json
+backup_*.sql

@@ -161,6 +161,29 @@ export async function saveEnterprisesToDb(articles: EnterpriseArticle[]): Promis
         target: siteContent.key,
         set: values,
       });
+
+    // Sync dedicated 'popup_article' row for ultra-fast reading
+    const popup = articles.find(
+      (a) => a.active !== false && getArticleTypes(a).includes("popup")
+    ) || null;
+    await db
+      .insert(siteContent)
+      .values({
+        key: "popup_article",
+        data: JSON.stringify(popup),
+        updatedBy: "admin",
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: siteContent.key,
+        set: {
+          data: JSON.stringify(popup),
+          updatedBy: "admin",
+          updatedAt: new Date(),
+        },
+      });
+
+    invalidatePopupArticleCache();
   } catch (err: any) {
     console.warn("Error saving enterprises to D1:", err?.message);
   }
@@ -335,13 +358,66 @@ export async function getUnifiedEventBySlug(slug: string): Promise<any | null> {
 export const getAllArticles = getEnterprises;
 export const getArticlesByType = getEnterprisesByType;
 export const getArticleBySlug = getEnterpriseBySlug;
+let memoryCachedPopup: { article: EnterpriseArticle | null; timestamp: number } | null = null;
 
-export async function getPopupArticle(): Promise<EnterpriseArticle | null> {
+export function invalidatePopupArticleCache(): void {
+  memoryCachedPopup = null;
+}
+
+export async function getPopupArticle(forceFresh = false): Promise<EnterpriseArticle | null> {
+  // 1. In-memory cache hit
+  if (!forceFresh && memoryCachedPopup !== null) {
+    return memoryCachedPopup.article;
+  }
+
+  // 2. Try reading dedicated lightweight 'popup_article' row from D1
+  try {
+    await ensureDbTable();
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(siteContent)
+      .where(eq(siteContent.key, "popup_article"))
+      .limit(1);
+
+    if (row && row.data) {
+      const parsed = JSON.parse(row.data);
+      memoryCachedPopup = { article: parsed, timestamp: Date.now() };
+      return parsed;
+    }
+  } catch (err: any) {
+    // Fall back to scanning enterprises table
+  }
+
+  // 3. Fallback: scan all enterprises
   const articles = await getEnterprises();
   const found = articles.find(
     (a) => a.active !== false && getArticleTypes(a).includes("popup")
-  );
-  return found || null;
+  ) || null;
+
+  // Persist to 'popup_article' for future fast reads
+  try {
+    const db = getDb();
+    await db
+      .insert(siteContent)
+      .values({
+        key: "popup_article",
+        data: JSON.stringify(found),
+        updatedBy: "system",
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: siteContent.key,
+        set: {
+          data: JSON.stringify(found),
+          updatedBy: "system",
+          updatedAt: new Date(),
+        },
+      });
+  } catch {}
+
+  memoryCachedPopup = { article: found, timestamp: Date.now() };
+  return found;
 }
 
 export { getArticleViewUrl } from "./enterprises-types";

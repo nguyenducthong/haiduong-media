@@ -59,6 +59,7 @@ export type MainAdminTab =
   | "trang-chu"
   | "bai-viet"
   | "su-kien"
+  | "tin-tuc"
   | "cau-hinh"
   | "tai-khoan";
 
@@ -884,13 +885,14 @@ export default function AdminEditor({
                 <a href="#homepage-sections">01. Bật/Tắt & Thứ tự</a>
                 <a href="#banner-slider">02. Banner Slider</a>
                 <a href="#vtv-commercials-admin">03. Phim & TVC Trên VTV</a>
-                <a href="#dich-vu">04. Dịch vụ chủ lực</a>
-                <a href="#trang-chu">05. Giới thiệu & Niềm tin</a>
-                <a href="#bao-chi-admin">06. Báo chí Đưa tin</a>
-                <a href="#thuong-hieu-admin">07. Hệ sinh thái</a>
-                <a href="#danh-gia-admin">08. Đánh giá Khách hàng</a>
-                <a href="#doi-tac-admin">09. Đối tác & Doanh nghiệp</a>
-                <a href="#quy-trinh-cta-admin">10. Quy trình & CTA</a>
+                <a href="#su-kien-admin">04. Sự Kiện Sắp Diễn Ra</a>
+                <a href="#dich-vu">05. Dịch vụ chủ lực</a>
+                <a href="#trang-chu">06. Giới thiệu & Niềm tin</a>
+                <a href="#bao-chi-admin">07. Báo chí Đưa tin</a>
+                <a href="#thuong-hieu-admin">08. Hệ sinh thái</a>
+                <a href="#danh-gia-admin">09. Đánh giá Khách hàng</a>
+                <a href="#doi-tac-admin">10. Đối tác & Doanh nghiệp</a>
+                <a href="#quy-trinh-cta-admin">11. Quy trình & CTA</a>
               </>
             )}
 
@@ -1738,6 +1740,127 @@ export default function AdminEditor({
             })}
           </div>
         </EditorSection>
+
+        {/* ========================================================
+            04. MỤC SỰ KIỆN SẮP DIỄN RA (TRANG CHỦ)
+            ======================================================== */}
+        <EditorSection
+          id="su-kien-admin"
+          number="04"
+          title="Mục Sự Kiện Sắp Diễn Ra (Trang Chủ)"
+          description="Chỉnh sửa dòng nhãn nhỏ, tiêu đề chính 'Sự Kiện Sắp Diễn Ra', đoạn văn giới thiệu và nhãn liên kết của khối sự kiện trên trang chủ."
+        >
+          <div
+            style={{
+              padding: "18px 20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid var(--line)",
+              marginBottom: "16px",
+              display: "grid",
+              gap: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Calendar size={18} color="#d42027" />
+              <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                Nội dung phần đầu mục Sự Kiện (Tiêu đề & Giới thiệu)
+              </strong>
+            </div>
+
+            <div className="field-row">
+              <Field
+                label="Dòng nhãn nhỏ (Eyebrow Badge)"
+                value={content.eventsEyebrow || ""}
+                onChange={(val) => update("eventsEyebrow", val)}
+              />
+              <Field
+                label="Tiêu đề chính mục Sự Kiện"
+                value={content.eventsTitle || ""}
+                onChange={(val) => update("eventsTitle", val)}
+              />
+            </div>
+
+            <Field
+              label="Đoạn văn mô tả / giới thiệu"
+              value={content.eventsDescription || ""}
+              onChange={(val) => update("eventsDescription", val)}
+              multiline
+            />
+
+            <div className="field-row">
+              <Field
+                label="Chữ trên nút xem tất cả sự kiện"
+                value={content.eventsViewAllText || ""}
+                onChange={(val) => update("eventsViewAllText", val)}
+              />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "6px" }}>
+              <button
+                type="button"
+                onClick={() => save("Đã lưu tiêu đề & giới thiệu mục Sự Kiện thành công!")}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#d42027",
+                  color: "#fff",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  fontWeight: 800,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Save size={15} /> Lưu mục Sự Kiện
+              </button>
+            </div>
+          </div>
+
+          <div
+            style={{
+              padding: "16px 20px",
+              borderRadius: "12px",
+              background: "#fff",
+              border: "1px dashed var(--line)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "12px",
+            }}
+          >
+            <div>
+              <strong style={{ fontSize: "14px", color: "#0f172a", display: "block" }}>
+                Danh sách bài viết & diễn đàn Sự kiện
+              </strong>
+              <span style={{ fontSize: "13px", color: "var(--muted)" }}>
+                Các thẻ sự kiện hiển thị phía dưới được quản lý tập trung trong danh mục Bài viết (Sự kiện & Diễn đàn).
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMainTab("bai-viet")}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                background: "#0f172a",
+                color: "#fff",
+                fontSize: "13px",
+                fontWeight: 800,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <BookOpen size={14} /> Mở Quản lý bài viết Sự kiện →
+            </button>
+          </div>
+        </EditorSection>
       </>
     )}
 
@@ -2476,6 +2599,76 @@ export default function AdminEditor({
             >
               <Newspaper size={14} /> Mở Danh sách bài viết Sự kiện & Diễn đàn
             </button>
+          </div>
+
+          {/* Cấu hình tiêu đề & nội dung giới thiệu mục Sự kiện */}
+          <div
+            style={{
+              padding: "18px 20px",
+              borderRadius: "14px",
+              background: "#f8fafc",
+              border: "1px solid var(--line)",
+              marginBottom: "24px",
+              display: "grid",
+              gap: "14px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <Calendar size={18} color="#d42027" />
+              <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                Nội dung phần đầu mục Sự Kiện (Tiêu đề & Giới thiệu)
+              </strong>
+            </div>
+
+            <div className="field-row">
+              <Field
+                label="Dòng nhãn nhỏ (Eyebrow Badge)"
+                value={content.eventsEyebrow || ""}
+                onChange={(val) => update("eventsEyebrow", val)}
+              />
+              <Field
+                label="Tiêu đề chính mục Sự Kiện"
+                value={content.eventsTitle || ""}
+                onChange={(val) => update("eventsTitle", val)}
+              />
+            </div>
+
+            <Field
+              label="Đoạn văn mô tả / giới thiệu"
+              value={content.eventsDescription || ""}
+              onChange={(val) => update("eventsDescription", val)}
+              multiline
+            />
+
+            <div className="field-row">
+              <Field
+                label="Chữ trên nút xem tất cả"
+                value={content.eventsViewAllText || ""}
+                onChange={(val) => update("eventsViewAllText", val)}
+              />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "6px" }}>
+              <button
+                type="button"
+                onClick={() => save("Đã lưu tiêu đề & giới thiệu mục Sự Kiện thành công!")}
+                style={{
+                  padding: "8px 18px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#d42027",
+                  color: "#fff",
+                  fontSize: "13px",
+                  cursor: "pointer",
+                  fontWeight: 800,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <Save size={15} /> Lưu mục Sự Kiện
+              </button>
+            </div>
           </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
@@ -4034,11 +4227,13 @@ function Field({
   value,
   onChange,
   multiline = false,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   multiline?: boolean;
+  placeholder?: string;
 }) {
   return (
     <label className="admin-field">
@@ -4048,11 +4243,13 @@ function Field({
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={3}
+          placeholder={placeholder}
         />
       ) : (
         <input
           value={value}
           onChange={(event) => onChange(event.target.value)}
+          placeholder={placeholder}
         />
       )}
     </label>

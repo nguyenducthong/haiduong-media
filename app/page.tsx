@@ -62,7 +62,16 @@ export default async function Home() {
         description={content.vtvDescription}
       />
     ),
-    events: () => <HomeEventsSection key="events" events={allEvents} />,
+    events: () => (
+      <HomeEventsSection
+        key="events"
+        events={allEvents}
+        eyebrow={content.eventsEyebrow}
+        title={content.eventsTitle}
+        description={content.eventsDescription}
+        viewAllText={content.eventsViewAllText}
+      />
+    ),
     services: () => (
       <section key="services" className="section services-section" id="dich-vu-chinh">
         <div className="site-container">

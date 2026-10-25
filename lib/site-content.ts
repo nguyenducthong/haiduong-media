@@ -142,6 +142,10 @@ export type SiteContent = {
   footerNote: string;
   bannerSlides: BannerSlide[];
   upcomingEvents: EventItem[];
+  eventsEyebrow?: string;
+  eventsTitle?: string;
+  eventsDescription?: string;
+  eventsViewAllText?: string;
   vtvCommercials: VtvCommercial[];
   vtvBadge?: string;
   vtvTitle?: string;
@@ -297,6 +301,11 @@ export const defaultSiteContent: SiteContent = {
     },
   ],
   upcomingEvents: [],
+  eventsEyebrow: "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
+  eventsTitle: "Sự Kiện Sắp Diễn Ra",
+  eventsDescription:
+    "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
+  eventsViewAllText: "Xem tất cả sự kiện",
   vtvCommercials: [
     {
       channel: "VTV1",
@@ -729,6 +738,10 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
     footerNote: read("footerNote"),
     bannerSlides,
     upcomingEvents,
+    eventsEyebrow: value.eventsEyebrow !== undefined ? cleanBrandText(value.eventsEyebrow) : (defaultSiteContent.eventsEyebrow || "LỊCH TRÌNH SỰ KIỆN 2026 – 2027"),
+    eventsTitle: value.eventsTitle !== undefined ? cleanBrandText(value.eventsTitle) : (defaultSiteContent.eventsTitle || "Sự Kiện Sắp Diễn Ra"),
+    eventsDescription: value.eventsDescription !== undefined ? cleanBrandText(value.eventsDescription) : (defaultSiteContent.eventsDescription || "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á."),
+    eventsViewAllText: value.eventsViewAllText !== undefined ? cleanBrandText(value.eventsViewAllText) : (defaultSiteContent.eventsViewAllText || "Xem tất cả sự kiện"),
     vtvCommercials,
     vtvBadge: value.vtvBadge !== undefined ? cleanBrandText(value.vtvBadge) : (defaultSiteContent.vtvBadge || "TRUYỀN HÌNH QUỐC GIA & ĐÀI LỚN"),
     vtvTitle: value.vtvTitle !== undefined ? cleanBrandText(value.vtvTitle) : (defaultSiteContent.vtvTitle || "Sản Xuất Phim Quảng Cáo Trên VTV"),

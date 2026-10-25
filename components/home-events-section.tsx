@@ -2,7 +2,19 @@ import Link from "@/components/link";
 import { Calendar, MapPin, ArrowRight, Sparkles, Clock } from "lucide-react";
 import type { EventItem } from "@/lib/site-content";
 
-export function HomeEventsSection({ events }: { events: EventItem[] }) {
+export function HomeEventsSection({
+  events,
+  eyebrow,
+  title,
+  description,
+  viewAllText,
+}: {
+  events: EventItem[];
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  viewAllText?: string;
+}) {
   const visibleEvents = (events || []).filter((e) => e.active !== false);
   if (!visibleEvents.length) return null;
 
@@ -12,21 +24,21 @@ export function HomeEventsSection({ events }: { events: EventItem[] }) {
         <div className="section-heading split-heading">
           <div>
             <span className="eyebrow" style={{ color: "#d42027" }}>
-              LỊCH TRÌNH SỰ KIỆN 2026 - 2027
+              {eyebrow || "LỊCH TRÌNH SỰ KIỆN 2026 – 2027"}
             </span>
-            <h2>Sự Kiện Sắp Diễn Ra</h2>
+            <h2>{title || "Sự Kiện Sắp Diễn Ra"}</h2>
           </div>
           <div>
             <p style={{ marginBottom: "8px" }}>
-              Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế
-              được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.
+              {description ||
+                "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á."}
             </p>
             <Link
               href="/su-kien"
               className="text-link"
               style={{ fontWeight: 800, color: "#d42027", display: "inline-flex", alignItems: "center", gap: "4px" }}
             >
-              Xem tất cả sự kiện ({visibleEvents.length}) <ArrowRight size={14} />
+              {(viewAllText || "Xem tất cả sự kiện")} ({visibleEvents.length}) <ArrowRight size={14} />
             </Link>
           </div>
         </div>

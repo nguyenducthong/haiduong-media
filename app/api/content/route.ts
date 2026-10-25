@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
-import { saveSiteContent, type SiteContent } from "@/lib/site-content";
+import { loadSiteContent, saveSiteContent, type SiteContent } from "@/lib/site-content";
+
+export async function GET() {
+  const content = await loadSiteContent();
+  return NextResponse.json(content);
+}
 
 export async function PUT(request: Request) {
   const user = await getChatGPTUser();

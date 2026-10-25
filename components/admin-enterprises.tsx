@@ -111,6 +111,74 @@ export function AdminEnterprises({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarFileInputRef = React.useRef<HTMLInputElement>(null);
 
+  // Modal for editing Homepage Event Section Heading
+  const [showEventHeadingModal, setShowEventHeadingModal] = useState(false);
+  const [eventHeadingData, setEventHeadingData] = useState({
+    eventsEyebrow: "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
+    eventsTitle: "Sự Kiện Sắp Diễn Ra",
+    eventsDescription:
+      "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
+    eventsViewAllText: "Xem tất cả sự kiện",
+  });
+  const [loadingEventHeading, setLoadingEventHeading] = useState(false);
+  const [savingEventHeading, setSavingEventHeading] = useState(false);
+  const [eventHeadingMsg, setEventHeadingMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const openEventHeadingModal = async () => {
+    setShowEventHeadingModal(true);
+    setLoadingEventHeading(true);
+    setEventHeadingMsg(null);
+    try {
+      const res = await fetch("/api/content");
+      if (res.ok) {
+        const data = await res.json();
+        setEventHeadingData({
+          eventsEyebrow: data.eventsEyebrow || "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
+          eventsTitle: data.eventsTitle || "Sự Kiện Sắp Diễn Ra",
+          eventsDescription:
+            data.eventsDescription ||
+            "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
+          eventsViewAllText: data.eventsViewAllText || "Xem tất cả sự kiện",
+        });
+      }
+    } catch {
+      // fallback
+    } finally {
+      setLoadingEventHeading(false);
+    }
+  };
+
+  const saveEventHeading = async () => {
+    setSavingEventHeading(true);
+    setEventHeadingMsg(null);
+    try {
+      const res = await fetch("/api/content");
+      const current = res.ok ? await res.json() : {};
+      const updated = {
+        ...current,
+        eventsEyebrow: eventHeadingData.eventsEyebrow,
+        eventsTitle: eventHeadingData.eventsTitle,
+        eventsDescription: eventHeadingData.eventsDescription,
+        eventsViewAllText: eventHeadingData.eventsViewAllText,
+      };
+      const putRes = await fetch("/api/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+      if (!putRes.ok) throw new Error("Không thể lưu cấu hình mục sự kiện.");
+      setEventHeadingMsg({ type: "success", text: "Đã cập nhật tiêu đề & giới thiệu Sự Kiện ngoài Trang Chủ thành công!" });
+      setTimeout(() => {
+        setShowEventHeadingModal(false);
+        setEventHeadingMsg(null);
+      }, 1500);
+    } catch (err: any) {
+      setEventHeadingMsg({ type: "error", text: err?.message || "Có lỗi khi lưu." });
+    } finally {
+      setSavingEventHeading(false);
+    }
+  };
+
   const openAvatarLibrary = async () => {
     setShowAvatarPickerModal(true);
     setLoadingAvatarLibrary(true);
@@ -989,6 +1057,71 @@ export function AdminEnterprises({
       {showCrawler && (
         <div style={{ animation: "fadeIn 0.25s ease-out" }}>
           <AdminCrawler />
+        </div>
+      )}
+
+      {/* Banner cấu hình Tiêu đề & Giới thiệu Mục Sự kiện ngoài Trang chủ */}
+      {activeTypeTab === "su-kien" && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)",
+            border: "1px solid #fed7aa",
+            borderRadius: "16px",
+            padding: "16px 20px",
+            marginBottom: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "14px",
+            boxShadow: "0 2px 10px rgba(234,88,12,0.06)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "10px",
+                background: "#ea580c",
+                color: "#fff",
+                display: "grid",
+                placeItems: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Calendar size={20} />
+            </div>
+            <div>
+              <strong style={{ fontSize: "14px", color: "#9a3412", display: "block" }}>
+                Tiêu đề & Giới thiệu Mục Sự Kiện ngoài Trang Chủ
+              </strong>
+              <span style={{ fontSize: "13px", color: "#7c2d12" }}>
+                Bạn có thể cập nhật dòng nhãn nhỏ ("LỊCH TRÌNH..."), tiêu đề chính ("Sự Kiện Sắp Diễn Ra") và đoạn văn mô tả ngoài trang chủ tại đây.
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={openEventHeadingModal}
+            style={{
+              padding: "9px 18px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#ea580c",
+              color: "#fff",
+              fontSize: "13px",
+              fontWeight: 800,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 2px 8px rgba(234,88,12,0.25)",
+            }}
+          >
+            <Edit3 size={15} /> Chỉnh sửa Tiêu đề & Giới thiệu Trang Chủ
+          </button>
         </div>
       )}
 
@@ -3105,6 +3238,268 @@ export function AdminEnterprises({
                 }}
               >
                 Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal chỉnh sửa Tiêu đề & Giới thiệu Mục Sự Kiện ngoài Trang Chủ */}
+      {showEventHeadingModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            padding: "20px",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !savingEventHeading) {
+              setShowEventHeadingModal(false);
+            }
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: "20px",
+              width: "min(680px, 100%)",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            {/* Header */}
+            <div
+              style={{
+                padding: "20px 24px",
+                borderBottom: "1px solid var(--line)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "#f8fafc",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div
+                  style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "10px",
+                    background: "#ea580c",
+                    color: "#fff",
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  <Calendar size={18} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>
+                    Chỉnh sửa Tiêu đề & Giới thiệu Mục Sự Kiện
+                  </h3>
+                  <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                    Hiển thị trên Trang chủ (khối Sự Kiện Sắp Diễn Ra)
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEventHeadingModal(false)}
+                disabled={savingEventHeading}
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  color: "#64748b",
+                  cursor: "pointer",
+                  padding: "6px",
+                  borderRadius: "6px",
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "24px", display: "grid", gap: "16px" }}>
+              {loadingEventHeading ? (
+                <div style={{ textAlign: "center", padding: "40px 0", color: "#64748b" }}>
+                  <Loader2 size={24} className="spin" style={{ margin: "0 auto 8px" }} />
+                  <span>Đang tải thông tin...</span>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: "grid", gap: "6px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                      Dòng nhãn nhỏ (Eyebrow Badge)
+                    </label>
+                    <input
+                      type="text"
+                      value={eventHeadingData.eventsEyebrow}
+                      onChange={(e) =>
+                        setEventHeadingData((prev) => ({ ...prev, eventsEyebrow: e.target.value }))
+                      }
+                      placeholder="vd: LỊCH TRÌNH SỰ KIỆN 2026 – 2027"
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid var(--line)",
+                        fontSize: "14px",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gap: "6px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                      Tiêu đề chính mục Sự Kiện
+                    </label>
+                    <input
+                      type="text"
+                      value={eventHeadingData.eventsTitle}
+                      onChange={(e) =>
+                        setEventHeadingData((prev) => ({ ...prev, eventsTitle: e.target.value }))
+                      }
+                      placeholder="vd: Sự Kiện Sắp Diễn Ra"
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid var(--line)",
+                        fontSize: "14px",
+                        fontWeight: 700,
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gap: "6px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                      Đoạn văn mô tả / giới thiệu
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={eventHeadingData.eventsDescription}
+                      onChange={(e) =>
+                        setEventHeadingData((prev) => ({ ...prev, eventsDescription: e.target.value }))
+                      }
+                      placeholder="Nhập đoạn văn mô tả giới thiệu các sự kiện..."
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid var(--line)",
+                        fontSize: "14px",
+                        lineHeight: 1.6,
+                        outline: "none",
+                        fontFamily: "inherit",
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: "grid", gap: "6px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                      Chữ trên nút xem tất cả sự kiện
+                    </label>
+                    <input
+                      type="text"
+                      value={eventHeadingData.eventsViewAllText}
+                      onChange={(e) =>
+                        setEventHeadingData((prev) => ({ ...prev, eventsViewAllText: e.target.value }))
+                      }
+                      placeholder="vd: Xem tất cả sự kiện"
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "8px",
+                        border: "1px solid var(--line)",
+                        fontSize: "14px",
+                        outline: "none",
+                      }}
+                    />
+                  </div>
+
+                  {eventHeadingMsg && (
+                    <div
+                      style={{
+                        padding: "12px 16px",
+                        borderRadius: "8px",
+                        fontSize: "13px",
+                        fontWeight: 700,
+                        background: eventHeadingMsg.type === "success" ? "#f0fdf4" : "#fef2f2",
+                        color: eventHeadingMsg.type === "success" ? "#166534" : "#991b1b",
+                        border: `1px solid ${eventHeadingMsg.type === "success" ? "#bbf7d0" : "#fecaca"}`,
+                      }}
+                    >
+                      {eventHeadingMsg.text}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                padding: "16px 24px",
+                borderTop: "1px solid var(--line)",
+                background: "#f8fafc",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setShowEventHeadingModal(false)}
+                disabled={savingEventHeading}
+                style={{
+                  padding: "9px 18px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  background: "#fff",
+                  color: "#475569",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                }}
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={saveEventHeading}
+                disabled={savingEventHeading || loadingEventHeading}
+                style={{
+                  padding: "9px 22px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#ea580c",
+                  color: "#fff",
+                  fontSize: "13px",
+                  fontWeight: 800,
+                  cursor: savingEventHeading ? "not-allowed" : "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  boxShadow: "0 2px 8px rgba(234,88,12,0.3)",
+                }}
+              >
+                {savingEventHeading ? (
+                  <>
+                    <Loader2 size={15} className="spin" /> Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <Check size={15} /> Lưu thay đổi
+                  </>
+                )}
               </button>
             </div>
           </div>

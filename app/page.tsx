@@ -23,12 +23,31 @@ import { getAllEvents } from "@/lib/enterprises";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: { canonical: "/" },
-  title: `THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | ${siteUrl.hostname}`,
-  description:
-    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
-};
+export async function generateMetadata() {
+  const content = await loadSiteContent();
+  const title = content.seoTitle || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu";
+  const description =
+    content.seoDescription ||
+    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.";
+  const ogImage = content.seoImage || "/images/logo.png";
+
+  return {
+    alternates: { canonical: "/" },
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImage }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 const serviceIcons = [Tv, Clapperboard, Megaphone, Sparkles, ChartNoAxesCombined, Palette];
 

@@ -1,6 +1,6 @@
 import Link from "@/components/link";
 import { ArrowUpRight, Award, ExternalLink, Handshake, HeartHandshake, Quote, Star, Users } from "lucide-react";
-import type { BrandItem, PressItem, TestimonialItem } from "@/lib/site-content";
+import type { BrandItem, ClientItem, PartnerItem, PressItem, TestimonialItem } from "@/lib/site-content";
 
 export function HomePressBrands({
   press,
@@ -11,13 +11,15 @@ export function HomePressBrands({
 }: {
   press: PressItem[];
   brands: BrandItem[];
-  partners: string[];
-  clients: string[];
+  partners: (PartnerItem | string)[];
+  clients: (ClientItem | string)[];
   testimonials: TestimonialItem[];
 }) {
   const visiblePress = (press || []).filter((item) => item.active !== false);
   const visibleBrands = (brands || []).filter((item) => item.active !== false);
   const visibleTestimonials = (testimonials || []).filter((item) => item.active !== false);
+  const visiblePartners = (partners || []).filter((item) => typeof item === "string" || item.active !== false);
+  const visibleClients = (clients || []).filter((item) => typeof item === "string" || item.active !== false);
 
   return (
     <>
@@ -118,12 +120,42 @@ export function HomePressBrands({
           </div>
 
           <div className="partners-grid-showcase">
-            {partners.map((partner, index) => (
-              <div className="partner-logo-item" key={index}>
-                <Handshake size={20} className="partner-icon" />
-                <span>{partner}</span>
-              </div>
-            ))}
+            {visiblePartners.map((item, index) => {
+              const name = typeof item === "string" ? item : item.name;
+              const logo = typeof item === "string" ? "" : item.logo;
+              const url = typeof item === "string" ? "" : item.url;
+              const key = typeof item === "string" ? index : item.id || index;
+
+              const Inner = (
+                <div className={`partner-logo-item ${logo ? "has-logo-img" : ""}`}>
+                  {logo ? (
+                    <div className="partner-logo-box">
+                      <img src={logo} alt={name} className="partner-logo-img" loading="lazy" />
+                    </div>
+                  ) : (
+                    <Handshake size={20} className="partner-icon" />
+                  )}
+                  <span className="partner-text">{name}</span>
+                </div>
+              );
+
+              return url ? (
+                <a
+                  href={url}
+                  key={key}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="partner-link-wrapper"
+                  title={name}
+                >
+                  {Inner}
+                </a>
+              ) : (
+                <div key={key} className="partner-link-wrapper">
+                  {Inner}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -163,15 +195,50 @@ export function HomePressBrands({
             ))}
           </div>
 
-          {/* Client Logos / Names */}
-          <div className="client-names-wrap">
-            <span className="client-names-title">CÁC DOANH NGHIỆP TIÊU BIỂU:</span>
-            <div className="client-tags-list">
-              {clients.map((client, index) => (
-                <span className="client-tag" key={index}>
-                  ✓ {client}
-                </span>
-              ))}
+          {/* Client Logos / Brands Showcase */}
+          <div className="client-logos-showcase-wrap">
+            <div className="client-logos-header">
+              <span className="client-names-title">CÁC THƯƠNG HIỆU & DOANH NGHIỆP ĐỒNG HÀNH:</span>
+            </div>
+            <div className="client-logos-grid">
+              {visibleClients.map((item, index) => {
+                const name = typeof item === "string" ? item : item.name;
+                const logo = typeof item === "string" ? "" : item.logo;
+                const url = typeof item === "string" ? "" : item.url;
+                const key = typeof item === "string" ? index : item.id || index;
+
+                const Card = (
+                  <div className={`client-logo-card ${logo ? "has-logo-img" : ""}`}>
+                    {logo ? (
+                      <div className="client-logo-box">
+                        <img src={logo} alt={name} className="client-brand-logo" loading="lazy" />
+                      </div>
+                    ) : (
+                      <div className="client-logo-initial">
+                        <span>{name.charAt(0)}</span>
+                      </div>
+                    )}
+                    <span className="client-brand-name">{name}</span>
+                  </div>
+                );
+
+                return url ? (
+                  <a
+                    href={url}
+                    key={key}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="client-logo-link"
+                    title={name}
+                  >
+                    {Card}
+                  </a>
+                ) : (
+                  <div key={key} className="client-logo-link">
+                    {Card}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

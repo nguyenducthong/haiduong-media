@@ -113,6 +113,22 @@ export type TestimonialItem = {
   active?: boolean;
 };
 
+export type PartnerItem = {
+  id?: string;
+  name: string;
+  logo?: string;
+  url?: string;
+  active?: boolean;
+};
+
+export type ClientItem = {
+  id?: string;
+  name: string;
+  logo?: string;
+  url?: string;
+  active?: boolean;
+};
+
 export type ProcessStep = {
   title: string;
   desc: string;
@@ -154,8 +170,8 @@ export type SiteContent = {
   press: PressItem[];
   brands: BrandItem[];
   testimonials: TestimonialItem[];
-  partners: string[];
-  clients: string[];
+  partners: PartnerItem[];
+  clients: ClientItem[];
   homepageSections: HomepageSection[];
   processEyebrow?: string;
   processTitle?: string;
@@ -164,6 +180,10 @@ export type SiteContent = {
   ctaTitle?: string;
   ctaButtonText?: string;
   ctaButtonHref?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoKeywords?: string;
+  seoImage?: string;
 };
 
 export const defaultSiteContent: SiteContent = {
@@ -452,27 +472,27 @@ export const defaultSiteContent: SiteContent = {
     },
   ],
   partners: [
-    "Đài Truyền hình Việt Nam (VTV)",
-    "Đài Truyền hình TP.HCM (HTV)",
-    "Báo VnExpress",
-    "Báo Dân Trí",
-    "Báo Tuổi Trẻ",
-    "Báo Thanh Niên",
-    "Báo VietnamNet",
-    "CafeF",
-    "Đài Tiếng nói Việt Nam (VOV)",
+    { id: "partner-1", name: "Đài Truyền hình Việt Nam (VTV)", logo: "", url: "", active: true },
+    { id: "partner-2", name: "Đài Truyền hình TP.HCM (HTV)", logo: "", url: "", active: true },
+    { id: "partner-3", name: "Báo VnExpress", logo: "", url: "", active: true },
+    { id: "partner-4", name: "Báo Dân Trí", logo: "", url: "", active: true },
+    { id: "partner-5", name: "Báo Tuổi Trẻ", logo: "", url: "", active: true },
+    { id: "partner-6", name: "Báo Thanh Niên", logo: "", url: "", active: true },
+    { id: "partner-7", name: "Báo VietnamNet", logo: "", url: "", active: true },
+    { id: "partner-8", name: "CafeF", logo: "", url: "", active: true },
+    { id: "partner-9", name: "Đài Tiếng nói Việt Nam (VOV)", logo: "", url: "", active: true },
   ],
   clients: [
-    "Tập đoàn Hoa Sen",
-    "BNI Vietnam",
-    "CMC Telecom",
-    "Tincom Media",
-    "Hồ Mây Park",
-    "ActionCOACH",
-    "Vũ Garden",
-    "Vườn Xoài Ecotourism",
-    "Westcor VN",
-    "PM International",
+    { id: "client-1", name: "Tập đoàn Hoa Sen", logo: "", url: "", active: true },
+    { id: "client-2", name: "BNI Vietnam", logo: "", url: "", active: true },
+    { id: "client-3", name: "CMC Telecom", logo: "", url: "", active: true },
+    { id: "client-4", name: "Tincom Media", logo: "", url: "", active: true },
+    { id: "client-5", name: "Hồ Mây Park", logo: "", url: "", active: true },
+    { id: "client-6", name: "ActionCOACH", logo: "", url: "", active: true },
+    { id: "client-7", name: "Vũ Garden", logo: "", url: "", active: true },
+    { id: "client-8", name: "Vườn Xoài Ecotourism", logo: "", url: "", active: true },
+    { id: "client-9", name: "Westcor VN", logo: "", url: "", active: true },
+    { id: "client-10", name: "PM International", logo: "", url: "", active: true },
   ],
   homepageSections: [
     { id: "banner", name: "Banner Slider nổi bật", enabled: true },
@@ -498,6 +518,10 @@ export const defaultSiteContent: SiteContent = {
   ctaTitle: "Đưa thương hiệu của bạn tỏa sáng trên sóng truyền hình quốc gia và báo chí hàng đầu.",
   ctaButtonText: "Liên hệ tư vấn ngay",
   ctaButtonHref: "/lien-he",
+  seoTitle: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
+  seoDescription: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
+  seoKeywords: "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, thương hiệu hàng đầu vn, truyền thông thương hiệu, sản xuất tvc vtv, booking báo chí pr, vinh danh thương hiệu",
+  seoImage: "/images/logo.png",
 };
 
 let tableEnsured = false;
@@ -699,12 +723,46 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
       }))
     : defaultSiteContent.testimonials;
 
-  const partners = Array.isArray(value.partners) && value.partners.length
-    ? value.partners.map(cleanBrandText)
+  const partners: PartnerItem[] = Array.isArray(value.partners) && value.partners.length
+    ? value.partners.map((p: any, i: number) => {
+        if (typeof p === "string") {
+          return {
+            id: `partner-${i + 1}`,
+            name: cleanBrandText(p),
+            logo: "",
+            url: "",
+            active: true,
+          };
+        }
+        return {
+          id: p?.id || `partner-${i + 1}`,
+          name: cleanBrandText(p?.name || "Đối tác"),
+          logo: p?.logo || "",
+          url: p?.url || "",
+          active: p?.active !== false,
+        };
+      })
     : defaultSiteContent.partners;
 
-  const clients = Array.isArray(value.clients) && value.clients.length
-    ? value.clients.map(cleanBrandText)
+  const clients: ClientItem[] = Array.isArray(value.clients) && value.clients.length
+    ? value.clients.map((c: any, i: number) => {
+        if (typeof c === "string") {
+          return {
+            id: `client-${i + 1}`,
+            name: cleanBrandText(c),
+            logo: "",
+            url: "",
+            active: true,
+          };
+        }
+        return {
+          id: c?.id || `client-${i + 1}`,
+          name: cleanBrandText(c?.name || "Khách hàng"),
+          logo: c?.logo || "",
+          url: c?.url || "",
+          active: c?.active !== false,
+        };
+      })
     : defaultSiteContent.clients;
 
   const processSteps = Array.isArray(value.processSteps) && value.processSteps.length
@@ -760,5 +818,9 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
     ctaTitle: value.ctaTitle?.trim() || defaultSiteContent.ctaTitle || "Đưa thương hiệu của bạn tỏa sáng trên sóng truyền hình quốc gia và báo chí hàng đầu.",
     ctaButtonText: value.ctaButtonText?.trim() || defaultSiteContent.ctaButtonText || "Liên hệ tư vấn ngay",
     ctaButtonHref: value.ctaButtonHref?.trim() || defaultSiteContent.ctaButtonHref || "/lien-he",
+    seoTitle: value.seoTitle?.trim() || defaultSiteContent.seoTitle || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
+    seoDescription: value.seoDescription?.trim() || defaultSiteContent.seoDescription || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
+    seoKeywords: value.seoKeywords?.trim() || defaultSiteContent.seoKeywords || "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, truyền thông thương hiệu, sản xuất tvc vtv",
+    seoImage: value.seoImage?.trim() || defaultSiteContent.seoImage || "/images/logo.png",
   };
 }

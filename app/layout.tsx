@@ -1,62 +1,67 @@
 import type { Metadata } from "next";
 import { siteUrl, absoluteSiteUrl } from "@/lib/site-url";
+import { loadSiteContent } from "@/lib/site-content";
 import { AutoPopupModal } from "@/components/auto-popup-modal";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: {
-    default: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-    template: "%s - Thương Hiệu Hàng Đầu VN",
-  },
-  description:
-    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
-  keywords: [
-    "thuonghieuhangdauvn",
-    "thương hiệu hàng đầu việt nam",
-    "thương hiệu hàng đầu vn",
-    "truyền thông thương hiệu",
-    "sản xuất tvc vtv",
-    "booking báo chí pr",
-    "vinh danh thương hiệu",
-    "thuong hieu hang dau viet nam",
-  ],
-  metadataBase: siteUrl,
-  openGraph: {
-    title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-    description:
-      "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
-    siteName: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
-    images: [
-      {
-        url: "/images/logo.png",
-        width: 1200,
-        height: 1200,
-        alt: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM - thuonghieuhangdauvn",
-      },
-    ],
-    locale: "vi_VN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu",
-    description:
-      "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
-    images: ["/images/logo.png"],
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/favicon.ico" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/favicon.png",
-    apple: "/apple-touch-icon.png",
-  },
-  verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await loadSiteContent();
+  const title = content.seoTitle || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu";
+  const description =
+    content.seoDescription ||
+    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.";
+  const ogImage = content.seoImage || "/images/logo.png";
+  const keywords = (
+    content.seoKeywords ||
+    "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, thương hiệu hàng đầu vn, truyền thông thương hiệu, sản xuất tvc vtv, booking báo chí pr, vinh danh thương hiệu"
+  )
+    .split(",")
+    .map((k) => k.trim())
+    .filter(Boolean);
+
+  return {
+    title: {
+      default: title,
+      template: `%s - ${content.brandName || "Thương Hiệu Hàng Đầu VN"}`,
+    },
+    description,
+    keywords,
+    metadataBase: siteUrl,
+    openGraph: {
+      title,
+      description,
+      siteName: content.brandName || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM",
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: title,
+        },
+      ],
+      locale: "vi_VN",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+    icons: {
+      icon: [
+        { url: "/favicon.png", type: "image/png" },
+        { url: "/favicon.ico" },
+        { url: "/favicon.svg", type: "image/svg+xml" },
+      ],
+      shortcut: "/favicon.png",
+      apple: "/apple-touch-icon.png",
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
+    },
+  };
+}
 
 const jsonLd = {
   "@context": "https://schema.org",

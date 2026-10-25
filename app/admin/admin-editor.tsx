@@ -38,10 +38,12 @@ import {
 import type {
   BannerSlide,
   BrandItem,
+  ClientItem,
   EventItem,
   HomepageSection,
   KnowledgeItem,
   NewsItem,
+  PartnerItem,
   PressItem,
   ProcessStep,
   SiteContent,
@@ -85,6 +87,8 @@ export default function AdminEditor({
   const [collapsedPress, setCollapsedPress] = useState<Record<string, boolean>>({});
   const [collapsedBrands, setCollapsedBrands] = useState<Record<string, boolean>>({});
   const [collapsedTestimonials, setCollapsedTestimonials] = useState<Record<string, boolean>>({});
+  const [collapsedPartners, setCollapsedPartners] = useState<Record<string, boolean>>({});
+  const [collapsedClients, setCollapsedClients] = useState<Record<string, boolean>>({});
 
   // String field update
   const update = (key: keyof SiteContent, value: string) =>
@@ -642,6 +646,124 @@ export default function AdminEditor({
   };
 
   // ==========================================
+  // PARTNERS (ĐỐI TÁC TRUYỀN THÔNG)
+  // ==========================================
+  const updatePartner = <K extends keyof PartnerItem>(index: number, key: K, value: PartnerItem[K]) =>
+    setContent((current) => ({
+      ...current,
+      partners: (current.partners || []).map((item, i) =>
+        i === index ? { ...item, [key]: value } : item
+      ),
+    }));
+
+  const addPartner = () => {
+    const newId = `partner-${Date.now()}`;
+    const newItem: PartnerItem = {
+      id: newId,
+      name: "Tên Đối Tác Mới",
+      logo: "",
+      url: "",
+      active: true,
+    };
+    setContent((current) => ({
+      ...current,
+      partners: [newItem, ...(current.partners || [])],
+    }));
+    setCollapsedPartners((prev) => ({ ...prev, [newId]: false }));
+  };
+
+  const removePartner = (index: number) => {
+    if (!confirm("Bạn có chắc muốn xóa đối tác này?")) return;
+    setContent((current) => ({
+      ...current,
+      partners: (current.partners || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const movePartner = (index: number, direction: "up" | "down") => {
+    setContent((current) => {
+      const list = [...(current.partners || [])];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= list.length) return current;
+      const temp = list[index];
+      list[index] = list[targetIndex];
+      list[targetIndex] = temp;
+      return { ...current, partners: list };
+    });
+  };
+
+  const toggleCollapsePartner = (id: string) => {
+    setCollapsedPartners((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
+  };
+
+  const setAllPartnerCollapse = (collapsed: boolean) => {
+    const next: Record<string, boolean> = {};
+    (content.partners || []).forEach((p, i) => {
+      next[p.id || `partner-${i}`] = collapsed;
+    });
+    setCollapsedPartners(next);
+  };
+
+  // ==========================================
+  // CLIENTS (KHÁCH HÀNG & THƯƠNG HIỆU TIÊU BIỂU)
+  // ==========================================
+  const updateClient = <K extends keyof ClientItem>(index: number, key: K, value: ClientItem[K]) =>
+    setContent((current) => ({
+      ...current,
+      clients: (current.clients || []).map((item, i) =>
+        i === index ? { ...item, [key]: value } : item
+      ),
+    }));
+
+  const addClient = () => {
+    const newId = `client-${Date.now()}`;
+    const newItem: ClientItem = {
+      id: newId,
+      name: "Tên Thương Hiệu Mới",
+      logo: "",
+      url: "",
+      active: true,
+    };
+    setContent((current) => ({
+      ...current,
+      clients: [newItem, ...(current.clients || [])],
+    }));
+    setCollapsedClients((prev) => ({ ...prev, [newId]: false }));
+  };
+
+  const removeClient = (index: number) => {
+    if (!confirm("Bạn có chắc muốn xóa khách hàng / thương hiệu này?")) return;
+    setContent((current) => ({
+      ...current,
+      clients: (current.clients || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const moveClient = (index: number, direction: "up" | "down") => {
+    setContent((current) => {
+      const list = [...(current.clients || [])];
+      const targetIndex = direction === "up" ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= list.length) return current;
+      const temp = list[index];
+      list[index] = list[targetIndex];
+      list[targetIndex] = temp;
+      return { ...current, clients: list };
+    });
+  };
+
+  const toggleCollapseClient = (id: string) => {
+    setCollapsedClients((prev) => ({ ...prev, [id]: !(prev[id] ?? true) }));
+  };
+
+  const setAllClientCollapse = (collapsed: boolean) => {
+    const next: Record<string, boolean> = {};
+    (content.clients || []).forEach((c, i) => {
+      next[c.id || `client-${i}`] = collapsed;
+    });
+    setCollapsedClients(next);
+  };
+
+  // ==========================================
   // 10. QUY TRÌNH 4 BƯỚC
   // ==========================================
   const updateProcessStep = (index: number, key: "title" | "desc", value: string) =>
@@ -928,7 +1050,8 @@ export default function AdminEditor({
               <>
                 <strong>Cấu hình chung</strong>
                 <a href="#thuong-hieu">01. Thông tin Thương hiệu</a>
-                <a href="#lien-he">02. Thông tin Liên hệ</a>
+                <a href="#seo-chia-se">02. SEO & Chia sẻ Link (Zalo/FB)</a>
+                <a href="#lien-he">03. Thông tin Liên hệ</a>
               </>
             )}
           </aside>
@@ -3864,37 +3987,653 @@ export default function AdminEditor({
           id="doi-tac-admin"
           number="10"
           title="Đối Tác Truyền Thông & Khách Hàng Tiêu Biểu"
-          description="Chỉnh sửa danh sách các đài truyền hình, cơ quan báo chí đối tác và các doanh nghiệp lớn đồng hành."
+          description="Quản lý và tải lên ảnh logo của các đài truyền hình, cơ quan báo chí đối tác và các thương hiệu, doanh nghiệp lớn đồng hành."
         >
-          <Field
-            label="Danh sách Đối tác truyền thông (Mỗi dòng một đối tác, ví dụ: Đài Truyền hình Việt Nam (VTV))"
-            value={(content.partners || []).join("\n")}
-            onChange={(val) =>
-              setContent((current) => ({
-                ...current,
-                partners: val
-                  .split("\n")
-                  .map((s) => s.trim())
-                  .filter(Boolean),
-              }))
-            }
-            multiline
-          />
+          {/* PHẦN 1: ĐỐI TÁC TRUYỀN THÔNG */}
+          <div style={{ marginBottom: "36px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+                paddingBottom: "12px",
+                borderBottom: "1px solid var(--line)",
+              }}
+            >
+              <div>
+                <h4 style={{ margin: "0 0 4px", fontSize: "16px", color: "#0f172a", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Handshake size={20} color="#d42027" /> 1. Đối Tác Truyền Thông (Báo chí & Đài truyền hình)
+                </h4>
+                <span style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 700 }}>
+                  Hiện có {(content.partners || []).length} đối tác truyền thông
+                </span>
+              </div>
 
-          <Field
-            label="Danh sách Doanh nghiệp tiêu biểu (Mỗi dòng một thương hiệu, ví dụ: Tập đoàn Hoa Sen, CMC Telecom)"
-            value={(content.clients || []).join("\n")}
-            onChange={(val) =>
-              setContent((current) => ({
-                ...current,
-                clients: val
-                  .split("\n")
-                  .map((s) => s.trim())
-                  .filter(Boolean),
-              }))
-            }
-            multiline
-          />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => setAllPartnerCollapse(true)}
+                  style={{ padding: "4px 10px", fontSize: "12px", borderRadius: "6px", border: "1px solid var(--line)", background: "#fff", cursor: "pointer", fontWeight: 700 }}
+                >
+                  Thu gọn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAllPartnerCollapse(false)}
+                  style={{ padding: "4px 10px", fontSize: "12px", borderRadius: "6px", border: "1px solid var(--line)", background: "#fff", cursor: "pointer", fontWeight: 700 }}
+                >
+                  Mở rộng
+                </button>
+                <button
+                  type="button"
+                  onClick={addPartner}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "8px 16px",
+                    borderRadius: "8px",
+                    background: "#0f172a",
+                    color: "#fff",
+                    fontWeight: 800,
+                    fontSize: "13px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Plus size={16} /> Thêm Đối Tác Mới
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gap: "14px" }}>
+              {(content.partners || []).map((partner, index) => {
+                const partnerId = partner.id || `partner-${index}`;
+                const isCollapsed = collapsedPartners[partnerId] ?? true;
+
+                return (
+                  <div
+                    key={partnerId}
+                    style={{
+                      border: "1px solid var(--line)",
+                      borderRadius: "14px",
+                      background: partner.active !== false ? "#ffffff" : "#f8fafc",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "12px 16px",
+                        background: "#fafbfd",
+                        borderBottom: isCollapsed ? "none" : "1px solid var(--line)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => toggleCollapsePartner(partnerId)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+                        {partner.logo ? (
+                          <div
+                            style={{
+                              width: "38px",
+                              height: "26px",
+                              borderRadius: "4px",
+                              background: "#fff",
+                              border: "1px solid var(--line)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "2px",
+                              overflow: "hidden",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <img src={partner.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: "38px",
+                              height: "26px",
+                              borderRadius: "4px",
+                              background: "#f1f5f9",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "#64748b",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <Handshake size={14} />
+                          </div>
+                        )}
+
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 900,
+                            color: "#d42027",
+                            background: "rgba(212,32,39,0.1)",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          #{index + 1}
+                        </span>
+
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <strong style={{ fontSize: "14px", color: "#0f172a", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {partner.name || "Chưa đặt tên đối tác"}
+                          </strong>
+                        </div>
+
+                        {partner.active === false ? (
+                          <span style={{ fontSize: "11px", padding: "3px 8px", borderRadius: "999px", background: "#f1f5f9", color: "#64748b", fontWeight: 700 }}>
+                            Đã ẩn
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: "11px", padding: "3px 8px", borderRadius: "999px", background: "#edfff4", color: "#166534", fontWeight: 700 }}>
+                            Active
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }} onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          disabled={index === 0}
+                          onClick={() => movePartner(index, "up")}
+                          title="Di chuyển lên"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: index === 0 ? "not-allowed" : "pointer",
+                            opacity: index === 0 ? 0.3 : 1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={index === (content.partners || []).length - 1}
+                          onClick={() => movePartner(index, "down")}
+                          title="Di chuyển xuống"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: index === (content.partners || []).length - 1 ? "not-allowed" : "pointer",
+                            opacity: index === (content.partners || []).length - 1 ? 0.3 : 1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => updatePartner(index, "active", partner.active === false)}
+                          title={partner.active === false ? "Bật hiển thị" : "Tắt (Ẩn)"}
+                          style={{
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: partner.active !== false ? "#edfff4" : "#f1f5f9",
+                            color: partner.active !== false ? "#166534" : "#64748b",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          {partner.active !== false ? <Eye size={12} /> : <EyeOff size={12} />}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => removePartner(index)}
+                          title="Xóa đối tác"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid #fee2e2",
+                            background: "#fff5f5",
+                            color: "#ef4444",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleCollapsePartner(partnerId)}
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {isCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {!isCollapsed && (
+                      <div style={{ padding: "16px 20px", display: "grid", gap: "14px" }}>
+                        <ImageUploadField
+                          label="Upload ảnh Logo Đối Tác (Chọn ảnh từ máy hoặc dán link URL)"
+                          value={partner.logo || ""}
+                          onChange={(val) => updatePartner(index, "logo", val)}
+                          placeholder="Chọn file logo từ máy tính (PNG, JPG, SVG, WebP) hoặc dán link URL..."
+                        />
+
+                        <div className="field-row">
+                          <Field
+                            label="Tên Đối Tác Truyền Thông (ví dụ: Đài Truyền hình Việt Nam (VTV))"
+                            value={partner.name || ""}
+                            onChange={(val) => updatePartner(index, "name", val)}
+                          />
+                          <Field
+                            label="Đường dẫn liên kết (Link website nếu có, ví dụ: https://vtv.vn)"
+                            value={partner.url || ""}
+                            onChange={(val) => updatePartner(index, "url", val)}
+                          />
+                        </div>
+
+                        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: 700, color: "#334155", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={partner.active !== false}
+                            onChange={(e) => updatePartner(index, "active", e.target.checked)}
+                            style={{ width: "16px", height: "16px", accentColor: "#d42027" }}
+                          />
+                          Hiển thị đối tác này trên trang chủ (Active)
+                        </label>
+
+                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px", borderTop: "1px solid var(--line)", paddingTop: "10px" }}>
+                          <button
+                            type="button"
+                            onClick={saveAllContent}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              padding: "6px 14px",
+                              borderRadius: "8px",
+                              background: "#d42027",
+                              color: "#fff",
+                              border: "none",
+                              fontWeight: 800,
+                              fontSize: "12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Save size={14} /> Lưu thay đổi
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* PHẦN 2: KHÁCH HÀNG & THƯƠNG HIỆU TIÊU BIỂU */}
+          <div>
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "16px",
+                paddingBottom: "12px",
+                borderBottom: "1px solid var(--line)",
+              }}
+            >
+              <div>
+                <h4 style={{ margin: "0 0 4px", fontSize: "16px", color: "#0f172a", fontWeight: 800, display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Building2 size={20} color="#d42027" /> 2. Khách Hàng & Thương Hiệu Tiêu Biểu Đồng Hành
+                </h4>
+                <span style={{ fontSize: "13px", color: "var(--muted)", fontWeight: 700 }}>
+                  Hiện có {(content.clients || []).length} thương hiệu / khách hàng
+                </span>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => setAllClientCollapse(true)}
+                  style={{ padding: "4px 10px", fontSize: "12px", borderRadius: "6px", border: "1px solid var(--line)", background: "#fff", cursor: "pointer", fontWeight: 700 }}
+                >
+                  Thu gọn
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAllClientCollapse(false)}
+                  style={{ padding: "4px 10px", fontSize: "12px", borderRadius: "6px", border: "1px solid var(--line)", background: "#fff", cursor: "pointer", fontWeight: 700 }}
+                >
+                  Mở rộng
+                </button>
+                <button
+                  type="button"
+                  onClick={addClient}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    padding: "8px 16px",
+                    borderRadius: "8px",
+                    background: "#d42027",
+                    color: "#fff",
+                    fontWeight: 800,
+                    fontSize: "13px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Plus size={16} /> Thêm Thương Hiệu Mới
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gap: "14px" }}>
+              {(content.clients || []).map((client, index) => {
+                const clientId = client.id || `client-${index}`;
+                const isCollapsed = collapsedClients[clientId] ?? true;
+
+                return (
+                  <div
+                    key={clientId}
+                    style={{
+                      border: "1px solid var(--line)",
+                      borderRadius: "14px",
+                      background: client.active !== false ? "#ffffff" : "#f8fafc",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.02)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "12px 16px",
+                        background: "#fafbfd",
+                        borderBottom: isCollapsed ? "none" : "1px solid var(--line)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => toggleCollapseClient(clientId)}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", flex: 1, minWidth: 0 }}>
+                        {client.logo ? (
+                          <div
+                            style={{
+                              width: "38px",
+                              height: "26px",
+                              borderRadius: "4px",
+                              background: "#fff",
+                              border: "1px solid var(--line)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              padding: "2px",
+                              overflow: "hidden",
+                              flexShrink: 0,
+                            }}
+                          >
+                            <img src={client.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              width: "38px",
+                              height: "26px",
+                              borderRadius: "4px",
+                              background: "rgba(212,32,39,0.08)",
+                              color: "#d42027",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: 900,
+                              fontSize: "12px",
+                              flexShrink: 0,
+                            }}
+                          >
+                            {(client.name || "C").charAt(0)}
+                          </div>
+                        )}
+
+                        <span
+                          style={{
+                            fontSize: "11px",
+                            fontWeight: 900,
+                            color: "#d42027",
+                            background: "rgba(212,32,39,0.1)",
+                            padding: "3px 8px",
+                            borderRadius: "6px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          #{index + 1}
+                        </span>
+
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                          <strong style={{ fontSize: "14px", color: "#0f172a", display: "block", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {client.name || "Chưa đặt tên thương hiệu"}
+                          </strong>
+                        </div>
+
+                        {client.active === false ? (
+                          <span style={{ fontSize: "11px", padding: "3px 8px", borderRadius: "999px", background: "#f1f5f9", color: "#64748b", fontWeight: 700 }}>
+                            Đã ẩn
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: "11px", padding: "3px 8px", borderRadius: "999px", background: "#edfff4", color: "#166534", fontWeight: 700 }}>
+                            Active
+                          </span>
+                        )}
+                      </div>
+
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }} onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          disabled={index === 0}
+                          onClick={() => moveClient(index, "up")}
+                          title="Di chuyển lên"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: index === 0 ? "not-allowed" : "pointer",
+                            opacity: index === 0 ? 0.3 : 1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ArrowUp size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={index === (content.clients || []).length - 1}
+                          onClick={() => moveClient(index, "down")}
+                          title="Di chuyển xuống"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: index === (content.clients || []).length - 1 ? "not-allowed" : "pointer",
+                            opacity: index === (content.clients || []).length - 1 ? 0.3 : 1,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <ArrowDown size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => updateClient(index, "active", client.active === false)}
+                          title={client.active === false ? "Bật hiển thị" : "Tắt (Ẩn)"}
+                          style={{
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: client.active !== false ? "#edfff4" : "#f1f5f9",
+                            color: client.active !== false ? "#166534" : "#64748b",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                            fontWeight: 700,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "4px",
+                          }}
+                        >
+                          {client.active !== false ? <Eye size={12} /> : <EyeOff size={12} />}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => removeClient(index)}
+                          title="Xóa thương hiệu"
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid #fee2e2",
+                            background: "#fff5f5",
+                            color: "#ef4444",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleCollapseClient(clientId)}
+                          style={{
+                            width: "28px",
+                            height: "28px",
+                            borderRadius: "6px",
+                            border: "1px solid var(--line)",
+                            background: "#fff",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {isCollapsed ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {!isCollapsed && (
+                      <div style={{ padding: "16px 20px", display: "grid", gap: "14px" }}>
+                        <ImageUploadField
+                          label="Upload ảnh Logo Thương Hiệu / Doanh Nghiệp (Chọn ảnh từ máy hoặc dán link URL)"
+                          value={client.logo || ""}
+                          onChange={(val) => updateClient(index, "logo", val)}
+                          placeholder="Chọn file logo từ máy tính (PNG, JPG, SVG, WebP) hoặc dán link URL..."
+                        />
+
+                        <div className="field-row">
+                          <Field
+                            label="Tên Thương Hiệu / Khách Hàng (ví dụ: Tập đoàn Hoa Sen, CMC Telecom)"
+                            value={client.name || ""}
+                            onChange={(val) => updateClient(index, "name", val)}
+                          />
+                          <Field
+                            label="Đường dẫn liên kết (Link website nếu có, ví dụ: https://hoasengroup.vn)"
+                            value={client.url || ""}
+                            onChange={(val) => updateClient(index, "url", val)}
+                          />
+                        </div>
+
+                        <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: 700, color: "#334155", cursor: "pointer" }}>
+                          <input
+                            type="checkbox"
+                            checked={client.active !== false}
+                            onChange={(e) => updateClient(index, "active", e.target.checked)}
+                            style={{ width: "16px", height: "16px", accentColor: "#d42027" }}
+                          />
+                          Hiển thị thương hiệu này trên trang chủ (Active)
+                        </label>
+
+                        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px", borderTop: "1px solid var(--line)", paddingTop: "10px" }}>
+                          <button
+                            type="button"
+                            onClick={saveAllContent}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              padding: "6px 14px",
+                              borderRadius: "8px",
+                              background: "#d42027",
+                              color: "#fff",
+                              border: "none",
+                              fontWeight: 800,
+                              fontSize: "12px",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <Save size={14} /> Lưu thay đổi
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </EditorSection>
 
         {/* ========================================================
@@ -3993,7 +4732,7 @@ export default function AdminEditor({
             ======================================================== */}
         <EditorSection
           id="thuong-hieu"
-          number="12"
+          number="01"
           title="Thông tin thương hiệu"
           description="Tên và câu mô tả ngắn hiển thị tại đầu và chân trang."
         >
@@ -4013,6 +4752,122 @@ export default function AdminEditor({
             onChange={(value) => update("footerNote", value)}
             multiline
           />
+        </EditorSection>
+
+        {/* ========================================================
+            SEO & THẺ CHIA SẺ LINK (ZALO, FACEBOOK, GOOGLE)
+            ======================================================== */}
+        <EditorSection
+          id="seo-chia-se"
+          number="02"
+          title="Cấu hình SEO & Thẻ Chia sẻ Link (Zalo, Facebook, Google)"
+          description="Chỉnh sửa tiêu đề, đoạn mô tả ngắn và hình ảnh thu nhỏ hiển thị khi gửi link website qua Zalo, Messenger, Facebook hoặc tìm kiếm Google."
+        >
+          <Field
+            label="Tiêu đề hiển thị khi chia sẻ link (Meta / OG Title)"
+            value={content.seoTitle || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu"}
+            onChange={(value) => update("seoTitle", value)}
+            placeholder="Ví dụ: THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu"
+          />
+
+          <Field
+            label="Mô tả ngắn khi chia sẻ link trên Zalo / Facebook / Google (Meta / OG Description)"
+            value={
+              content.seoDescription ||
+              "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu."
+            }
+            onChange={(value) => update("seoDescription", value)}
+            multiline
+            placeholder="Nhập đoạn giới thiệu ngắn hiển thị bên dưới tiêu đề khi gửi link..."
+          />
+
+          <ImageUploadField
+            label="Ảnh thu nhỏ khi chia sẻ link (Thumbnail / OG Image)"
+            value={content.seoImage || "/images/logo.png"}
+            onChange={(value) => update("seoImage", value)}
+            placeholder="Chọn ảnh từ máy tính hoặc dán link ảnh (mặc định: /images/logo.png)"
+          />
+
+          <Field
+            label="Từ khóa SEO (Keywords - cách nhau bằng dấu phẩy)"
+            value={
+              content.seoKeywords ||
+              "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, thương hiệu hàng đầu vn, truyền thông thương hiệu, sản xuất tvc vtv, booking báo chí pr, vinh danh thương hiệu"
+            }
+            onChange={(value) => update("seoKeywords", value)}
+          />
+
+          {/* Bản xem trước trực tiếp (Zalo / Facebook Link Preview) */}
+          <div style={{ marginTop: "12px" }}>
+            <span style={{ display: "block", fontSize: "12px", fontWeight: 800, color: "#475569", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              Xem trước hiển thị khi gửi link trên Zalo / Facebook:
+            </span>
+            <div
+              style={{
+                maxWidth: "420px",
+                borderRadius: "12px",
+                overflow: "hidden",
+                border: "1px solid #cbd5e1",
+                background: "#e9f2fd",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+                fontFamily: "system-ui, -apple-system, sans-serif",
+              }}
+            >
+              <div style={{ width: "100%", height: "210px", background: "#fff", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <img
+                  src={content.seoImage || "/images/logo.png"}
+                  alt="Preview"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    left: "10px",
+                    background: "rgba(0,0,0,0.6)",
+                    color: "#fff",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    padding: "2px 6px",
+                    borderRadius: "4px",
+                  }}
+                >
+                  HD
+                </span>
+              </div>
+              <div style={{ padding: "12px 14px" }}>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#0f172a",
+                    marginBottom: "4px",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {content.seoTitle || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM | Truyền thông & Thương hiệu"}
+                </div>
+                <div
+                  style={{
+                    fontSize: "13px",
+                    color: "#475569",
+                    lineHeight: 1.4,
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                    overflow: "hidden",
+                    marginBottom: "6px",
+                  }}
+                >
+                  {content.seoDescription ||
+                    "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu."}
+                </div>
+                <div style={{ fontSize: "12px", color: "#2563eb" }}>thuonghieuhangdauvn.com</div>
+              </div>
+            </div>
+          </div>
         </EditorSection>
       </>
     )}

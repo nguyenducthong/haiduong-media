@@ -472,27 +472,27 @@ export const defaultSiteContent: SiteContent = {
     },
   ],
   partners: [
-    { id: "partner-1", name: "Đài Truyền hình Việt Nam (VTV)", logo: "", url: "", active: true },
-    { id: "partner-2", name: "Đài Truyền hình TP.HCM (HTV)", logo: "", url: "", active: true },
-    { id: "partner-3", name: "Báo VnExpress", logo: "", url: "", active: true },
-    { id: "partner-4", name: "Báo Dân Trí", logo: "", url: "", active: true },
-    { id: "partner-5", name: "Báo Tuổi Trẻ", logo: "", url: "", active: true },
-    { id: "partner-6", name: "Báo Thanh Niên", logo: "", url: "", active: true },
-    { id: "partner-7", name: "Báo VietnamNet", logo: "", url: "", active: true },
-    { id: "partner-8", name: "CafeF", logo: "", url: "", active: true },
-    { id: "partner-9", name: "Đài Tiếng nói Việt Nam (VOV)", logo: "", url: "", active: true },
+    { id: "partner-1", name: "Đài Truyền hình Việt Nam (VTV)", logo: "/images/partners/vtv.png", url: "https://vtv.vn", active: true },
+    { id: "partner-2", name: "Đài Truyền hình TP.HCM (HTV)", logo: "/images/partners/htv.png", url: "https://htv.com.vn", active: true },
+    { id: "partner-3", name: "Báo Dân Trí", logo: "/images/partners/dantri.png", url: "https://dantri.com.vn", active: true },
+    { id: "partner-4", name: "Báo Thanh Niên", logo: "/images/partners/thanh-nien.png", url: "https://thanhnien.vn", active: true },
+    { id: "partner-5", name: "Báo VietnamNet", logo: "/images/partners/vietnamnet.png", url: "https://vietnamnet.vn", active: true },
+    { id: "partner-6", name: "CafeF", logo: "/images/partners/cafef.png", url: "https://cafef.vn", active: true },
+    { id: "partner-7", name: "Báo VnExpress", logo: "", url: "https://vnexpress.net", active: true },
+    { id: "partner-8", name: "Báo Tuổi Trẻ", logo: "", url: "https://tuoitre.vn", active: true },
+    { id: "partner-9", name: "Đài Tiếng nói Việt Nam (VOV)", logo: "", url: "https://vov.vn", active: true },
   ],
   clients: [
-    { id: "client-1", name: "Tập đoàn Hoa Sen", logo: "", url: "", active: true },
-    { id: "client-2", name: "BNI Vietnam", logo: "", url: "", active: true },
-    { id: "client-3", name: "CMC Telecom", logo: "", url: "", active: true },
-    { id: "client-4", name: "Tincom Media", logo: "", url: "", active: true },
-    { id: "client-5", name: "Hồ Mây Park", logo: "", url: "", active: true },
-    { id: "client-6", name: "ActionCOACH", logo: "", url: "", active: true },
-    { id: "client-7", name: "Vũ Garden", logo: "", url: "", active: true },
-    { id: "client-8", name: "Vườn Xoài Ecotourism", logo: "", url: "", active: true },
-    { id: "client-9", name: "Westcor VN", logo: "", url: "", active: true },
-    { id: "client-10", name: "PM International", logo: "", url: "", active: true },
+    { id: "client-1", name: "ActionCOACH", logo: "/images/clients/action-coach.png", url: "", active: true },
+    { id: "client-2", name: "APAC", logo: "/images/clients/apac.jpg", url: "", active: true },
+    { id: "client-3", name: "CMC Telecom", logo: "/images/clients/cmc-telecom.png", url: "", active: true },
+    { id: "client-4", name: "Hồ Mây Park", logo: "/images/clients/ho-may-park.png", url: "", active: true },
+    { id: "client-5", name: "PM International", logo: "/images/clients/pm-international.jpg", url: "", active: true },
+    { id: "client-6", name: "Vũ Garden", logo: "/images/clients/vu-garden.png", url: "", active: true },
+    { id: "client-7", name: "Vườn Xoài Ecotourism", logo: "/images/clients/vuon-xoai.png", url: "", active: true },
+    { id: "client-8", name: "Westcor VN", logo: "/images/clients/westcor-vn.png", url: "", active: true },
+    { id: "client-9", name: "Tập đoàn Hoa Sen", logo: "/images/clients/hoa-sen-group.png", url: "", active: true },
+    { id: "client-10", name: "BNI Vietnam", logo: "/images/clients/bni-vietnam.png", url: "", active: true },
   ],
   homepageSections: [
     { id: "banner", name: "Banner Slider nổi bật", enabled: true },
@@ -726,18 +726,20 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
   const partners: PartnerItem[] = Array.isArray(value.partners) && value.partners.length
     ? value.partners.map((p: any, i: number) => {
         if (typeof p === "string") {
+          const matchDefault = defaultSiteContent.partners.find((dp) => dp.name.toLowerCase() === p.toLowerCase() || p.toLowerCase().includes(dp.name.toLowerCase()) || dp.name.toLowerCase().includes(p.toLowerCase()));
           return {
             id: `partner-${i + 1}`,
             name: cleanBrandText(p),
-            logo: "",
-            url: "",
+            logo: matchDefault?.logo || "",
+            url: matchDefault?.url || "",
             active: true,
           };
         }
+        const defaultLogo = defaultSiteContent.partners.find((dp) => dp.id === p.id || dp.name.toLowerCase() === (p.name || "").toLowerCase())?.logo || "";
         return {
           id: p?.id || `partner-${i + 1}`,
           name: cleanBrandText(p?.name || "Đối tác"),
-          logo: p?.logo || "",
+          logo: p?.logo || defaultLogo,
           url: p?.url || "",
           active: p?.active !== false,
         };
@@ -747,18 +749,20 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
   const clients: ClientItem[] = Array.isArray(value.clients) && value.clients.length
     ? value.clients.map((c: any, i: number) => {
         if (typeof c === "string") {
+          const matchDefault = defaultSiteContent.clients.find((dc) => dc.name.toLowerCase() === c.toLowerCase() || c.toLowerCase().includes(dc.name.toLowerCase()) || dc.name.toLowerCase().includes(c.toLowerCase()));
           return {
             id: `client-${i + 1}`,
             name: cleanBrandText(c),
-            logo: "",
-            url: "",
+            logo: matchDefault?.logo || "",
+            url: matchDefault?.url || "",
             active: true,
           };
         }
+        const defaultLogo = defaultSiteContent.clients.find((dc) => dc.id === c.id || dc.name.toLowerCase() === (c.name || "").toLowerCase())?.logo || "";
         return {
           id: c?.id || `client-${i + 1}`,
           name: cleanBrandText(c?.name || "Khách hàng"),
-          logo: c?.logo || "",
+          logo: c?.logo || defaultLogo,
           url: c?.url || "",
           active: c?.active !== false,
         };

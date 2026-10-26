@@ -4084,17 +4084,18 @@ export default function AdminEditor({
                         {partner.logo ? (
                           <div
                             style={{
-                              width: "38px",
-                              height: "26px",
-                              borderRadius: "4px",
+                              width: "64px",
+                              height: "42px",
+                              borderRadius: "8px",
                               background: "#fff",
                               border: "1px solid var(--line)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              padding: "2px",
+                              padding: "3px 6px",
                               overflow: "hidden",
                               flexShrink: 0,
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                             }}
                           >
                             <img src={partner.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
@@ -4102,9 +4103,9 @@ export default function AdminEditor({
                         ) : (
                           <div
                             style={{
-                              width: "38px",
-                              height: "26px",
-                              borderRadius: "4px",
+                              width: "64px",
+                              height: "42px",
+                              borderRadius: "8px",
                               background: "#f1f5f9",
                               display: "flex",
                               alignItems: "center",
@@ -4113,7 +4114,7 @@ export default function AdminEditor({
                               flexShrink: 0,
                             }}
                           >
-                            <Handshake size={14} />
+                            <Handshake size={18} />
                           </div>
                         )}
 
@@ -4406,17 +4407,18 @@ export default function AdminEditor({
                         {client.logo ? (
                           <div
                             style={{
-                              width: "38px",
-                              height: "26px",
-                              borderRadius: "4px",
+                              width: "64px",
+                              height: "42px",
+                              borderRadius: "8px",
                               background: "#fff",
                               border: "1px solid var(--line)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
-                              padding: "2px",
+                              padding: "3px 6px",
                               overflow: "hidden",
                               flexShrink: 0,
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                             }}
                           >
                             <img src={client.logo} alt="" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
@@ -4424,16 +4426,16 @@ export default function AdminEditor({
                         ) : (
                           <div
                             style={{
-                              width: "38px",
-                              height: "26px",
-                              borderRadius: "4px",
+                              width: "64px",
+                              height: "42px",
+                              borderRadius: "8px",
                               background: "rgba(212,32,39,0.08)",
                               color: "#d42027",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontWeight: 900,
-                              fontSize: "12px",
+                              fontSize: "14px",
                               flexShrink: 0,
                             }}
                           >

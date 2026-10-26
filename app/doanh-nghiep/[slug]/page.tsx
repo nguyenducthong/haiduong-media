@@ -1,5 +1,5 @@
 import Link from "@/components/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import {
   CalendarDays,
   Eye,
@@ -23,6 +23,14 @@ export async function generateMetadata({
   const { slug } = await params;
   const article = await getEnterpriseBySlug(slug);
   if (!article) return { title: "Không tìm thấy bài viết" };
+
+  if (article.type === "su-kien") {
+    return {
+      alternates: { canonical: `/su-kien/${encodeURIComponent(article.slug || slug)}` },
+      title: article.title,
+      description: article.excerpt || article.title,
+    };
+  }
 
   return {
     alternates: { canonical: `/doanh-nghiep/${encodeURIComponent(article.slug || slug)}` },
@@ -50,6 +58,11 @@ export default async function EnterpriseDetailPage({
 
   if (!article) {
     notFound();
+  }
+
+  // Redirect 301 về URL chuẩn /su-kien để tránh trùng lặp nội dung theo khuyến nghị SEO
+  if (article.type === "su-kien") {
+    redirect(`/su-kien/${encodeURIComponent(article.slug || slug)}`);
   }
 
   const related = allEnterprises.filter((a) => a.slug !== article.slug).slice(0, 4);

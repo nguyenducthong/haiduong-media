@@ -83,9 +83,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
-    // 3. Các bài viết doanh nghiệp / thương hiệu
+    // 3. Các bài viết doanh nghiệp / thương hiệu (chỉ lấy bài thuộc danh mục doanh nghiệp, loại trừ sự kiện để tránh trùng lặp URL với /su-kien)
     const enterpriseRoutes: MetadataRoute.Sitemap = (enterprises || [])
-      .filter((item) => item.active !== false && (item.slug || item.id))
+      .filter((item) => item.active !== false && (item.slug || item.id) && item.type !== "su-kien")
       .map((item) => ({
         url: `${baseUrl}/doanh-nghiep/${item.slug || item.id}`,
         lastModified: now,

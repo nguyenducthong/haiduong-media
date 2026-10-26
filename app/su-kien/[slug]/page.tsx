@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { loadSiteContent } from "@/lib/site-content";
+import { siteUrl } from "@/lib/site-url";
 import { getUnifiedEventBySlug, getAllEvents } from "@/lib/enterprises";
 import { ArticleContentRenderer } from "@/components/article-content-renderer";
 
@@ -60,9 +61,74 @@ export default async function EventDetailPage({
 
   const otherEvents = allEvents.filter((e) => e.slug !== slug);
 
+  const siteOrigin = siteUrl.origin;
+  const eventUrl = `${siteOrigin}/su-kien/${encodeURIComponent(event.slug || slug)}`;
+  const eventImage = event.image
+    ? (event.image.startsWith("http") ? event.image : `${siteOrigin}${event.image}`)
+    : `${siteOrigin}/images/og-image.png`;
+
+  const jsonLdEvent = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": event.title,
+    "description": event.summary || event.title,
+    "url": eventUrl,
+    "image": [eventImage],
+    "startDate": event.date || "2026-11-14",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+    "location": {
+      "@type": "Place",
+      "name": event.location || "Nhà Hát Quân Đội",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "TP. Hồ Chí Minh",
+        "addressCountry": "VN"
+      }
+    },
+    "organizer": {
+      "@type": "Organization",
+      "name": content.brandName || "Hải Dương Media",
+      "url": siteOrigin
+    }
+  };
+
+  const jsonLdBreadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Trang chủ",
+        "item": siteOrigin
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Sự kiện",
+        "item": `${siteOrigin}/su-kien`
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": event.title,
+        "item": eventUrl
+      }
+    ]
+  };
+
   return (
     <>
       <SiteHeader content={content} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdEvent) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdBreadcrumb) }}
+      />
       <main className="event-detail-page">
         {/* Breadcrumb & Hero */}
         <section className="event-detail-hero">

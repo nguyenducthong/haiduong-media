@@ -73,9 +73,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       getAllEvents().catch(() => []),
     ]);
 
-    // 2. Các bài viết tin tức
-    const newsRoutes: MetadataRoute.Sitemap = (content?.news || [])
-      .filter((item) => item.active !== false && item.slug)
+    // 2. Các bài viết tin tức (chuẩn hóa đúng chuyên mục /tin-tuc/)
+    const newsSlugs = new Set();
+    const allNewsItems = [
+      ...(content?.news || []),
+      ...(enterprises || []).filter((item) => item.type === "tin-tuc"),
+    ];
+    const newsRoutes: MetadataRoute.Sitemap = allNewsItems
+      .filter((item) => {
+        if (!item || item.active === false || !item.slug) return false;
+        if (newsSlugs.has(item.slug)) return false;
+        newsSlugs.add(item.slug);
+        return true;
+      })
       .map((item) => ({
         url: `${baseUrl}/tin-tuc/${item.slug}`,
         lastModified: now,
@@ -83,21 +93,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
-    // 3. Các bài viết doanh nghiệp / thương hiệu (chỉ lấy bài thuộc danh mục doanh nghiệp, loại trừ sự kiện để tránh trùng lặp URL với /su-kien)
-    const enterpriseRoutes: MetadataRoute.Sitemap = (enterprises || [])
-      .filter((item) => item.active !== false && (item.slug || item.id) && item.type !== "su-kien")
+    // 3. Các bài viết sự kiện (chuẩn hóa đúng chuyên mục /su-kien/)
+    const eventSlugs = new Set();
+    const allEventItems = [
+      ...(events || []),
+      ...(enterprises || []).filter((item) => item.type === "su-kien"),
+    ];
+    const eventRoutes: MetadataRoute.Sitemap = allEventItems
+      .filter((item) => {
+        if (!item || item.active === false || !item.slug) return false;
+        if (eventSlugs.has(item.slug)) return false;
+        eventSlugs.add(item.slug);
+        return true;
+      })
       .map((item) => ({
-        url: `${baseUrl}/doanh-nghiep/${item.slug || item.id}`,
+        url: `${baseUrl}/su-kien/${item.slug}`,
         lastModified: now,
         changeFrequency: "weekly" as const,
         priority: 0.7,
       }));
 
-    // 4. Các sự kiện
-    const eventRoutes: MetadataRoute.Sitemap = (events || [])
-      .filter((item) => item.active !== false && item.slug)
+    // 4. Các bài viết doanh nghiệp / thương hiệu (chỉ lấy bài doanh nghiệp, loại trừ tin-tuc và su-kien để tránh trùng lặp tuyệt đối)
+    const enterpriseRoutes: MetadataRoute.Sitemap = (enterprises || [])
+      .filter(
+        (item) =>
+          item.active !== false &&
+          (item.slug || item.id) &&
+          item.type !== "su-kien" &&
+          item.type !== "tin-tuc"
+      )
       .map((item) => ({
-        url: `${baseUrl}/su-kien/${item.slug}`,
+        url: `${baseUrl}/doanh-nghiep/${item.slug || item.id}`,
         lastModified: now,
         changeFrequency: "weekly" as const,
         priority: 0.7,

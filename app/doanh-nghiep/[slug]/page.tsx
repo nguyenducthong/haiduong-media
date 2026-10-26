@@ -60,9 +60,12 @@ export default async function EnterpriseDetailPage({
     notFound();
   }
 
-  // Redirect 301 về URL chuẩn /su-kien để tránh trùng lặp nội dung theo khuyến nghị SEO
+  // Điều hướng 301 tự động về đúng chuyên mục chuẩn để tránh tuyệt đối lỗi trùng lặp nội dung (Keyword Cannibalization)
   if (article.type === "su-kien") {
     redirect(`/su-kien/${encodeURIComponent(article.slug || slug)}`);
+  }
+  if (article.type === "tin-tuc") {
+    redirect(`/tin-tuc/${encodeURIComponent(article.slug || slug)}`);
   }
 
   const related = allEnterprises.filter((a) => a.slug !== article.slug).slice(0, 4);

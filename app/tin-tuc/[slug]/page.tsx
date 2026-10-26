@@ -1,5 +1,5 @@
 import Link from "@/components/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, CalendarDays, User, Share2, Tag, ArrowRight } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { getNewsBySlug, loadSiteContent } from "@/lib/site-content";
@@ -44,6 +44,11 @@ export default async function NewsDetailPage({
 
   if (!article) {
     notFound();
+  }
+
+  // Nếu bài viết thuộc loại sự kiện, chuyển hướng 301 sang /su-kien/[slug]
+  if (dbArticle?.type === "su-kien") {
+    redirect(`/su-kien/${encodeURIComponent(dbArticle.slug || slug)}`);
   }
 
   const allNews = await getEnterprisesByType("tin-tuc");

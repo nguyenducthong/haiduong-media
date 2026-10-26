@@ -777,6 +777,8 @@ export default function AdminEditor({
   // ==========================================
   // LƯU TOÀN BỘ NỘI DUNG / LƯU BÀI VIẾT
   // ==========================================
+  const saveAllContent = () => save();
+
   async function save(customSuccessMessage?: string) {
     setSaving(true);
     setMessage(null);
@@ -4285,7 +4287,7 @@ export default function AdminEditor({
                         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px", borderTop: "1px solid var(--line)", paddingTop: "10px" }}>
                           <button
                             type="button"
-                            onClick={saveAllContent}
+                            onClick={() => save("Đã lưu thông tin đối tác thành công.")}
                             style={{
                               display: "inline-flex",
                               alignItems: "center",
@@ -4609,7 +4611,7 @@ export default function AdminEditor({
                         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "8px", borderTop: "1px solid var(--line)", paddingTop: "10px" }}>
                           <button
                             type="button"
-                            onClick={saveAllContent}
+                            onClick={() => save("Đã lưu thông tin đối tác thành công.")}
                             style={{
                               display: "inline-flex",
                               alignItems: "center",

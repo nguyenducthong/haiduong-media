@@ -59,6 +59,7 @@ import type { SafeAdminUser } from "@/lib/admin-auth";
 type Message = { type: "success" | "error"; text: string } | null;
 export type MainAdminTab =
   | "trang-chu"
+  | "menu-trang"
   | "bai-viet"
   | "su-kien"
   | "tin-tuc"
@@ -844,6 +845,26 @@ export default function AdminEditor({
 
         <button
           type="button"
+          onClick={() => setMainTab("menu-trang")}
+          className={`admin-nav-tab-item ${mainTab === "menu-trang" ? "active" : ""}`}
+        >
+          <div
+            className="admin-nav-tab-icon"
+            style={{
+              background: mainTab === "menu-trang" ? "#2563eb" : undefined,
+              color: mainTab === "menu-trang" ? "#fff" : undefined,
+            }}
+          >
+            <Layers size={18} />
+          </div>
+          <div className="admin-nav-tab-info">
+            <span className="admin-nav-tab-label">Trang Menu</span>
+            <span className="admin-nav-tab-desc">Giới thiệu, Tin tức, Doanh nghiệp, Doanh nhân</span>
+          </div>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setMainTab("bai-viet")}
           className={`admin-nav-tab-item ${mainTab === "bai-viet" ? "active" : ""}`}
         >
@@ -1048,6 +1069,17 @@ export default function AdminEditor({
               </>
             )}
 
+            {mainTab === "menu-trang" && (
+              <>
+                <strong>Nội dung Trang Menu</strong>
+                <a href="#menu-gioi-thieu">01. Trang Giới thiệu</a>
+                <a href="#menu-tin-tuc">02. Trang Tin tức</a>
+                <a href="#menu-doanh-nghiep">03. Trang Doanh nghiệp</a>
+                <a href="#menu-doanh-nhan">04. Trang Doanh nhân</a>
+                <a href="#menu-san-pham">05. Trang Sản phẩm</a>
+              </>
+            )}
+
             {mainTab === "cau-hinh" && (
               <>
                 <strong>Cấu hình chung</strong>
@@ -1059,6 +1091,429 @@ export default function AdminEditor({
           </aside>
 
           <div className="admin-content">
+            {/* ========================================================
+                TRANG MENU: GIỚI THIỆU, TIN TỨC, DOANH NGHIỆP, DOANH NHÂN, SẢN PHẨM
+                ======================================================== */}
+            {mainTab === "menu-trang" && (
+              <>
+                {/* 01. GIỚI THIỆU */}
+                <EditorSection
+                  id="menu-gioi-thieu"
+                  number="01"
+                  title="Trang Giới thiệu (/gioi-thieu)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính, giới thiệu chi tiết và phần cam kết niềm tin trên trang Giới thiệu."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/gioi-thieu"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /gioi-thieu ↗
+                    </a>
+                  </div>
+
+                  {/* Live preview */}
+                  <div style={{ background: "#f8fafc", border: "1px dashed #cbd5e1", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                      👁️ Xem trước tiêu đề đầu trang Giới thiệu:
+                    </div>
+                    <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                      <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
+                        {content.aboutEyebrow || "GIỚI THIỆU DOANH NGHIỆP"}
+                      </span>
+                      <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
+                        {content.aboutTitle || "Hơn 11 năm đồng hành xây dựng hệ sinh thái thương hiệu vững mạnh"}
+                      </h2>
+                      <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
+                        {content.aboutBody || "Hải Dương Media kết nối chiến lược..."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Field
+                    label="Dòng nhấn đầu trang (Eyebrow)"
+                    value={content.aboutEyebrow || ""}
+                    onChange={(value) => update("aboutEyebrow", value)}
+                    placeholder="vd: GIỚI THIỆU DOANH NGHIỆP"
+                  />
+                  <Field
+                    label="Tiêu đề chính trang Giới thiệu"
+                    value={content.aboutTitle || ""}
+                    onChange={(value) => update("aboutTitle", value)}
+                    placeholder="vd: Hơn 11 năm đồng hành xây dựng hệ sinh thái thương hiệu vững mạnh"
+                  />
+                  <Field
+                    label="Nội dung giới thiệu chi tiết (Mô tả)"
+                    value={content.aboutBody || ""}
+                    onChange={(value) => update("aboutBody", value)}
+                    multiline
+                    placeholder="Nhập đoạn văn giới thiệu năng lực công ty..."
+                  />
+
+                  <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--line)" }}>
+                    <h4 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "12px" }}>
+                      Khối Cam Kết & Giá Trị
+                    </h4>
+                    <div className="field-row">
+                      <Field
+                        label="Dòng nhấn khối cam kết (Eyebrow)"
+                        value={content.trustEyebrow || ""}
+                        onChange={(value) => update("trustEyebrow", value)}
+                        placeholder="vd: Cam kết"
+                      />
+                      <Field
+                        label="Tiêu đề khối cam kết"
+                        value={content.trustTitle || ""}
+                        onChange={(value) => update("trustTitle", value)}
+                        placeholder="vd: Tập trung vào kết quả có thể đo lường và kiểm chứng"
+                      />
+                    </div>
+                    <Field
+                      label="Nội dung cam kết niềm tin"
+                      value={content.trustBody || ""}
+                      onChange={(value) => update("trustBody", value)}
+                      multiline
+                      placeholder="Mỗi chiến dịch được chuẩn bị kỹ lưỡng..."
+                    />
+                  </div>
+                </EditorSection>
+
+                {/* 02. TIN TỨC */}
+                <EditorSection
+                  id="menu-tin-tuc"
+                  number="02"
+                  title="Trang Tin tức (/tin-tuc)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề và mô tả giới thiệu đầu trang Tin tức (khối Tin Tức & Hoạt Động Doanh Nghiệp)."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/tin-tuc"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#9333ea",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /tin-tuc ↗
+                    </a>
+                  </div>
+
+                  {/* Live preview */}
+                  <div style={{ background: "#faf5ff", border: "1px dashed #d8b4fe", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#9333ea", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                      👁️ Xem trước tiêu đề đầu trang Tin tức (giống ảnh bạn gửi):
+                    </div>
+                    <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #e9d5ff" }}>
+                      <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
+                        {content.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN"}
+                      </span>
+                      <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
+                        {content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp"}
+                      </h2>
+                      <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
+                        {content.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.newsPageEyebrow || ""}
+                    onChange={(value) => update("newsPageEyebrow", value)}
+                    placeholder="vd: TIN TỨC & CHUYÊN MÔN"
+                  />
+                  <Field
+                    label="Tiêu đề chính trang Tin tức"
+                    value={content.newsPageTitle || ""}
+                    onChange={(value) => update("newsPageTitle", value)}
+                    placeholder="vd: Tin Tức & Hoạt Động Doanh Nghiệp"
+                  />
+                  <Field
+                    label="Đoạn văn mô tả / giới thiệu (sửa text trong ô đỏ)"
+                    value={content.newsPageDescription || ""}
+                    onChange={(value) => update("newsPageDescription", value)}
+                    multiline
+                    placeholder="vd: Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."
+                  />
+                  <Field
+                    label="Tiêu đề danh sách tin tức & hoạt động"
+                    value={content.newsPageListTitle || ""}
+                    onChange={(value) => update("newsPageListTitle", value)}
+                    placeholder="vd: Danh sách tin tức & hoạt động"
+                  />
+                </EditorSection>
+
+                {/* 03. DOANH NGHIỆP */}
+                <EditorSection
+                  id="menu-doanh-nghiep"
+                  number="03"
+                  title="Trang Doanh nghiệp (/doanh-nghiep)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính, mô tả đầu trang và banner kêu gọi hợp tác cuối trang Doanh nghiệp."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/doanh-nghiep"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#d42027",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /doanh-nghiep ↗
+                    </a>
+                  </div>
+
+                  {/* Live preview */}
+                  <div style={{ background: "#fef2f2", border: "1px dashed #fca5a5", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#d42027", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                      👁️ Xem trước tiêu đề đầu trang Doanh nghiệp:
+                    </div>
+                    <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #fecaca" }}>
+                      <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
+                        {content.enterprisesPageEyebrow || "ĐỒNG HÀNH & NÂNG TẦM"}
+                      </span>
+                      <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
+                        {content.enterprisesPageTitle || "Doanh Nghiệp & Thương Hiệu Tiêu Biểu"}
+                      </h2>
+                      <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
+                        {content.enterprisesPageDescription || "Hơn 3.000 thương hiệu hàng đầu Việt Nam đã lựa chọn Hải Dương Media để kiến tạo chiến lược truyền thông..."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.enterprisesPageEyebrow || ""}
+                    onChange={(value) => update("enterprisesPageEyebrow", value)}
+                    placeholder="vd: ĐỒNG HÀNH & NÂNG TẦM"
+                  />
+                  <Field
+                    label="Tiêu đề chính trang Doanh nghiệp"
+                    value={content.enterprisesPageTitle || ""}
+                    onChange={(value) => update("enterprisesPageTitle", value)}
+                    placeholder="vd: Doanh Nghiệp & Thương Hiệu Tiêu Biểu"
+                  />
+                  <Field
+                    label="Đoạn văn mô tả / giới thiệu"
+                    value={content.enterprisesPageDescription || ""}
+                    onChange={(value) => update("enterprisesPageDescription", value)}
+                    multiline
+                    placeholder="vd: Hơn 3.000 thương hiệu hàng đầu Việt Nam đã lựa chọn Hải Dương Media..."
+                  />
+                  <Field
+                    label="Tiêu đề danh sách doanh nghiệp & thương hiệu"
+                    value={content.enterprisesPageListTitle || ""}
+                    onChange={(value) => update("enterprisesPageListTitle", value)}
+                    placeholder="vd: Danh sách doanh nghiệp & thương hiệu"
+                  />
+
+                  {/* CTA Box Section */}
+                  <div style={{ marginTop: "24px", paddingTop: "16px", borderTop: "1px solid var(--line)" }}>
+                    <h4 style={{ fontSize: "15px", fontWeight: 800, color: "#0f172a", marginBottom: "12px" }}>
+                      Khối Banner Kêu Gọi Hợp Tác (CTA) Cuối Trang Doanh Nghiệp
+                    </h4>
+                    <Field
+                      label="Dòng nhãn nhỏ CTA"
+                      value={content.enterprisesCtaEyebrow || ""}
+                      onChange={(value) => update("enterprisesCtaEyebrow", value)}
+                      placeholder="vd: DÀNH CHO DOANH NGHIỆP"
+                    />
+                    <Field
+                      label="Tiêu đề khối CTA"
+                      value={content.enterprisesCtaTitle || ""}
+                      onChange={(value) => update("enterprisesCtaTitle", value)}
+                      placeholder="vd: Đưa thương hiệu của bạn xuất hiện trên VTV & hơn 200 báo điện tử"
+                    />
+                    <Field
+                      label="Mô tả quyền lợi doanh nghiệp CTA"
+                      value={content.enterprisesCtaDescription || ""}
+                      onChange={(value) => update("enterprisesCtaDescription", value)}
+                      multiline
+                      placeholder="vd: Đồng hành cùng Hải Dương Media để sản xuất TVC chuẩn 4K..."
+                    />
+                    <div className="field-row">
+                      <Field
+                        label="Chữ trên nút bấm CTA"
+                        value={content.enterprisesCtaButtonText || ""}
+                        onChange={(value) => update("enterprisesCtaButtonText", value)}
+                        placeholder="vd: Nhận tư vấn truyền thông"
+                      />
+                      <Field
+                        label="Đường dẫn nút bấm CTA"
+                        value={content.enterprisesCtaButtonHref || ""}
+                        onChange={(value) => update("enterprisesCtaButtonHref", value)}
+                        placeholder="vd: /lien-he"
+                      />
+                    </div>
+                  </div>
+                </EditorSection>
+
+                {/* 04. DOANH NHÂN */}
+                <EditorSection
+                  id="menu-doanh-nhan"
+                  number="04"
+                  title="Trang Doanh nhân (/doanh-nhan)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính và mô tả trên trang Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/doanh-nhan"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#0284c7",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /doanh-nhan ↗
+                    </a>
+                  </div>
+
+                  {/* Live preview */}
+                  <div style={{ background: "#f0f9ff", border: "1px dashed #7dd3fc", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#0284c7", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                      👁️ Xem trước tiêu đề đầu trang Doanh nhân:
+                    </div>
+                    <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #bae6fd" }}>
+                      <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
+                        {content.entrepreneursPageEyebrow || "CHUYÊN ĐỀ DOANH NHÂN"}
+                      </span>
+                      <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
+                        {content.entrepreneursPageTitle || "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu"}
+                      </h2>
+                      <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
+                        {content.entrepreneursPageDescription || "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng..."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.entrepreneursPageEyebrow || ""}
+                    onChange={(value) => update("entrepreneursPageEyebrow", value)}
+                    placeholder="vd: CHUYÊN ĐỀ DOANH NHÂN"
+                  />
+                  <Field
+                    label="Tiêu đề chính trang Doanh nhân"
+                    value={content.entrepreneursPageTitle || ""}
+                    onChange={(value) => update("entrepreneursPageTitle", value)}
+                    placeholder="vd: Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu"
+                  />
+                  <Field
+                    label="Đoạn văn mô tả / giới thiệu"
+                    value={content.entrepreneursPageDescription || ""}
+                    onChange={(value) => update("entrepreneursPageDescription", value)}
+                    multiline
+                    placeholder="vd: Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp."
+                  />
+                  <Field
+                    label="Tiêu đề danh sách bài viết doanh nhân"
+                    value={content.entrepreneursPageListTitle || ""}
+                    onChange={(value) => update("entrepreneursPageListTitle", value)}
+                    placeholder="vd: Danh sách bài viết doanh nhân"
+                  />
+                </EditorSection>
+
+                {/* 05. SẢN PHẨM */}
+                <EditorSection
+                  id="menu-san-pham"
+                  number="05"
+                  title="Trang Sản phẩm (/san-pham)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính và mô tả giải pháp dịch vụ truyền thông toàn diện."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/san-pham"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#16a34a",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /san-pham ↗
+                    </a>
+                  </div>
+
+                  {/* Live preview */}
+                  <div style={{ background: "#f0fdf4", border: "1px dashed #86efac", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 800, color: "#16a34a", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                      👁️ Xem trước tiêu đề đầu trang Sản phẩm:
+                    </div>
+                    <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #bbf7d0" }}>
+                      <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
+                        {content.productsPageEyebrow || "SẢN PHẨM & DỊCH VỤ TRUYỀN THÔNG"}
+                      </span>
+                      <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
+                        {content.productsPageTitle || "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện"}
+                      </h2>
+                      <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
+                        {content.productsPageDescription || "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ..."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.productsPageEyebrow || ""}
+                    onChange={(value) => update("productsPageEyebrow", value)}
+                    placeholder="vd: SẢN PHẨM & DỊCH VỤ TRUYỀN THÔNG"
+                  />
+                  <Field
+                    label="Tiêu đề chính trang Sản phẩm"
+                    value={content.productsPageTitle || ""}
+                    onChange={(value) => update("productsPageTitle", value)}
+                    placeholder="vd: Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện"
+                  />
+                  <Field
+                    label="Đoạn văn mô tả / giới thiệu"
+                    value={content.productsPageDescription || ""}
+                    onChange={(value) => update("productsPageDescription", value)}
+                    multiline
+                    placeholder="vd: Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ..."
+                  />
+                  <Field
+                    label="Tiêu đề danh sách sản phẩm & dịch vụ"
+                    value={content.productsPageListTitle || ""}
+                    onChange={(value) => update("productsPageListTitle", value)}
+                    placeholder="vd: Danh sách sản phẩm & dịch vụ"
+                  />
+                </EditorSection>
+              </>
+            )}
+
             {/* TRANG CHỦ PHẦN 1 */}
             {mainTab === "trang-chu" && (
               <>
@@ -4800,6 +5255,11 @@ export default function AdminEditor({
             }
             onChange={(value) => update("seoKeywords", value)}
           />
+          <p style={{ margin: 0, fontSize: "13px", lineHeight: 1.6, color: "#475569" }}>
+            Lưu ý: Mục này chỉ khai báo thẻ meta keywords. Google không sử dụng thẻ này
+            để xếp hạng hoặc lập chỉ mục; nhập thêm từ khóa không giúp website tăng hạng.
+            Hãy ưu tiên tiêu đề, mô tả và nội dung hữu ích của từng trang.
+          </p>
 
           {/* Bản xem trước trực tiếp (Zalo / Facebook Link Preview) */}
           <div style={{ marginTop: "12px" }}>

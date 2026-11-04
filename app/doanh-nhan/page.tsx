@@ -5,12 +5,16 @@ import { EnterpriseList } from "@/components/enterprise-list";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: { canonical: "/doanh-nhan" },
-  title: "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu",
-  description:
-    "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng đồng hành cùng THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
-};
+export async function generateMetadata() {
+  const content = await loadSiteContent();
+  return {
+    alternates: { canonical: "/doanh-nhan" },
+    title: content.entrepreneursPageTitle || "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu",
+    description:
+      content.entrepreneursPageDescription ||
+      "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng đồng hành cùng THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
+  };
+}
 
 export default async function DoanhNhanPage() {
   const content = await loadSiteContent();
@@ -22,9 +26,9 @@ export default async function DoanhNhanPage() {
       <SiteHeader content={content} />
       <main>
         <PageHero
-          eyebrow="CHUYÊN ĐỀ DOANH NHÂN"
-          title="Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu"
-          description="Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp."
+          eyebrow={content.entrepreneursPageEyebrow || "CHUYÊN ĐỀ DOANH NHÂN"}
+          title={content.entrepreneursPageTitle || "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu"}
+          description={content.entrepreneursPageDescription || "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp."}
         />
 
         <section className="section" style={{ paddingTop: "40px", paddingBottom: "90px" }}>
@@ -32,7 +36,7 @@ export default async function DoanhNhanPage() {
             <EnterpriseList
               initialArticles={visibleArticles}
               basePath="/doanh-nghiep"
-              title="Danh sách bài viết doanh nhân"
+              title={content.entrepreneursPageListTitle || "Danh sách bài viết doanh nhân"}
               searchPlaceholder="Tìm kiếm doanh nhân, lãnh đạo, bài viết..."
               pageSize={9}
             />

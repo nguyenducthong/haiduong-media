@@ -134,6 +134,12 @@ export type ProcessStep = {
   desc: string;
 };
 
+export type AboutValueItem = {
+  number: string;
+  title: string;
+  desc: string;
+};
+
 export type SiteContent = {
   brandName: string;
   brandKicker: string;
@@ -184,6 +190,36 @@ export type SiteContent = {
   seoDescription?: string;
   seoKeywords?: string;
   seoImage?: string;
+
+  // Cấu hình nội dung các trang Menu
+  aboutEyebrow?: string;
+  trustEyebrow?: string;
+  aboutValues?: AboutValueItem[];
+
+  newsPageEyebrow?: string;
+  newsPageTitle?: string;
+  newsPageDescription?: string;
+  newsPageListTitle?: string;
+
+  enterprisesPageEyebrow?: string;
+  enterprisesPageTitle?: string;
+  enterprisesPageDescription?: string;
+  enterprisesPageListTitle?: string;
+  enterprisesCtaEyebrow?: string;
+  enterprisesCtaTitle?: string;
+  enterprisesCtaDescription?: string;
+  enterprisesCtaButtonText?: string;
+  enterprisesCtaButtonHref?: string;
+
+  entrepreneursPageEyebrow?: string;
+  entrepreneursPageTitle?: string;
+  entrepreneursPageDescription?: string;
+  entrepreneursPageListTitle?: string;
+
+  productsPageEyebrow?: string;
+  productsPageTitle?: string;
+  productsPageDescription?: string;
+  productsPageListTitle?: string;
 };
 
 export const defaultSiteContent: SiteContent = {
@@ -522,6 +558,41 @@ export const defaultSiteContent: SiteContent = {
   seoDescription: "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
   seoKeywords: "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, thương hiệu hàng đầu vn, truyền thông thương hiệu, sản xuất tvc vtv, booking báo chí pr, vinh danh thương hiệu",
   seoImage: "/images/logo.png",
+
+  // Cấu hình nội dung các trang Menu
+  aboutEyebrow: "GIỚI THIỆU DOANH NGHIỆP",
+  trustEyebrow: "Cam kết",
+  aboutValues: [
+    { number: "01", title: "Hiểu doanh nghiệp", desc: "Mỗi quyết định đều bám sát mục tiêu và trải nghiệm của khách hàng." },
+    { number: "02", title: "Sáng tạo có mục tiêu", desc: "Mỗi quyết định đều bám sát mục tiêu và trải nghiệm của khách hàng." },
+    { number: "03", title: "Thực thi có trách nhiệm", desc: "Mỗi quyết định đều bám sát mục tiêu và trải nghiệm của khách hàng." },
+    { number: "04", title: "Đồng hành dài hạn", desc: "Mỗi quyết định đều bám sát mục tiêu và trải nghiệm của khách hàng." },
+  ],
+
+  newsPageEyebrow: "TIN TỨC & CHUYÊN MÔN",
+  newsPageTitle: "Tin Tức & Hoạt Động Doanh Nghiệp",
+  newsPageDescription: "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số.",
+  newsPageListTitle: "Danh sách tin tức & hoạt động",
+
+  enterprisesPageEyebrow: "ĐỒNG HÀNH & NÂNG TẦM",
+  enterprisesPageTitle: "Doanh Nghiệp & Thương Hiệu Tiêu Biểu",
+  enterprisesPageDescription: "Hơn 3.000 thương hiệu hàng đầu Việt Nam đã lựa chọn Hải Dương Media để kiến tạo chiến lược truyền thông, nâng cao định vị và phủ sóng trên sóng truyền hình quốc gia.",
+  enterprisesPageListTitle: "Danh sách doanh nghiệp & thương hiệu",
+  enterprisesCtaEyebrow: "DÀNH CHO DOANH NGHIỆP",
+  enterprisesCtaTitle: "Đưa thương hiệu của bạn xuất hiện trên VTV & hơn 200 báo điện tử",
+  enterprisesCtaDescription: "Đồng hành cùng Hải Dương Media để sản xuất TVC chuẩn 4K, đăng ký bảng vàng Thương hiệu Quốc gia và phủ sóng truyền thông toàn diện.",
+  enterprisesCtaButtonText: "Nhận tư vấn truyền thông",
+  enterprisesCtaButtonHref: "/lien-he",
+
+  entrepreneursPageEyebrow: "CHUYÊN ĐỀ DOANH NHÂN",
+  entrepreneursPageTitle: "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu",
+  entrepreneursPageDescription: "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp.",
+  entrepreneursPageListTitle: "Danh sách bài viết doanh nhân",
+
+  productsPageEyebrow: "SẢN PHẨM & DỊCH VỤ TRUYỀN THÔNG",
+  productsPageTitle: "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện",
+  productsPageDescription: "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ từ sản xuất phim TVC, booking báo đài, tư vấn nhận diện đến tổ chức sự kiện quốc tế.",
+  productsPageListTitle: "Danh sách sản phẩm & dịch vụ",
 };
 
 let tableEnsured = false;
@@ -826,5 +897,40 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
     seoDescription: value.seoDescription?.trim() || defaultSiteContent.seoDescription || "THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn) - Tư vấn chiến lược truyền thông, sản xuất TVC phát sóng VTV và kết nối doanh nghiệp với báo chí hàng đầu.",
     seoKeywords: value.seoKeywords?.trim() || defaultSiteContent.seoKeywords || "thuonghieuhangdauvn, thương hiệu hàng đầu việt nam, truyền thông thương hiệu, sản xuất tvc vtv",
     seoImage: value.seoImage?.trim() || defaultSiteContent.seoImage || "/images/logo.png",
+
+    aboutEyebrow: value.aboutEyebrow !== undefined ? cleanBrandText(value.aboutEyebrow) : (defaultSiteContent.aboutEyebrow || "GIỚI THIỆU DOANH NGHIỆP"),
+    trustEyebrow: value.trustEyebrow !== undefined ? cleanBrandText(value.trustEyebrow) : (defaultSiteContent.trustEyebrow || "Cam kết"),
+    aboutValues: Array.isArray(value.aboutValues) && value.aboutValues.length
+      ? value.aboutValues.map((v: any, i: number) => ({
+          number: v.number || `0${i + 1}`,
+          title: cleanBrandText(v.title || ""),
+          desc: cleanBrandText(v.desc || ""),
+        }))
+      : (defaultSiteContent.aboutValues || []),
+
+    newsPageEyebrow: value.newsPageEyebrow !== undefined ? cleanBrandText(value.newsPageEyebrow) : (defaultSiteContent.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN"),
+    newsPageTitle: value.newsPageTitle !== undefined ? cleanBrandText(value.newsPageTitle) : (defaultSiteContent.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp"),
+    newsPageDescription: value.newsPageDescription !== undefined ? cleanBrandText(value.newsPageDescription) : (defaultSiteContent.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."),
+    newsPageListTitle: value.newsPageListTitle !== undefined ? cleanBrandText(value.newsPageListTitle) : (defaultSiteContent.newsPageListTitle || "Danh sách tin tức & hoạt động"),
+
+    enterprisesPageEyebrow: value.enterprisesPageEyebrow !== undefined ? cleanBrandText(value.enterprisesPageEyebrow) : (defaultSiteContent.enterprisesPageEyebrow || "ĐỒNG HÀNH & NÂNG TẦM"),
+    enterprisesPageTitle: value.enterprisesPageTitle !== undefined ? cleanBrandText(value.enterprisesPageTitle) : (defaultSiteContent.enterprisesPageTitle || "Doanh Nghiệp & Thương Hiệu Tiêu Biểu"),
+    enterprisesPageDescription: value.enterprisesPageDescription !== undefined ? cleanBrandText(value.enterprisesPageDescription) : (defaultSiteContent.enterprisesPageDescription || "Hơn 3.000 thương hiệu hàng đầu Việt Nam đã lựa chọn Hải Dương Media để kiến tạo chiến lược truyền thông, nâng cao định vị và phủ sóng trên sóng truyền hình quốc gia."),
+    enterprisesPageListTitle: value.enterprisesPageListTitle !== undefined ? cleanBrandText(value.enterprisesPageListTitle) : (defaultSiteContent.enterprisesPageListTitle || "Danh sách doanh nghiệp & thương hiệu"),
+    enterprisesCtaEyebrow: value.enterprisesCtaEyebrow !== undefined ? cleanBrandText(value.enterprisesCtaEyebrow) : (defaultSiteContent.enterprisesCtaEyebrow || "DÀNH CHO DOANH NGHIỆP"),
+    enterprisesCtaTitle: value.enterprisesCtaTitle !== undefined ? cleanBrandText(value.enterprisesCtaTitle) : (defaultSiteContent.enterprisesCtaTitle || "Đưa thương hiệu của bạn xuất hiện trên VTV & hơn 200 báo điện tử"),
+    enterprisesCtaDescription: value.enterprisesCtaDescription !== undefined ? cleanBrandText(value.enterprisesCtaDescription) : (defaultSiteContent.enterprisesCtaDescription || "Đồng hành cùng Hải Dương Media để sản xuất TVC chuẩn 4K, đăng ký bảng vàng Thương hiệu Quốc gia và phủ sóng truyền thông toàn diện."),
+    enterprisesCtaButtonText: value.enterprisesCtaButtonText !== undefined ? cleanBrandText(value.enterprisesCtaButtonText) : (defaultSiteContent.enterprisesCtaButtonText || "Nhận tư vấn truyền thông"),
+    enterprisesCtaButtonHref: value.enterprisesCtaButtonHref !== undefined ? cleanBrandText(value.enterprisesCtaButtonHref) : (defaultSiteContent.enterprisesCtaButtonHref || "/lien-he"),
+
+    entrepreneursPageEyebrow: value.entrepreneursPageEyebrow !== undefined ? cleanBrandText(value.entrepreneursPageEyebrow) : (defaultSiteContent.entrepreneursPageEyebrow || "CHUYÊN ĐỀ DOANH NHÂN"),
+    entrepreneursPageTitle: value.entrepreneursPageTitle !== undefined ? cleanBrandText(value.entrepreneursPageTitle) : (defaultSiteContent.entrepreneursPageTitle || "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu"),
+    entrepreneursPageDescription: value.entrepreneursPageDescription !== undefined ? cleanBrandText(value.entrepreneursPageDescription) : (defaultSiteContent.entrepreneursPageDescription || "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp."),
+    entrepreneursPageListTitle: value.entrepreneursPageListTitle !== undefined ? cleanBrandText(value.entrepreneursPageListTitle) : (defaultSiteContent.entrepreneursPageListTitle || "Danh sách bài viết doanh nhân"),
+
+    productsPageEyebrow: value.productsPageEyebrow !== undefined ? cleanBrandText(value.productsPageEyebrow) : (defaultSiteContent.productsPageEyebrow || "SẢN PHẨM & DỊCH VỤ TRUYỀN THÔNG"),
+    productsPageTitle: value.productsPageTitle !== undefined ? cleanBrandText(value.productsPageTitle) : (defaultSiteContent.productsPageTitle || "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện"),
+    productsPageDescription: value.productsPageDescription !== undefined ? cleanBrandText(value.productsPageDescription) : (defaultSiteContent.productsPageDescription || "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ từ sản xuất phim TVC, booking báo đài, tư vấn nhận diện đến tổ chức sự kiện quốc tế."),
+    productsPageListTitle: value.productsPageListTitle !== undefined ? cleanBrandText(value.productsPageListTitle) : (defaultSiteContent.productsPageListTitle || "Danh sách sản phẩm & dịch vụ"),
   };
 }

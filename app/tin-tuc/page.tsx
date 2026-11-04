@@ -5,12 +5,16 @@ import { EnterpriseList } from "@/components/enterprise-list";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = {
-  alternates: { canonical: "/tin-tuc" },
-  title: "Tin Tức & Hoạt Động Doanh Nghiệp",
-  description:
-    "Cập nhật tin tức kinh tế, hoạt động doanh nghiệp và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
-};
+export async function generateMetadata() {
+  const content = await loadSiteContent();
+  return {
+    alternates: { canonical: "/tin-tuc" },
+    title: content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp",
+    description:
+      content.newsPageDescription ||
+      "Cập nhật tin tức kinh tế, hoạt động doanh nghiệp và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
+  };
+}
 
 export default async function NewsPage() {
   const content = await loadSiteContent();
@@ -25,9 +29,9 @@ export default async function NewsPage() {
       <SiteHeader content={content} />
       <main>
         <PageHero
-          eyebrow="TIN TỨC & CHUYÊN MÔN"
-          title="Tin Tức & Hoạt Động Doanh Nghiệp"
-          description="Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."
+          eyebrow={content.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN"}
+          title={content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp"}
+          description={content.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."}
         />
 
         <section className="section" style={{ paddingTop: "40px", paddingBottom: "90px" }}>
@@ -35,7 +39,7 @@ export default async function NewsPage() {
             <EnterpriseList
               initialArticles={visibleNews}
               basePath="/tin-tuc"
-              title="Danh sách tin tức & hoạt động"
+              title={content.newsPageListTitle || "Danh sách tin tức & hoạt động"}
               searchPlaceholder="Tìm kiếm tin tức, sự kiện, thông báo..."
               pageSize={9}
             />

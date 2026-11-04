@@ -111,71 +111,159 @@ export function AdminEnterprises({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const avatarFileInputRef = React.useRef<HTMLInputElement>(null);
 
-  // Modal for editing Homepage Event Section Heading
-  const [showEventHeadingModal, setShowEventHeadingModal] = useState(false);
-  const [eventHeadingData, setEventHeadingData] = useState({
-    eventsEyebrow: "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
-    eventsTitle: "Sự Kiện Sắp Diễn Ra",
-    eventsDescription:
-      "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
-    eventsViewAllText: "Xem tất cả sự kiện",
+  // Modal for editing Page Headings (tin-tuc, doanh-nghiep, doanh-nhan, san-pham, su-kien)
+  const [showPageHeadingModal, setShowPageHeadingModal] = useState(false);
+  const [activeHeadingType, setActiveHeadingType] = useState<string>("tin-tuc");
+  const [pageHeadingData, setPageHeadingData] = useState({
+    eyebrow: "",
+    title: "",
+    description: "",
+    listTitle: "",
+    ctaEyebrow: "",
+    ctaTitle: "",
+    ctaDescription: "",
+    ctaButtonText: "",
+    ctaButtonHref: "",
   });
-  const [loadingEventHeading, setLoadingEventHeading] = useState(false);
-  const [savingEventHeading, setSavingEventHeading] = useState(false);
-  const [eventHeadingMsg, setEventHeadingMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [loadingPageHeading, setLoadingPageHeading] = useState(false);
+  const [savingPageHeading, setSavingPageHeading] = useState(false);
+  const [pageHeadingMsg, setPageHeadingMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const openEventHeadingModal = async () => {
-    setShowEventHeadingModal(true);
-    setLoadingEventHeading(true);
-    setEventHeadingMsg(null);
+  const openPageHeadingModal = async (type: string) => {
+    const targetType = type === "all" || type === "popup" ? "tin-tuc" : type;
+    setActiveHeadingType(targetType);
+    setShowPageHeadingModal(true);
+    setLoadingPageHeading(true);
+    setPageHeadingMsg(null);
     try {
       const res = await fetch("/api/content");
       if (res.ok) {
-        const data = await res.json();
-        setEventHeadingData({
-          eventsEyebrow: data.eventsEyebrow || "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
-          eventsTitle: data.eventsTitle || "Sự Kiện Sắp Diễn Ra",
-          eventsDescription:
-            data.eventsDescription ||
-            "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
-          eventsViewAllText: data.eventsViewAllText || "Xem tất cả sự kiện",
-        });
+        const data = (await res.json()) as any;
+        if (targetType === "tin-tuc") {
+          setPageHeadingData({
+            eyebrow: data.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN",
+            title: data.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp",
+            description: data.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số.",
+            listTitle: data.newsPageListTitle || "Danh sách tin tức & hoạt động",
+            ctaEyebrow: "", ctaTitle: "", ctaDescription: "", ctaButtonText: "", ctaButtonHref: "",
+          });
+        } else if (targetType === "doanh-nghiep") {
+          setPageHeadingData({
+            eyebrow: data.enterprisesPageEyebrow || "ĐỒNG HÀNH & NÂNG TẦM",
+            title: data.enterprisesPageTitle || "Doanh Nghiệp & Thương Hiệu Tiêu Biểu",
+            description: data.enterprisesPageDescription || "Hơn 3.000 thương hiệu hàng đầu Việt Nam đã lựa chọn Hải Dương Media để kiến tạo chiến lược truyền thông, nâng cao định vị và phủ sóng trên sóng truyền hình quốc gia.",
+            listTitle: data.enterprisesPageListTitle || "Danh sách doanh nghiệp & thương hiệu",
+            ctaEyebrow: data.enterprisesCtaEyebrow || "DÀNH CHO DOANH NGHIỆP",
+            ctaTitle: data.enterprisesCtaTitle || "Đưa thương hiệu của bạn xuất hiện trên VTV & hơn 200 báo điện tử",
+            ctaDescription: data.enterprisesCtaDescription || "Đồng hành cùng Hải Dương Media để sản xuất TVC chuẩn 4K, đăng ký bảng vàng Thương hiệu Quốc gia và phủ sóng truyền thông toàn diện.",
+            ctaButtonText: data.enterprisesCtaButtonText || "Nhận tư vấn truyền thông",
+            ctaButtonHref: data.enterprisesCtaButtonHref || "/lien-he",
+          });
+        } else if (targetType === "doanh-nhan") {
+          setPageHeadingData({
+            eyebrow: data.entrepreneursPageEyebrow || "CHUYÊN ĐỀ DOANH NHÂN",
+            title: data.entrepreneursPageTitle || "Gương Mặt Doanh Nhân & Lãnh Đạo Tiêu Biểu",
+            description: data.entrepreneursPageDescription || "Chân dung các nhà lãnh đạo tiên phong, câu chuyện khởi nghiệp truyền cảm hứng và hành trình phát triển doanh nghiệp.",
+            listTitle: data.entrepreneursPageListTitle || "Danh sách bài viết doanh nhân",
+            ctaEyebrow: "", ctaTitle: "", ctaDescription: "", ctaButtonText: "", ctaButtonHref: "",
+          });
+        } else if (targetType === "san-pham") {
+          setPageHeadingData({
+            eyebrow: data.productsPageEyebrow || "SẢN PHẨM & DỊCH VỤ TRUYỀN THÔNG",
+            title: data.productsPageTitle || "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện",
+            description: data.productsPageDescription || "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ từ sản xuất phim TVC, booking báo đài, tư vấn nhận diện đến tổ chức sự kiện quốc tế.",
+            listTitle: data.productsPageListTitle || "Danh sách sản phẩm & dịch vụ",
+            ctaEyebrow: "", ctaTitle: "", ctaDescription: "", ctaButtonText: "", ctaButtonHref: "",
+          });
+        } else if (targetType === "su-kien") {
+          setPageHeadingData({
+            eyebrow: data.eventsEyebrow || "LỊCH TRÌNH SỰ KIỆN 2026 – 2027",
+            title: data.eventsTitle || "Sự Kiện Sắp Diễn Ra",
+            description: data.eventsDescription || "Các diễn đàn kinh tế, chương trình tôn vinh thương hiệu uy tín và sự kiện xúc tiến thương mại quốc tế được phối hợp và đồng hành tổ chức tại Việt Nam và các nước Châu Á.",
+            listTitle: data.eventsViewAllText || "Xem tất cả sự kiện",
+            ctaEyebrow: "", ctaTitle: "", ctaDescription: "", ctaButtonText: "", ctaButtonHref: "",
+          });
+        }
       }
     } catch {
       // fallback
     } finally {
-      setLoadingEventHeading(false);
+      setLoadingPageHeading(false);
     }
   };
 
-  const saveEventHeading = async () => {
-    setSavingEventHeading(true);
-    setEventHeadingMsg(null);
+  const openEventHeadingModal = () => openPageHeadingModal("su-kien");
+
+  const savePageHeading = async () => {
+    setSavingPageHeading(true);
+    setPageHeadingMsg(null);
     try {
       const res = await fetch("/api/content");
-      const current = res.ok ? await res.json() : {};
-      const updated = {
-        ...current,
-        eventsEyebrow: eventHeadingData.eventsEyebrow,
-        eventsTitle: eventHeadingData.eventsTitle,
-        eventsDescription: eventHeadingData.eventsDescription,
-        eventsViewAllText: eventHeadingData.eventsViewAllText,
-      };
+      const current = res.ok ? ((await res.json()) as any) : {};
+      let updated = { ...current };
+
+      if (activeHeadingType === "tin-tuc") {
+        updated = {
+          ...updated,
+          newsPageEyebrow: pageHeadingData.eyebrow,
+          newsPageTitle: pageHeadingData.title,
+          newsPageDescription: pageHeadingData.description,
+          newsPageListTitle: pageHeadingData.listTitle,
+        };
+      } else if (activeHeadingType === "doanh-nghiep") {
+        updated = {
+          ...updated,
+          enterprisesPageEyebrow: pageHeadingData.eyebrow,
+          enterprisesPageTitle: pageHeadingData.title,
+          enterprisesPageDescription: pageHeadingData.description,
+          enterprisesPageListTitle: pageHeadingData.listTitle,
+          enterprisesCtaEyebrow: pageHeadingData.ctaEyebrow,
+          enterprisesCtaTitle: pageHeadingData.ctaTitle,
+          enterprisesCtaDescription: pageHeadingData.ctaDescription,
+          enterprisesCtaButtonText: pageHeadingData.ctaButtonText,
+          enterprisesCtaButtonHref: pageHeadingData.ctaButtonHref,
+        };
+      } else if (activeHeadingType === "doanh-nhan") {
+        updated = {
+          ...updated,
+          entrepreneursPageEyebrow: pageHeadingData.eyebrow,
+          entrepreneursPageTitle: pageHeadingData.title,
+          entrepreneursPageDescription: pageHeadingData.description,
+          entrepreneursPageListTitle: pageHeadingData.listTitle,
+        };
+      } else if (activeHeadingType === "san-pham") {
+        updated = {
+          ...updated,
+          productsPageEyebrow: pageHeadingData.eyebrow,
+          productsPageTitle: pageHeadingData.title,
+          productsPageDescription: pageHeadingData.description,
+          productsPageListTitle: pageHeadingData.listTitle,
+        };
+      } else if (activeHeadingType === "su-kien") {
+        updated = {
+          ...updated,
+          eventsEyebrow: pageHeadingData.eyebrow,
+          eventsTitle: pageHeadingData.title,
+          eventsDescription: pageHeadingData.description,
+          eventsViewAllText: pageHeadingData.listTitle,
+        };
+      }
+
       const putRes = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),
       });
-      if (!putRes.ok) throw new Error("Không thể lưu cấu hình mục sự kiện.");
-      setEventHeadingMsg({ type: "success", text: "Đã cập nhật tiêu đề & giới thiệu Sự Kiện ngoài Trang Chủ thành công!" });
+      if (!putRes.ok) throw new Error("Không thể lưu cấu hình trang.");
+      setPageHeadingMsg({ type: "success", text: "Đã cập nhật tiêu đề & giới thiệu thành công!" });
       setTimeout(() => {
-        setShowEventHeadingModal(false);
-        setEventHeadingMsg(null);
-      }, 1500);
+        setShowPageHeadingModal(false);
+        setPageHeadingMsg(null);
+      }, 1200);
     } catch (err: any) {
-      setEventHeadingMsg({ type: "error", text: err?.message || "Có lỗi khi lưu." });
+      setPageHeadingMsg({ type: "error", text: err?.message || "Có lỗi khi lưu." });
     } finally {
-      setSavingEventHeading(false);
+      setSavingPageHeading(false);
     }
   };
 
@@ -1060,70 +1148,152 @@ export function AdminEnterprises({
         </div>
       )}
 
-      {/* Banner cấu hình Tiêu đề & Giới thiệu Mục Sự kiện ngoài Trang chủ */}
-      {activeTypeTab === "su-kien" && (
-        <div
-          style={{
-            background: "linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)",
-            border: "1px solid #fed7aa",
-            borderRadius: "16px",
-            padding: "16px 20px",
-            marginBottom: "16px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: "14px",
-            boxShadow: "0 2px 10px rgba(234,88,12,0.06)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                borderRadius: "10px",
-                background: "#ea580c",
-                color: "#fff",
-                display: "grid",
-                placeItems: "center",
-                flexShrink: 0,
-              }}
-            >
-              <Calendar size={20} />
-            </div>
-            <div>
-              <strong style={{ fontSize: "14px", color: "#9a3412", display: "block" }}>
-                Tiêu đề & Giới thiệu Mục Sự Kiện ngoài Trang Chủ
-              </strong>
-              <span style={{ fontSize: "13px", color: "#7c2d12" }}>
-                Bạn có thể cập nhật dòng nhãn nhỏ ("LỊCH TRÌNH..."), tiêu đề chính ("Sự Kiện Sắp Diễn Ra") và đoạn văn mô tả ngoài trang chủ tại đây.
-              </span>
-            </div>
-          </div>
+      {/* Banner cấu hình Tiêu đề & Giới thiệu theo từng loại menu */}
+      {activeTypeTab !== "all" && activeTypeTab !== "popup" && (() => {
+        const pageConfigs: Record<string, {
+          title: string;
+          desc: string;
+          color: string;
+          bg: string;
+          border: string;
+          btnText: string;
+          icon: any;
+          badgeText: string;
+        }> = {
+          "tin-tuc": {
+            title: "Cấu hình Tiêu đề & Mô tả Trang Tin Tức (/tin-tuc)",
+            desc: 'Chỉnh sửa dòng chữ nhấn ("TIN TỨC & CHUYÊN MÔN"), tiêu đề chính và đoạn văn giới thiệu đầu trang Tin tức (khối Tin Tức & Hoạt Động Doanh Nghiệp).',
+            color: "#9333ea",
+            bg: "linear-gradient(135deg, #faf5ff 0%, #ffffff 100%)",
+            border: "#e9d5ff",
+            btnText: "Sửa tiêu đề & mô tả Tin Tức",
+            icon: Newspaper,
+            badgeText: "Trang Tin tức",
+          },
+          "doanh-nghiep": {
+            title: "Cấu hình Tiêu đề & Giới thiệu Trang Doanh Nghiệp (/doanh-nghiep)",
+            desc: 'Chỉnh sửa dòng chữ nhấn ("ĐỒNG HÀNH & NÂNG TẦM"), tiêu đề chính, mô tả và khối kêu gọi hợp tác (CTA) cuối trang Doanh nghiệp.',
+            color: "#d42027",
+            bg: "linear-gradient(135deg, #fef2f2 0%, #ffffff 100%)",
+            border: "#fecaca",
+            btnText: "Sửa tiêu đề & mô tả Doanh Nghiệp",
+            icon: Building2,
+            badgeText: "Trang Doanh nghiệp",
+          },
+          "doanh-nhan": {
+            title: "Cấu hình Tiêu đề & Giới thiệu Trang Doanh Nhân (/doanh-nhan)",
+            desc: 'Chỉnh sửa dòng chữ nhấn ("CHUYÊN ĐỀ DOANH NHÂN"), tiêu đề chính và mô tả câu chuyện doanh nhân.',
+            color: "#0284c7",
+            bg: "linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%)",
+            border: "#bae6fd",
+            btnText: "Sửa tiêu đề & mô tả Doanh Nhân",
+            icon: Users,
+            badgeText: "Trang Doanh nhân",
+          },
+          "san-pham": {
+            title: "Cấu hình Tiêu đề & Giới thiệu Trang Sản Phẩm (/san-pham)",
+            desc: "Chỉnh sửa dòng chữ nhấn, tiêu đề chính và mô tả giải pháp dịch vụ truyền thông toàn diện.",
+            color: "#16a34a",
+            bg: "linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)",
+            border: "#bbf7d0",
+            btnText: "Sửa tiêu đề & mô tả Sản Phẩm",
+            icon: Package,
+            badgeText: "Trang Sản phẩm",
+          },
+          "su-kien": {
+            title: "Cấu hình Tiêu đề & Giới thiệu Mục Sự Kiện ngoài Trang Chủ",
+            desc: 'Cập nhật dòng nhãn nhỏ ("LỊCH TRÌNH SỰ KIỆN..."), tiêu đề chính ("Sự Kiện Sắp Diễn Ra") và đoạn văn mô tả ngoài trang chủ.',
+            color: "#ea580c",
+            bg: "linear-gradient(135deg, #fff7ed 0%, #ffffff 100%)",
+            border: "#fed7aa",
+            btnText: "Chỉnh sửa Tiêu đề Sự Kiện",
+            icon: Calendar,
+            badgeText: "Khối Sự kiện",
+          },
+        };
+        const cfg = pageConfigs[activeTypeTab];
+        if (!cfg) return null;
+        const IconComponent = cfg.icon;
 
-          <button
-            type="button"
-            onClick={openEventHeadingModal}
+        return (
+          <div
             style={{
-              padding: "9px 18px",
-              borderRadius: "8px",
-              border: "none",
-              background: "#ea580c",
-              color: "#fff",
-              fontSize: "13px",
-              fontWeight: 800,
-              cursor: "pointer",
-              display: "inline-flex",
+              background: cfg.bg,
+              border: `1px solid ${cfg.border}`,
+              borderRadius: "16px",
+              padding: "16px 20px",
+              marginBottom: "16px",
+              display: "flex",
               alignItems: "center",
-              gap: "6px",
-              boxShadow: "0 2px 8px rgba(234,88,12,0.25)",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "14px",
+              boxShadow: `0 2px 10px ${cfg.color}15`,
             }}
           >
-            <Edit3 size={15} /> Chỉnh sửa Tiêu đề & Giới thiệu Trang Chủ
-          </button>
-        </div>
-      )}
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", maxWidth: "780px" }}>
+              <div
+                style={{
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "10px",
+                  background: cfg.color,
+                  color: "#fff",
+                  display: "grid",
+                  placeItems: "center",
+                  flexShrink: 0,
+                }}
+              >
+                <IconComponent size={20} />
+              </div>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "2px" }}>
+                  <strong style={{ fontSize: "14px", color: cfg.color }}>
+                    {cfg.title}
+                  </strong>
+                  <span
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: 700,
+                      background: `${cfg.color}18`,
+                      color: cfg.color,
+                      padding: "2px 8px",
+                      borderRadius: "6px",
+                    }}
+                  >
+                    {cfg.badgeText}
+                  </span>
+                </div>
+                <span style={{ fontSize: "13px", color: "#475569", lineHeight: 1.5 }}>
+                  {cfg.desc}
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => openPageHeadingModal(activeTypeTab)}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "10px",
+                border: "none",
+                background: cfg.color,
+                color: "#fff",
+                fontSize: "13px",
+                fontWeight: 800,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                boxShadow: `0 4px 12px ${cfg.color}40`,
+                transition: "all 0.15s ease",
+              }}
+            >
+              <Edit3 size={15} /> {cfg.btnText}
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Filter and Search Bar */}
       <div
@@ -3243,268 +3413,436 @@ export function AdminEnterprises({
           </div>
         </div>
       )}
-      {/* Modal chỉnh sửa Tiêu đề & Giới thiệu Mục Sự Kiện ngoài Trang Chủ */}
-      {showEventHeadingModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(15, 23, 42, 0.65)",
-            backdropFilter: "blur(4px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 9999,
-            padding: "20px",
-          }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !savingEventHeading) {
-              setShowEventHeadingModal(false);
-            }
-          }}
-        >
+      {/* Modal chỉnh sửa Tiêu đề & Giới thiệu các trang (Tin tức, Doanh nghiệp, Doanh nhân, Sản phẩm, Sự kiện) */}
+      {showPageHeadingModal && (() => {
+        const typeLabels: Record<string, { label: string; icon: any; color: string; path: string }> = {
+          "tin-tuc": { label: "Tin Tức & Hoạt Động", icon: Newspaper, color: "#9333ea", path: "/tin-tuc" },
+          "doanh-nghiep": { label: "Doanh Nghiệp & Thương Hiệu", icon: Building2, color: "#d42027", path: "/doanh-nghiep" },
+          "doanh-nhan": { label: "Doanh Nhân & Lãnh Đạo", icon: Users, color: "#0284c7", path: "/doanh-nhan" },
+          "san-pham": { label: "Sản Phẩm & Dịch Vụ", icon: Package, color: "#16a34a", path: "/san-pham" },
+          "su-kien": { label: "Sự Kiện Ngoài Trang Chủ", icon: Calendar, color: "#ea580c", path: "/su-kien" },
+        };
+        const activeInfo = typeLabels[activeHeadingType] || typeLabels["tin-tuc"];
+        const ActiveIcon = activeInfo.icon;
+
+        return (
           <div
             style={{
-              background: "#fff",
-              borderRadius: "20px",
-              width: "min(680px, 100%)",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(15, 23, 42, 0.65)",
+              backdropFilter: "blur(4px)",
               display: "flex",
-              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 9999,
+              padding: "20px",
+            }}
+            onClick={(e) => {
+              if (e.target === e.currentTarget && !savingPageHeading) {
+                setShowPageHeadingModal(false);
+              }
             }}
           >
-            {/* Header */}
             <div
               style={{
-                padding: "20px 24px",
-                borderBottom: "1px solid var(--line)",
+                background: "#fff",
+                borderRadius: "20px",
+                width: "min(720px, 100%)",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
                 display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "#f8fafc",
+                flexDirection: "column",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div
+              {/* Header */}
+              <div
+                style={{
+                  padding: "20px 24px",
+                  borderBottom: "1px solid var(--line)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "#f8fafc",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div
+                    style={{
+                      width: "38px",
+                      height: "38px",
+                      borderRadius: "10px",
+                      background: activeInfo.color,
+                      color: "#fff",
+                      display: "grid",
+                      placeItems: "center",
+                    }}
+                  >
+                    <ActiveIcon size={20} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>
+                      Chỉnh sửa Tiêu đề & Giới thiệu {activeInfo.label}
+                    </h3>
+                    <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                      Áp dụng cho trang {activeInfo.path} trên website
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPageHeadingModal(false)}
+                  disabled={savingPageHeading}
                   style={{
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "10px",
-                    background: "#ea580c",
-                    color: "#fff",
-                    display: "grid",
-                    placeItems: "center",
+                    border: "none",
+                    background: "transparent",
+                    color: "#64748b",
+                    cursor: "pointer",
+                    padding: "6px",
+                    borderRadius: "6px",
                   }}
                 >
-                  <Calendar size={18} />
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a" }}>
-                    Chỉnh sửa Tiêu đề & Giới thiệu Mục Sự Kiện
-                  </h3>
-                  <span style={{ fontSize: "12px", color: "var(--muted)" }}>
-                    Hiển thị trên Trang chủ (khối Sự Kiện Sắp Diễn Ra)
-                  </span>
-                </div>
+                  <X size={20} />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowEventHeadingModal(false)}
-                disabled={savingEventHeading}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: "#64748b",
-                  cursor: "pointer",
-                  padding: "6px",
-                  borderRadius: "6px",
-                }}
-              >
-                <X size={20} />
-              </button>
-            </div>
 
-            {/* Body */}
-            <div style={{ padding: "24px", display: "grid", gap: "16px" }}>
-              {loadingEventHeading ? (
-                <div style={{ textAlign: "center", padding: "40px 0", color: "#64748b" }}>
-                  <Loader2 size={24} className="spin" style={{ margin: "0 auto 8px" }} />
-                  <span>Đang tải thông tin...</span>
-                </div>
-              ) : (
-                <>
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
-                      Dòng nhãn nhỏ (Eyebrow Badge)
-                    </label>
-                    <input
-                      type="text"
-                      value={eventHeadingData.eventsEyebrow}
-                      onChange={(e) =>
-                        setEventHeadingData((prev) => ({ ...prev, eventsEyebrow: e.target.value }))
-                      }
-                      placeholder="vd: LỊCH TRÌNH SỰ KIỆN 2026 – 2027"
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "8px",
-                        border: "1px solid var(--line)",
-                        fontSize: "14px",
-                        outline: "none",
-                      }}
-                    />
+              {/* Body */}
+              <div style={{ padding: "24px", display: "grid", gap: "18px" }}>
+                {loadingPageHeading ? (
+                  <div style={{ textAlign: "center", padding: "40px 0", color: "#64748b" }}>
+                    <Loader2 size={24} className="spin" style={{ margin: "0 auto 8px" }} />
+                    <span>Đang tải thông tin...</span>
                   </div>
-
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
-                      Tiêu đề chính mục Sự Kiện
-                    </label>
-                    <input
-                      type="text"
-                      value={eventHeadingData.eventsTitle}
-                      onChange={(e) =>
-                        setEventHeadingData((prev) => ({ ...prev, eventsTitle: e.target.value }))
-                      }
-                      placeholder="vd: Sự Kiện Sắp Diễn Ra"
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "8px",
-                        border: "1px solid var(--line)",
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
-                      Đoạn văn mô tả / giới thiệu
-                    </label>
-                    <textarea
-                      rows={4}
-                      value={eventHeadingData.eventsDescription}
-                      onChange={(e) =>
-                        setEventHeadingData((prev) => ({ ...prev, eventsDescription: e.target.value }))
-                      }
-                      placeholder="Nhập đoạn văn mô tả giới thiệu các sự kiện..."
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "8px",
-                        border: "1px solid var(--line)",
-                        fontSize: "14px",
-                        lineHeight: 1.6,
-                        outline: "none",
-                        fontFamily: "inherit",
-                      }}
-                    />
-                  </div>
-
-                  <div style={{ display: "grid", gap: "6px" }}>
-                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
-                      Chữ trên nút xem tất cả sự kiện
-                    </label>
-                    <input
-                      type="text"
-                      value={eventHeadingData.eventsViewAllText}
-                      onChange={(e) =>
-                        setEventHeadingData((prev) => ({ ...prev, eventsViewAllText: e.target.value }))
-                      }
-                      placeholder="vd: Xem tất cả sự kiện"
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "8px",
-                        border: "1px solid var(--line)",
-                        fontSize: "14px",
-                        outline: "none",
-                      }}
-                    />
-                  </div>
-
-                  {eventHeadingMsg && (
-                    <div
-                      style={{
-                        padding: "12px 16px",
-                        borderRadius: "8px",
-                        fontSize: "13px",
-                        fontWeight: 700,
-                        background: eventHeadingMsg.type === "success" ? "#f0fdf4" : "#fef2f2",
-                        color: eventHeadingMsg.type === "success" ? "#166534" : "#991b1b",
-                        border: `1px solid ${eventHeadingMsg.type === "success" ? "#bbf7d0" : "#fecaca"}`,
-                      }}
-                    >
-                      {eventHeadingMsg.text}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div
-              style={{
-                padding: "16px 24px",
-                borderTop: "1px solid var(--line)",
-                background: "#f8fafc",
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => setShowEventHeadingModal(false)}
-                disabled={savingEventHeading}
-                style={{
-                  padding: "9px 18px",
-                  borderRadius: "8px",
-                  border: "1px solid #cbd5e1",
-                  background: "#fff",
-                  color: "#475569",
-                  fontSize: "13px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                Hủy bỏ
-              </button>
-              <button
-                type="button"
-                onClick={saveEventHeading}
-                disabled={savingEventHeading || loadingEventHeading}
-                style={{
-                  padding: "9px 22px",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: "#ea580c",
-                  color: "#fff",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  cursor: savingEventHeading ? "not-allowed" : "pointer",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  boxShadow: "0 2px 8px rgba(234,88,12,0.3)",
-                }}
-              >
-                {savingEventHeading ? (
-                  <>
-                    <Loader2 size={15} className="spin" /> Đang lưu...
-                  </>
                 ) : (
                   <>
-                    <Check size={15} /> Lưu thay đổi
+                    {/* Live Preview Box */}
+                    <div
+                      style={{
+                        background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)",
+                        border: "1px dashed #cbd5e1",
+                        borderRadius: "12px",
+                        padding: "16px 20px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "11px",
+                          fontWeight: 800,
+                          color: "#94a3b8",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.08em",
+                          marginBottom: "8px",
+                        }}
+                      >
+                        👁️ Xem trước giao diện thực tế trên website:
+                      </div>
+                      <div style={{ background: "#fff", padding: "20px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                        <span
+                          style={{
+                            color: "#d42027",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.08em",
+                            display: "block",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          {pageHeadingData.eyebrow || "(Dòng nhấn đầu trang)"}
+                        </span>
+                        <h2
+                          style={{
+                            fontSize: "22px",
+                            fontWeight: 800,
+                            color: "#0f172a",
+                            margin: "0 0 10px 0",
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {pageHeadingData.title || "(Tiêu đề chính)"}
+                        </h2>
+                        <p
+                          style={{
+                            color: "#64748b",
+                            fontSize: "14px",
+                            lineHeight: 1.6,
+                            margin: 0,
+                          }}
+                        >
+                          {pageHeadingData.description || "(Nội dung giới thiệu chi tiết)"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "grid", gap: "6px" }}>
+                      <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                        Dòng nhãn nhỏ đầu trang (Eyebrow Badge)
+                      </label>
+                      <input
+                        type="text"
+                        value={pageHeadingData.eyebrow}
+                        onChange={(e) =>
+                          setPageHeadingData((prev) => ({ ...prev, eyebrow: e.target.value }))
+                        }
+                        placeholder="vd: TIN TỨC & CHUYÊN MÔN"
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          border: "1px solid var(--line)",
+                          fontSize: "14px",
+                          outline: "none",
+                        }}
+                      />
+                      <span style={{ fontSize: "12px", color: "var(--muted)" }}>
+                        Dòng chữ in hoa màu đỏ nằm ngay phía trên tiêu đề chính.
+                      </span>
+                    </div>
+
+                    <div style={{ display: "grid", gap: "6px" }}>
+                      <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                        Tiêu đề chính của trang (Title)
+                      </label>
+                      <input
+                        type="text"
+                        value={pageHeadingData.title}
+                        onChange={(e) =>
+                          setPageHeadingData((prev) => ({ ...prev, title: e.target.value }))
+                        }
+                        placeholder="vd: Tin Tức & Hoạt Động Doanh Nghiệp"
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          border: "1px solid var(--line)",
+                          fontSize: "14px",
+                          fontWeight: 700,
+                          outline: "none",
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ display: "grid", gap: "6px" }}>
+                      <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                        Đoạn văn mô tả / giới thiệu (Description)
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={pageHeadingData.description}
+                        onChange={(e) =>
+                          setPageHeadingData((prev) => ({ ...prev, description: e.target.value }))
+                        }
+                        placeholder="vd: Nội dung chuyên sâu, cập nhật hoạt động mới nhất..."
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          border: "1px solid var(--line)",
+                          fontSize: "14px",
+                          lineHeight: 1.6,
+                          outline: "none",
+                          fontFamily: "inherit",
+                        }}
+                      />
+                    </div>
+
+                    <div style={{ display: "grid", gap: "6px" }}>
+                      <label style={{ fontSize: "13px", fontWeight: 700, color: "#334155" }}>
+                        {activeHeadingType === "su-kien" ? "Chữ trên nút xem tất cả sự kiện" : "Tiêu đề thanh danh sách bài viết"}
+                      </label>
+                      <input
+                        type="text"
+                        value={pageHeadingData.listTitle}
+                        onChange={(e) =>
+                          setPageHeadingData((prev) => ({ ...prev, listTitle: e.target.value }))
+                        }
+                        placeholder="vd: Danh sách bài viết"
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "8px",
+                          border: "1px solid var(--line)",
+                          fontSize: "14px",
+                          outline: "none",
+                        }}
+                      />
+                    </div>
+
+                    {/* Doanh nghiệp CTA Box section */}
+                    {activeHeadingType === "doanh-nghiep" && (
+                      <div
+                        style={{
+                          background: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                          padding: "16px",
+                          display: "grid",
+                          gap: "12px",
+                        }}
+                      >
+                        <strong style={{ fontSize: "14px", color: "#0f172a" }}>
+                          Khối Kêu Gọi Hành Động (CTA Banner) Cuối Trang Doanh Nghiệp
+                        </strong>
+
+                        <div style={{ display: "grid", gap: "4px" }}>
+                          <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                            Dòng nhãn nhỏ CTA
+                          </label>
+                          <input
+                            type="text"
+                            value={pageHeadingData.ctaEyebrow}
+                            onChange={(e) =>
+                              setPageHeadingData((prev) => ({ ...prev, ctaEyebrow: e.target.value }))
+                            }
+                            placeholder="vd: DÀNH CHO DOANH NGHIỆP"
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                          />
+                        </div>
+
+                        <div style={{ display: "grid", gap: "4px" }}>
+                          <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                            Tiêu đề CTA
+                          </label>
+                          <input
+                            type="text"
+                            value={pageHeadingData.ctaTitle}
+                            onChange={(e) =>
+                              setPageHeadingData((prev) => ({ ...prev, ctaTitle: e.target.value }))
+                            }
+                            placeholder="vd: Đưa thương hiệu của bạn xuất hiện trên VTV & hơn 200 báo điện tử"
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontWeight: 700 }}
+                          />
+                        </div>
+
+                        <div style={{ display: "grid", gap: "4px" }}>
+                          <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                            Mô tả CTA
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={pageHeadingData.ctaDescription}
+                            onChange={(e) =>
+                              setPageHeadingData((prev) => ({ ...prev, ctaDescription: e.target.value }))
+                            }
+                            placeholder="Mô tả quyền lợi doanh nghiệp..."
+                            style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontFamily: "inherit" }}
+                          />
+                        </div>
+
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                          <div style={{ display: "grid", gap: "4px" }}>
+                            <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                              Chữ trên nút bấm
+                            </label>
+                            <input
+                              type="text"
+                              value={pageHeadingData.ctaButtonText}
+                              onChange={(e) =>
+                                setPageHeadingData((prev) => ({ ...prev, ctaButtonText: e.target.value }))
+                              }
+                              placeholder="vd: Nhận tư vấn truyền thông"
+                              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                            />
+                          </div>
+                          <div style={{ display: "grid", gap: "4px" }}>
+                            <label style={{ fontSize: "12px", fontWeight: 600, color: "#475569" }}>
+                              Đường link nút bấm
+                            </label>
+                            <input
+                              type="text"
+                              value={pageHeadingData.ctaButtonHref}
+                              onChange={(e) =>
+                                setPageHeadingData((prev) => ({ ...prev, ctaButtonHref: e.target.value }))
+                              }
+                              placeholder="vd: /lien-he"
+                              style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {pageHeadingMsg && (
+                      <div
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: "8px",
+                          fontSize: "13px",
+                          fontWeight: 700,
+                          background: pageHeadingMsg.type === "success" ? "#f0fdf4" : "#fef2f2",
+                          color: pageHeadingMsg.type === "success" ? "#166534" : "#991b1b",
+                          border: `1px solid ${pageHeadingMsg.type === "success" ? "#bbf7d0" : "#fecaca"}`,
+                        }}
+                      >
+                        {pageHeadingMsg.text}
+                      </div>
+                    )}
                   </>
                 )}
-              </button>
+              </div>
+
+              {/* Footer */}
+              <div
+                style={{
+                  padding: "16px 24px",
+                  borderTop: "1px solid var(--line)",
+                  background: "#f8fafc",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowPageHeadingModal(false)}
+                  disabled={savingPageHeading}
+                  style={{
+                    padding: "9px 18px",
+                    borderRadius: "8px",
+                    border: "1px solid #cbd5e1",
+                    background: "#fff",
+                    color: "#475569",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="button"
+                  onClick={savePageHeading}
+                  disabled={savingPageHeading || loadingPageHeading}
+                  style={{
+                    padding: "9px 24px",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: activeInfo.color,
+                    color: "#fff",
+                    fontSize: "13px",
+                    fontWeight: 800,
+                    cursor: savingPageHeading ? "not-allowed" : "pointer",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    boxShadow: `0 4px 12px ${activeInfo.color}40`,
+                  }}
+                >
+                  {savingPageHeading ? (
+                    <>
+                      <Loader2 size={15} className="spin" /> Đang lưu...
+                    </>
+                  ) : (
+                    <>
+                      <Check size={15} /> Lưu thay đổi
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

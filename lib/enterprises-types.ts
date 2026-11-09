@@ -59,6 +59,7 @@ export function getArticleViewUrl(art?: EnterpriseArticle | Partial<EnterpriseAr
   const types = getArticleTypes(art);
   if (types.includes("su-kien")) return `/su-kien/${art.slug}`;
   if (types.includes("tin-tuc")) return `/tin-tuc/${art.slug}`;
+  if (types.includes("dich-vu-facebook")) return `/dich-vu-facebook/${art.slug}`;
   return `/doanh-nghiep/${art.slug}`;
 }
 

@@ -30,7 +30,7 @@ export function ViewCounter({ slug, initialViews, className, iconSize = 14 }: Vi
         body: JSON.stringify({ slug }),
       })
         .then((res) => res.json())
-        .then((data) => {
+        .then((data: any) => {
           if (data && data.success && data.views) {
             setViews(data.views);
           }

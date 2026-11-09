@@ -3,7 +3,7 @@ import { incrementArticleViews } from "@/lib/enterprises";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const body = (await request.json()) as any;
     const slug = body?.slug;
     if (!slug || typeof slug !== "string") {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });

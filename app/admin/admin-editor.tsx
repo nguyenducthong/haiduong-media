@@ -4,6 +4,9 @@ import { useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
+  ArrowLeft,
+  ArrowRight,
+  Shield,
   Award,
   BookOpen,
   Building2,
@@ -51,10 +54,64 @@ import type {
   VtvCommercial,
 } from "@/lib/site-content";
 import { AdminRichEditor } from "@/components/admin-rich-editor";
+import { EnterpriseContentEditor } from "@/components/enterprise-content-editor";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { AdminEnterprises } from "@/components/admin-enterprises";
+import { AdminFacebookManager } from "@/components/admin-facebook-manager";
 import { AdminAccountsManager } from "@/components/admin-accounts-manager";
+import { AdminSidebarV2 } from "@/components/admin-sidebar-v2";
+import { AdminLogoutButton } from "@/components/admin-logout-button";
 import type { SafeAdminUser } from "@/lib/admin-auth";
+import React, { useEffect } from "react";
+
+export interface ScreenMeta {
+  id: string;
+  groupId: string;
+  groupLabel: string;
+  itemLabel: string;
+  liveUrl?: string;
+}
+
+export const ADMIN_SCREENS: ScreenMeta[] = [
+  // 1. Nhóm Trang Chủ
+  { id: "homepage-sections", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "01. Bật/Tắt & Thứ tự khối", liveUrl: "/" },
+  { id: "banner-slider", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "02. Banner Slider", liveUrl: "/" },
+  { id: "vtv-commercials-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "03. Phim/TVC Trên VTV", liveUrl: "/" },
+  { id: "su-kien-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "04. Sự Kiện Sắp Diễn Ra", liveUrl: "/" },
+  { id: "trang-chu", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "05. Giới Thiệu & Niềm Tin", liveUrl: "/" },
+  { id: "dich-vu", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "06. Dịch Vụ Chủ Lực", liveUrl: "/" },
+  { id: "bao-chi-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "07. Báo Chí Đưa Tin", liveUrl: "/" },
+  { id: "thuong-hieu-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "08. Hệ Sinh Thái Đa Kênh", liveUrl: "/" },
+  { id: "danh-gia-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "09. Đánh Giá Khách Hàng", liveUrl: "/" },
+  { id: "doi-tac-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "10. Đối Tác Doanh Nghiệp", liveUrl: "/" },
+  { id: "quy-trinh-cta-admin", groupId: "trang-chu", groupLabel: "Trang Chủ", itemLabel: "11. Quy Trình & Kêu Gọi Hợp Tác", liveUrl: "/" },
+
+  // 2. Nhóm Trang Menu
+  { id: "menu-gioi-thieu", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "01. Trang Giới thiệu", liveUrl: "/gioi-thieu" },
+  { id: "menu-tin-tuc", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "02. Trang Tin tức", liveUrl: "/tin-tuc" },
+  { id: "menu-doanh-nghiep", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "03. Trang Doanh nghiệp", liveUrl: "/doanh-nghiep" },
+  { id: "menu-doanh-nhan", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "04. Trang Doanh nhân", liveUrl: "/doanh-nhan" },
+  { id: "menu-san-pham", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "05. Trang Sản phẩm", liveUrl: "/san-pham" },
+  { id: "menu-iso", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "06. Tư Vấn ISO", liveUrl: "/dich-vu/chung-nhan-iso" },
+  { id: "menu-nhan-hieu", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "07. Đăng Ký Nhãn Hiệu", liveUrl: "/dich-vu/dang-ky-nhan-hieu" },
+  { id: "menu-shtt", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "08. Sở Hữu Trí Tuệ", liveUrl: "/dich-vu/so-huu-tri-tue" },
+  { id: "menu-fb", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "09. Dịch Vụ Facebook", liveUrl: "/dich-vu-facebook" },
+
+  // 3. Nhóm Bài Viết
+  { id: "bai-viet", groupId: "bai-viet", groupLabel: "Bài Viết", itemLabel: "Quản Lý Bài Viết", liveUrl: "/tin-tuc" },
+
+  // 4. Nhóm Cấu Hình
+  { id: "thuong-hieu", groupId: "cau-hinh", groupLabel: "Cấu Hình Chung", itemLabel: "01. Thông Tin Thương Hiệu", liveUrl: "/" },
+  { id: "seo-chia-se", groupId: "cau-hinh", groupLabel: "Cấu Hình Chung", itemLabel: "02. SEO & Thẻ Chia Sẻ Link", liveUrl: "/" },
+  { id: "lien-he", groupId: "cau-hinh", groupLabel: "Cấu Hình Chung", itemLabel: "03. Thông Tin Liên Hệ", liveUrl: "/lien-he" },
+
+  // 5. Nhóm Tài Khoản
+  { id: "tai-khoan", groupId: "tai-khoan", groupLabel: "Hệ Thống", itemLabel: "Tài Khoản Quản Trị", liveUrl: "/admin" },
+];
+
+export const ActiveScreenContext = React.createContext<{
+  activeScreenId: string;
+}>({ activeScreenId: "" });
 
 type Message = { type: "success" | "error"; text: string } | null;
 export type MainAdminTab =
@@ -78,6 +135,52 @@ export default function AdminEditor({
   const [message, setMessage] = useState<Message>(null);
   const [mainTab, setMainTab] = useState<MainAdminTab>("trang-chu");
   const [eventAdminView, setEventAdminView] = useState<"articles" | "cards">("articles");
+
+  // State màn hình đang chọn (Single-Screen View)
+  const [activeScreenId, setActiveScreenId] = useState<string>("menu-iso");
+  const [activeParentLabel, setActiveParentLabel] = useState<string>("Trang Menu");
+  const [activeItemLabel, setActiveItemLabel] = useState<string>("06. Tư Vấn ISO");
+
+  useEffect(() => {
+    try {
+      const savedId = localStorage.getItem("admin_active_screen");
+      const savedParent = localStorage.getItem("admin_active_parent");
+      const savedItem = localStorage.getItem("admin_active_item");
+      if (savedId) {
+        setActiveScreenId(savedId);
+        if (savedParent) setActiveParentLabel(savedParent);
+        if (savedItem) setActiveItemLabel(savedItem);
+        const meta = ADMIN_SCREENS.find((s) => s.id === savedId);
+        if (meta) setMainTab(meta.groupId as MainAdminTab);
+      } else {
+        setMainTab("menu-trang");
+      }
+    } catch {}
+  }, []);
+
+  const handleSelectScreen = (screenId: string, parentLabel: string, itemLabel: string) => {
+    setActiveScreenId(screenId);
+    setActiveParentLabel(parentLabel);
+    setActiveItemLabel(itemLabel);
+    const meta = ADMIN_SCREENS.find((s) => s.id === screenId);
+    if (meta) {
+      setMainTab(meta.groupId as MainAdminTab);
+    }
+    try {
+      localStorage.setItem("admin_active_screen", screenId);
+      localStorage.setItem("admin_active_parent", parentLabel);
+      localStorage.setItem("admin_active_item", itemLabel);
+    } catch {}
+  };
+
+  // Tính toán meta màn hình hiện tại, mục trước và mục sau
+  const currentScreenIndex = ADMIN_SCREENS.findIndex((s) => s.id === activeScreenId);
+  const currentScreenMeta = currentScreenIndex !== -1 ? ADMIN_SCREENS[currentScreenIndex] : null;
+  const prevScreenMeta = currentScreenIndex > 0 ? ADMIN_SCREENS[currentScreenIndex - 1] : null;
+  const nextScreenMeta =
+    currentScreenIndex !== -1 && currentScreenIndex < ADMIN_SCREENS.length - 1
+      ? ADMIN_SCREENS[currentScreenIndex + 1]
+      : null;
 
   // Collapsed state tracking (mặc định thu gọn)
   const [collapsedBanners, setCollapsedBanners] = useState<Record<string, boolean>>({});
@@ -824,278 +927,119 @@ export default function AdminEditor({
   ];
 
   return (
-    <div className="admin-editor-wrapper">
-      {/* ========================================================
-          MENU NGANG PHÂN QUẢN TRỊ THEO TỪNG DANH MỤC
-          ======================================================== */}
-      <nav className="admin-horizontal-nav-bar">
-        <button
-          type="button"
-          onClick={() => setMainTab("trang-chu")}
-          className={`admin-nav-tab-item ${mainTab === "trang-chu" ? "active" : ""}`}
-        >
-          <div className="admin-nav-tab-icon">
-            <Home size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Trang chủ</span>
-            <span className="admin-nav-tab-desc">Chỉnh sửa khối & giao diện</span>
-          </div>
-        </button>
+    <ActiveScreenContext.Provider value={{ activeScreenId }}>
+      <div className="admin-shell-v2" style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", color: "#0f172a" }}>
+        {/* 1. SIDEBAR DỌC */}
+        <AdminSidebarV2
+          activeScreenId={activeScreenId}
+          onSelectScreen={handleSelectScreen}
+          currentUser={currentUser}
+        />
 
-        <button
-          type="button"
-          onClick={() => setMainTab("menu-trang")}
-          className={`admin-nav-tab-item ${mainTab === "menu-trang" ? "active" : ""}`}
-        >
-          <div
-            className="admin-nav-tab-icon"
-            style={{
-              background: mainTab === "menu-trang" ? "#2563eb" : undefined,
-              color: mainTab === "menu-trang" ? "#fff" : undefined,
-            }}
-          >
-            <Layers size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Trang Menu</span>
-            <span className="admin-nav-tab-desc">Giới thiệu, Tin tức, Doanh nghiệp, Doanh nhân</span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setMainTab("bai-viet")}
-          className={`admin-nav-tab-item ${mainTab === "bai-viet" ? "active" : ""}`}
-        >
-          <div
-            className="admin-nav-tab-icon"
-            style={{
-              background: mainTab === "bai-viet" ? "#d42027" : undefined,
-              color: mainTab === "bai-viet" ? "#fff" : undefined,
-            }}
-          >
-            <BookOpen size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Bài viết</span>
-            <span className="admin-nav-tab-desc">Doanh nghiệp, Doanh nhân, Sự kiện, Tin tức</span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setMainTab("cau-hinh")}
-          className={`admin-nav-tab-item ${mainTab === "cau-hinh" ? "active" : ""}`}
-        >
-          <div className="admin-nav-tab-icon">
-            <Sliders size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Cấu hình chung</span>
-            <span className="admin-nav-tab-desc">Thông tin liên hệ & thương hiệu</span>
-          </div>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setMainTab("tai-khoan")}
-          className={`admin-nav-tab-item ${mainTab === "tai-khoan" ? "active" : ""}`}
-        >
-          <div
-            className="admin-nav-tab-icon"
-            style={{
-              background: mainTab === "tai-khoan" ? "#0f172a" : undefined,
-              color: mainTab === "tai-khoan" ? "#fff" : undefined,
-            }}
-          >
-            <Users size={18} />
-          </div>
-          <div className="admin-nav-tab-info">
-            <span className="admin-nav-tab-label">Tài khoản</span>
-            <span className="admin-nav-tab-desc">Phân quyền & bảo mật truy cập</span>
-          </div>
-        </button>
-      </nav>
-
-      {/* ========================================================
-          TAB QUẢN LÝ TẤT CẢ BÀI VIẾT (LƯU TẬP TRUNG 1 FILE DUY NHẤT data/enterprises.json)
-          ======================================================== */}
-      {mainTab === "bai-viet" && (
-        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
-          <AdminEnterprises defaultType="all" />
-        </div>
-      )}
-
-      {/* ========================================================
-          TAB SỰ KIỆN CHẾ ĐỘ QUẢN LÝ BÀI VIẾT SỰ KIỆN & DIỄN ĐÀN
-          ======================================================== */}
-      {mainTab === "su-kien" && eventAdminView === "articles" && (
-        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
-          {/* Switcher header */}
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              gap: "14px",
-              background: "#ffffff",
-              padding: "16px 24px",
-              borderRadius: "16px",
-              border: "1px solid var(--line)",
-              marginBottom: "24px",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.03)",
-            }}
-          >
-            <div>
-              <strong style={{ fontSize: "16px", color: "#0f172a", display: "block" }}>
-                Quản lý Sự Kiện & Diễn Đàn Doanh Nghiệp
-              </strong>
-              <span style={{ fontSize: "13px", color: "var(--muted)" }}>
-                Đang hiển thị danh sách bài viết sự kiện. Bạn có thể biên tập bài viết hoặc chuyển sang cấu hình thẻ sự kiện nổi bật.
-              </span>
+        {/* 2. WORKSPACE BÊN PHẢI */}
+        <main className="admin-workspace-v2" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", background: "#f8fafc" }}>
+          {/* Topbar Header */}
+          <header className="admin-topbar-v2" style={{ height: "64px", background: "#ffffff", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px", flexShrink: 0, zIndex: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13.5px", color: "#64748b" }}>
+                <a href="/" style={{ color: "#64748b", textDecoration: "none", fontWeight: 500 }}>Website</a>
+                <span style={{ color: "#cbd5e1" }}>/</span>
+                <span>{activeParentLabel}</span>
+                <span style={{ color: "#cbd5e1" }}>/</span>
+                <span style={{ color: "#0f172a", fontWeight: 700 }}>{activeItemLabel}</span>
+              </div>
             </div>
 
-            <div style={{ display: "flex", gap: "8px", background: "#f1f5f9", padding: "4px", borderRadius: "10px" }}>
-              <button
-                type="button"
-                onClick={() => setEventAdminView("articles")}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  border: "none",
-                  cursor: "pointer",
-                  background: "#0f172a",
-                  color: "#fff",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                }}
-              >
-                <Newspaper size={15} /> Danh sách bài viết Sự kiện
-              </button>
-              <button
-                type="button"
-                onClick={() => setEventAdminView("cards")}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "8px",
-                  fontSize: "13px",
-                  fontWeight: 800,
-                  border: "none",
-                  cursor: "pointer",
-                  background: "transparent",
-                  color: "#64748b",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-              >
-                <Calendar size={15} /> Thẻ Sự kiện Trang chủ ({content.upcomingEvents.length})
-              </button>
-            </div>
-          </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+              {message && (
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px", fontWeight: 600, color: message.type === "success" ? "#16a34a" : "#dc2626", background: message.type === "success" ? "#f0fdf4" : "#fef2f2", padding: "5px 12px", borderRadius: "20px", border: `1px solid ${message.type === "success" ? "#bbf7d0" : "#fecaca"}` }}>
+                  <CheckCircle2 size={14} />
+                  {message.text}
+                </div>
+              )}
 
-          <AdminEnterprises
-            defaultType="su-kien"
-            title="Quản lý Bài Viết Sự Kiện & Diễn Đàn Doanh Nghiệp"
-            subtitle="Danh sách bài viết sự kiện, diễn đàn kinh tế, chương trình vinh danh và thông báo tiếp nhận hồ sơ."
-          />
-        </div>
-      )}
+              {/* User info & Logout */}
+              {currentUser && (
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingRight: "12px", borderRight: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                    <span style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a" }}>
+                      {currentUser.fullName || currentUser.username}
+                    </span>
+                    <span style={{ fontSize: "11px", color: currentUser.role === "super_admin" ? "#dc2626" : "#64748b", fontWeight: 600 }}>
+                      {currentUser.role === "super_admin" ? "Quản trị tối cao" : "Quản trị viên"}
+                    </span>
+                  </div>
+                  <AdminLogoutButton />
+                </div>
+              )}
 
-      {/* ========================================================
-          TAB QUẢN LÝ TẤT CẢ TÀI KHOẢN TRUY CẬP & BẢO MẬT HỆ THỐNG
-          ======================================================== */}
-      {mainTab === "tai-khoan" && (
-        <div style={{ width: "min(1240px, calc(100% - 40px))", margin: "0 auto", paddingBottom: "120px" }}>
-          <AdminAccountsManager currentUser={currentUser} />
-        </div>
-      )}
-
-      {/* ========================================================
-          CÁC TAB SỬ DỤNG GIAO DIỆN CHỈNH SỬA VÀ LƯU FORM (CONTENT)
-          ======================================================== */}
-      {mainTab !== "bai-viet" && !(mainTab === "su-kien" && eventAdminView === "articles") && mainTab !== "tai-khoan" && (
-        <div className="admin-layout">
-          {/* SIDEBAR NAVIGATION TAILORED TO ACTIVE TAB */}
-          <aside className="admin-nav">
-            {mainTab === "trang-chu" && (
-              <>
-                <strong>Mục Trang chủ</strong>
-                <a href="#homepage-sections">01. Bật/Tắt & Thứ tự</a>
-                <a href="#banner-slider">02. Banner Slider</a>
-                <a href="#vtv-commercials-admin">03. Phim & TVC Trên VTV</a>
-                <a href="#su-kien-admin">04. Sự Kiện Sắp Diễn Ra</a>
-                <a href="#dich-vu">05. Dịch vụ chủ lực</a>
-                <a href="#trang-chu">06. Giới thiệu & Niềm tin</a>
-                <a href="#bao-chi-admin">07. Báo chí Đưa tin</a>
-                <a href="#thuong-hieu-admin">08. Hệ sinh thái</a>
-                <a href="#danh-gia-admin">09. Đánh giá Khách hàng</a>
-                <a href="#doi-tac-admin">10. Đối tác & Doanh nghiệp</a>
-                <a href="#quy-trinh-cta-admin">11. Quy trình & CTA</a>
-              </>
-            )}
-
-            {mainTab === "su-kien" && (
-              <>
-                <strong>Sự kiện & Diễn đàn</strong>
-                <button
-                  type="button"
-                  onClick={() => setEventAdminView("articles")}
+              {currentScreenMeta?.liveUrl && (
+                <a
+                  href={currentScreenMeta.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
                   style={{
-                    background: "#0f172a",
-                    color: "#fff",
-                    border: "none",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    marginBottom: "10px",
-                    display: "flex",
+                    display: "inline-flex",
                     alignItems: "center",
                     gap: "6px",
-                    width: "100%",
+                    padding: "8px 14px",
+                    borderRadius: "8px",
+                    background: "#ffffff",
+                    border: "1px solid #cbd5e1",
+                    color: "#475569",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    textDecoration: "none",
                   }}
                 >
-                  <Newspaper size={14} /> Danh sách bài viết
-                </button>
-                <a href="#su-kien" style={{ fontWeight: 800 }}>01. Thẻ Sự kiện Trang chủ</a>
-              </>
+                  <Eye size={14} /> Xem trang thực tế
+                </a>
+              )}
+
+              <button
+                type="button"
+                onClick={() => save()}
+                disabled={saving}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "8px 20px",
+                  borderRadius: "8px",
+                  background: "#1877f2",
+                  border: "none",
+                  color: "#ffffff",
+                  fontSize: "13.5px",
+                  fontWeight: 700,
+                  cursor: saving ? "not-allowed" : "pointer",
+                  boxShadow: "0 2px 6px rgba(24, 119, 242, 0.3)",
+                }}
+              >
+                {saving ? <LoaderCircle className="spin" size={16} /> : <Save size={16} />}
+                {saving ? "Đang lưu..." : "Lưu thay đổi"}
+              </button>
+            </div>
+          </header>
+
+          {/* Screen Viewport */}
+          <div className="admin-screen-viewport-v2" style={{ flex: 1, overflowY: "auto", padding: "28px", display: "flex", flexDirection: "column" }}>
+            {/* 1. Màn hình Bài Viết */}
+            {activeScreenId === "bai-viet" && (
+              <div style={{ maxWidth: "1240px", width: "100%", margin: "0 auto", paddingBottom: "40px" }}>
+                <AdminEnterprises defaultType="all" />
+              </div>
             )}
 
-            {mainTab === "menu-trang" && (
-              <>
-                <strong>Nội dung Trang Menu</strong>
-                <a href="#menu-gioi-thieu">01. Trang Giới thiệu</a>
-                <a href="#menu-tin-tuc">02. Trang Tin tức</a>
-                <a href="#menu-doanh-nghiep">03. Trang Doanh nghiệp</a>
-                <a href="#menu-doanh-nhan">04. Trang Doanh nhân</a>
-                <a href="#menu-san-pham">05. Trang Sản phẩm</a>
-              </>
+            {/* 2. Màn hình Tài Khoản */}
+            {activeScreenId === "tai-khoan" && (
+              <div style={{ maxWidth: "1240px", width: "100%", margin: "0 auto", paddingBottom: "40px" }}>
+                <AdminAccountsManager currentUser={currentUser} />
+              </div>
             )}
 
-            {mainTab === "cau-hinh" && (
-              <>
-                <strong>Cấu hình chung</strong>
-                <a href="#thuong-hieu">01. Thông tin Thương hiệu</a>
-                <a href="#seo-chia-se">02. SEO & Chia sẻ Link (Zalo/FB)</a>
-                <a href="#lien-he">03. Thông tin Liên hệ</a>
-              </>
-            )}
-          </aside>
-
-          <div className="admin-content">
-            {/* ========================================================
-                TRANG MENU: GIỚI THIỆU, TIN TỨC, DOANH NGHIỆP, DOANH NHÂN, SẢN PHẨM
-                ======================================================== */}
-            {mainTab === "menu-trang" && (
-              <>
+            {/* 3. Màn hình Các Form Chỉnh Sửa */}
+            {activeScreenId !== "bai-viet" && activeScreenId !== "tai-khoan" && (
+              <div style={{ maxWidth: "1100px", width: "100%", margin: "0 auto" }}>
                 {/* 01. GIỚI THIỆU */}
                 <EditorSection
                   id="menu-gioi-thieu"
@@ -1511,12 +1455,295 @@ export default function AdminEditor({
                     placeholder="vd: Danh sách sản phẩm & dịch vụ"
                   />
                 </EditorSection>
-              </>
-            )}
 
-            {/* TRANG CHỦ PHẦN 1 */}
-            {mainTab === "trang-chu" && (
-              <>
+                {/* 06. TƯ VẤN VÀ CHỨNG NHẬN ISO */}
+                <EditorSection
+                  id="menu-iso"
+                  number="06"
+                  title="Trang Tư Vấn & Chứng Nhận ISO (/dich-vu/chung-nhan-iso)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính, mô tả, nội dung chi tiết bài viết và nút hành động của dịch vụ ISO."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/dich-vu/chung-nhan-iso"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#2563eb",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /dich-vu/chung-nhan-iso ↗
+                    </a>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.isoEyebrow || ""}
+                    onChange={(value) => update("isoEyebrow", value)}
+                    placeholder="vd: TIÊU CHUẨN QUỐC TẾ"
+                  />
+                  <Field
+                    label="Tiêu đề chính dịch vụ ISO"
+                    value={content.isoTitle || ""}
+                    onChange={(value) => update("isoTitle", value)}
+                    placeholder="vd: Tư Vấn & Chứng Nhận ISO Chuyên Nghiệp"
+                  />
+                  <Field
+                    label="Mô tả tóm tắt đầu trang"
+                    value={content.isoDescription || ""}
+                    onChange={(value) => update("isoDescription", value)}
+                    multiline
+                    placeholder="vd: Dịch vụ tư vấn, đào tạo và cấp chứng chỉ ISO..."
+                  />
+                  <div className="field-row">
+                    <Field
+                      label="Chữ trên nút liên hệ (CTA)"
+                      value={content.isoCtaText || ""}
+                      onChange={(value) => update("isoCtaText", value)}
+                      placeholder="vd: Nhận hồ sơ tư vấn miễn phí"
+                    />
+                    <Field
+                      label="Đường dẫn nút liên hệ"
+                      value={content.isoCtaHref || ""}
+                      onChange={(value) => update("isoCtaHref", value)}
+                      placeholder="vd: /lien-he"
+                    />
+                  </div>
+                  <div style={{ marginTop: "16px" }}>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", color: "var(--ink)" }}>
+                      Nội dung chi tiết bài viết ISO (Trình soạn thảo chuyên nghiệp)
+                    </label>
+                    <EnterpriseContentEditor
+                      value={content.isoContent || ""}
+                      onChange={(val) => update("isoContent", val)}
+                      minHeight="450px"
+                    />
+                  </div>
+                </EditorSection>
+
+                {/* 07. ĐĂNG KÝ NHÃN HIỆU ĐỘC QUYỀN */}
+                <EditorSection
+                  id="menu-nhan-hieu"
+                  number="07"
+                  title="Trang Đăng Ký Nhãn Hiệu Độc Quyền (/dich-vu/dang-ky-nhan-hieu)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề chính, mô tả, nội dung chi tiết bài viết và nút hành động của dịch vụ bảo hộ nhãn hiệu."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/dich-vu/dang-ky-nhan-hieu"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#dc2626",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /dich-vu/dang-ky-nhan-hieu ↗
+                    </a>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.trademarkEyebrow || ""}
+                    onChange={(value) => update("trademarkEyebrow", value)}
+                    placeholder="vd: BẢO VỆ TÀI SẢN THƯƠNG HIỆU"
+                  />
+                  <Field
+                    label="Tiêu đề chính đăng ký nhãn hiệu"
+                    value={content.trademarkTitle || ""}
+                    onChange={(value) => update("trademarkTitle", value)}
+                    placeholder="vd: Đăng Ký Nhãn Hiệu Độc Quyền Trọn Gói"
+                  />
+                  <Field
+                    label="Mô tả tóm tắt đầu trang"
+                    value={content.trademarkDescription || ""}
+                    onChange={(value) => update("trademarkDescription", value)}
+                    multiline
+                    placeholder="vd: Xác lập quyền sở hữu hợp pháp đối với nhãn hiệu..."
+                  />
+                  <div className="field-row">
+                    <Field
+                      label="Chữ trên nút liên hệ (CTA)"
+                      value={content.trademarkCtaText || ""}
+                      onChange={(value) => update("trademarkCtaText", value)}
+                      placeholder="vd: Tra cứu nhãn hiệu miễn phí"
+                    />
+                    <Field
+                      label="Đường dẫn nút liên hệ"
+                      value={content.trademarkCtaHref || ""}
+                      onChange={(value) => update("trademarkCtaHref", value)}
+                      placeholder="vd: /lien-he"
+                    />
+                  </div>
+                  <div style={{ marginTop: "16px" }}>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", color: "var(--ink)" }}>
+                      Nội dung chi tiết bài viết Đăng ký nhãn hiệu (Trình soạn thảo chuyên nghiệp)
+                    </label>
+                    <EnterpriseContentEditor
+                      value={content.trademarkContent || ""}
+                      onChange={(val) => update("trademarkContent", val)}
+                      minHeight="450px"
+                    />
+                  </div>
+                </EditorSection>
+
+                {/* 08. ĐĂNG KÝ SỞ HỮU TRÍ TUỆ */}
+                <EditorSection
+                  id="menu-shtt"
+                  number="08"
+                  title="Trang Đăng Ký Sở Hữu Trí Tuệ (/dich-vu/so-huu-tri-tue)"
+                  description="Chỉnh sửa thông tin bản quyền tác giả, sáng chế, kiểu dáng công nghiệp và giải pháp bảo vệ SHTT."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/dich-vu/so-huu-tri-tue"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#059669",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /dich-vu/so-huu-tri-tue ↗
+                    </a>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.ipEyebrow || ""}
+                    onChange={(value) => update("ipEyebrow", value)}
+                    placeholder="vd: BẢO HỘ TÀI SẢN VÔ HÌNH"
+                  />
+                  <Field
+                    label="Tiêu đề chính dịch vụ Sở hữu trí tuệ"
+                    value={content.ipTitle || ""}
+                    onChange={(value) => update("ipTitle", value)}
+                    placeholder="vd: Đăng Ký & Bảo Hộ Sở Hữu Trí Tuệ Toàn Diện"
+                  />
+                  <Field
+                    label="Mô tả tóm tắt đầu trang"
+                    value={content.ipDescription || ""}
+                    onChange={(value) => update("ipDescription", value)}
+                    multiline
+                    placeholder="vd: Giải pháp bảo hộ toàn diện cho bản quyền tác giả, sáng chế..."
+                  />
+                  <div className="field-row">
+                    <Field
+                      label="Chữ trên nút liên hệ (CTA)"
+                      value={content.ipCtaText || ""}
+                      onChange={(value) => update("ipCtaText", value)}
+                      placeholder="vd: Tư vấn xác lập quyền"
+                    />
+                    <Field
+                      label="Đường dẫn nút liên hệ"
+                      value={content.ipCtaHref || ""}
+                      onChange={(value) => update("ipCtaHref", value)}
+                      placeholder="vd: /lien-he"
+                    />
+                  </div>
+                  <div style={{ marginTop: "16px" }}>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", color: "var(--ink)" }}>
+                      Nội dung chi tiết bài viết Sở hữu trí tuệ (Trình soạn thảo chuyên nghiệp)
+                    </label>
+                    <EnterpriseContentEditor
+                      value={content.ipContent || ""}
+                      onChange={(val) => update("ipContent", val)}
+                      minHeight="450px"
+                    />
+                  </div>
+                </EditorSection>
+
+                {/* 09. DỊCH VỤ FACEBOOK TOÀN DIỆN */}
+                <EditorSection
+                  id="menu-fb"
+                  number="09"
+                  title="Trang Dịch Vụ Facebook Toàn Diện (/dich-vu-facebook)"
+                  description="Chỉnh sửa thông điệp đầu trang và khối Cam kết Làm trước trả tiền sau của Hub Dịch vụ Facebook (10 dịch vụ con được quản lý trong tab 'Bài viết')."
+                >
+                  <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <a
+                      href="/dich-vu-facebook"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontSize: "13px",
+                        color: "#1877f2",
+                        fontWeight: 700,
+                        textDecoration: "none",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                      }}
+                    >
+                      <Eye size={14} /> Xem trang thực tế: /dich-vu-facebook ↗
+                    </a>
+                  </div>
+
+                  <Field
+                    label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
+                    value={content.facebookHubEyebrow || ""}
+                    onChange={(value) => update("facebookHubEyebrow", value)}
+                    placeholder="vd: DỊCH VỤ FACEBOOK TOÀN DIỆN"
+                  />
+                  <Field
+                    label="Tiêu đề chính Hub Dịch vụ Facebook"
+                    value={content.facebookHubTitle || ""}
+                    onChange={(value) => update("facebookHubTitle", value)}
+                    placeholder="vd: Dịch Vụ Facebook Chuyên Nghiệp - Uy Tín Hàng Đầu"
+                  />
+                  <Field
+                    label="Mô tả tóm tắt Hub Dịch vụ Facebook"
+                    value={content.facebookHubDescription || ""}
+                    onChange={(value) => update("facebookHubDescription", value)}
+                    multiline
+                    placeholder="vd: Hệ thống giải pháp xử lý sự cố Facebook toàn diện..."
+                  />
+                  <Field
+                    label="Tiêu đề khối Cam kết vàng"
+                    value={content.facebookHubPolicyTitle || ""}
+                    onChange={(value) => update("facebookHubPolicyTitle", value)}
+                    placeholder="vd: CHÍNH SÁCH VÀNG: LÀM TRƯỚC - TRẢ TIỀN SAU (KHÔNG CỌC)"
+                  />
+                  <Field
+                    label="Nội dung chi tiết cam kết vàng"
+                    value={content.facebookHubPolicyContent || ""}
+                    onChange={(value) => update("facebookHubPolicyContent", value)}
+                    multiline
+                    placeholder="vd: Chúng tôi chỉ nhận thanh toán khi bạn đã lấy lại được nick..."
+                  />
+
+                  {/* NỘI DUNG BÀI VIẾT GIỚI THIỆU HUB FACEBOOK DẠNG WYSIWYG EDITOR */}
+                  <div style={{ marginTop: "20px" }}>
+                    <label style={{ display: "block", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", marginBottom: "8px", color: "var(--ink)" }}>
+                      Nội dung bài viết giới thiệu Hub Dịch vụ Facebook (Trình soạn thảo chuyên nghiệp - hỗ trợ bảng biểu, hình ảnh)
+                    </label>
+                    <EnterpriseContentEditor
+                      value={content.facebookHubContent || ""}
+                      onChange={(val) => update("facebookHubContent", val)}
+                      minHeight="350px"
+                    />
+                  </div>
+
+                  {/* QUẢN LÝ VÀ CHỈNH SỬA NỘI DUNG 10 DỊCH VỤ FACEBOOK CON */}
+                  <AdminFacebookManager />
+                </EditorSection>
+
                 {/* ========================================================
                     01. CẤU HÌNH HIỂN THỊ & SẮP XẾP CÁC MỤC TRÊN TRANG CHỦ
                     ======================================================== */}
@@ -2441,14 +2668,7 @@ export default function AdminEditor({
             </button>
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        TAB TIN TỨC & KIẾN THỨC
-        ======================================================== */}
-    {mainTab === "tin-tuc" && (
-      <>
         {/* ========================================================
             04. QUẢN LÝ BÀI VIẾT (TIN TỨC)
             ======================================================== */}
@@ -3125,14 +3345,7 @@ export default function AdminEditor({
             })}
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        TAB SỰ KIỆN
-        ======================================================== */}
-    {mainTab === "su-kien" && (
-      <>
         {/* ========================================================
             06. QUẢN LÝ SỰ KIỆN (CÓ THU GỌN, SẮP XẾP, ACTIVE)
             ======================================================== */}
@@ -3619,14 +3832,7 @@ export default function AdminEditor({
             })}
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        TRANG CHỦ PHẦN 2: BÁO CHÍ, THƯƠNG HIỆU, ĐÁNH GIÁ, ĐỐI TÁC, CTA
-        ======================================================== */}
-    {mainTab === "trang-chu" && (
-      <>
         {/* ========================================================
             07. BÁO CHÍ NÓI VỀ CHÚNG TÔI
             ======================================================== */}
@@ -5178,14 +5384,7 @@ export default function AdminEditor({
             </div>
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        CẤU HÌNH: THƯƠNG HIỆU
-        ======================================================== */}
-    {mainTab === "cau-hinh" && (
-      <>
         {/* ========================================================
             12. THÔNG TIN THƯƠNG HIỆU
             ======================================================== */}
@@ -5333,14 +5532,7 @@ export default function AdminEditor({
             </div>
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        TRANG CHỦ PHẦN 3: GIỚI THIỆU & DỊCH VỤ CHỦ LỰC
-        ======================================================== */}
-    {mainTab === "trang-chu" && (
-      <>
         {/* ========================================================
             13. TIÊU ĐỀ & GIỚI THIỆU CHUNG
             ======================================================== */}
@@ -5433,14 +5625,7 @@ export default function AdminEditor({
             ))}
           </div>
         </EditorSection>
-      </>
-    )}
 
-    {/* ========================================================
-        CẤU HÌNH: THÔNG TIN LIÊN HỆ
-        ======================================================== */}
-    {mainTab === "cau-hinh" && (
-      <>
         {/* ========================================================
             15. THÔNG TIN LIÊN HỆ
             ======================================================== */}
@@ -5491,27 +5676,78 @@ export default function AdminEditor({
             onChange={(value) => update("mapUrl", value)}
           />
         </EditorSection>
-      </>
-    )}
 
-        {/* Floating Save Bar */}
-        <div className="admin-savebar">
-          {message && (
-            <p className={message.type}>
-              <CheckCircle2 size={17} />
-              {message.text}
-            </p>
-          )}
-          <button type="button" onClick={() => save()} disabled={saving}>
-            {saving ? <LoaderCircle className="spin" size={18} /> : <Save size={18} />}{" "}
-            {saving ? "Đang lưu..." : "Lưu toàn bộ thay đổi"}
-          </button>
-        </div>
+              </div>
+            )}
+
+            {/* Footer Navigation: Mục Trước / Mục Tiếp Theo */}
+            {(prevScreenMeta || nextScreenMeta) && (
+              <div
+                className="admin-screen-footer-v2"
+                style={{
+                  marginTop: "auto",
+                  paddingTop: "24px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  maxWidth: "1100px",
+                  width: "100%",
+                  margin: "auto auto 0",
+                }}
+              >
+                {prevScreenMeta ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSelectScreen(prevScreenMeta.id, prevScreenMeta.groupLabel, prevScreenMeta.itemLabel)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "10px 18px",
+                      borderRadius: "10px",
+                      background: "#ffffff",
+                      border: "1px solid #cbd5e1",
+                      color: "#334155",
+                      fontSize: "13.5px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                    }}
+                  >
+                    <ArrowLeft size={16} /> Mục trước: {prevScreenMeta.itemLabel}
+                  </button>
+                ) : <div />}
+
+                {nextScreenMeta ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSelectScreen(nextScreenMeta.id, nextScreenMeta.groupLabel, nextScreenMeta.itemLabel)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      padding: "10px 18px",
+                      borderRadius: "10px",
+                      background: "#0f172a",
+                      border: "1px solid #0f172a",
+                      color: "#ffffff",
+                      fontSize: "13.5px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      marginLeft: "auto",
+                      boxShadow: "0 2px 6px rgba(15,23,42,0.25)",
+                    }}
+                  >
+                    Mục tiếp theo: {nextScreenMeta.itemLabel} <ArrowRight size={16} />
+                  </button>
+                ) : <div />}
+              </div>
+            )}
+          </div>
+        </main>
       </div>
-    </div>
-    )}
-  </div>
-);
+    </ActiveScreenContext.Provider>
+  );
 }
 
 function EditorSection({
@@ -5527,9 +5763,35 @@ function EditorSection({
   description: string;
   children: React.ReactNode;
 }) {
+  const { activeScreenId } = React.useContext(ActiveScreenContext);
+  // Nếu activeScreenId được đặt và không khớp với id của section này thì không render (Single-Screen View)
+  if (activeScreenId && activeScreenId !== id) {
+    return null;
+  }
+
   return (
-    <section id={id} className="editor-section">
-      <div className="editor-heading">
+    <section
+      id={id}
+      className="editor-section admin-screen-card-v2"
+      style={{
+        maxWidth: "1100px",
+        width: "100%",
+        margin: "0 auto 24px",
+        background: "#ffffff",
+        border: "1px solid #e2e8f0",
+        borderRadius: "18px",
+        padding: "32px 36px",
+        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+      }}
+    >
+      <div
+        className="editor-heading"
+        style={{
+          marginBottom: "24px",
+          paddingBottom: "20px",
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
         <span>{number}</span>
         <div>
           <h2>{title}</h2>

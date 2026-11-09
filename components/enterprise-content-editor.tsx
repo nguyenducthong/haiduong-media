@@ -36,6 +36,12 @@ import {
   Type,
   Maximize2,
   Minimize2,
+  Table,
+  Plus,
+  Trash2,
+  Rows,
+  Columns,
+  Grid,
 } from "lucide-react";
 
 const FONT_SIZES = [
@@ -137,6 +143,15 @@ export function EnterpriseContentEditor({
   const [selectedFontSize, setSelectedFontSize] = useState<string>("");
   const [isExpandedView, setIsExpandedView] = useState<boolean>(false);
 
+  // Table State & Active Context
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(3);
+  const [tableHasHeader, setTableHasHeader] = useState(true);
+  const [activeTable, setActiveTable] = useState<HTMLTableElement | null>(null);
+  const [activeTableRow, setActiveTableRow] = useState<HTMLTableRowElement | null>(null);
+  const [activeTableCell, setActiveTableCell] = useState<HTMLTableCellElement | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docFileInputRef = useRef<HTMLInputElement>(null);
   const wordFileInputRef = useRef<HTMLInputElement>(null);
@@ -175,6 +190,43 @@ export function EnterpriseContentEditor({
             }
           }
         } catch {}
+
+        // Detect if cursor is inside a table
+        try {
+          let cur: Node | null = sel.anchorNode;
+          let foundCell: HTMLTableCellElement | null = null;
+          let foundRow: HTMLTableRowElement | null = null;
+          let foundTable: HTMLTableElement | null = null;
+
+          while (cur && cur !== editorRef.current) {
+            if (cur instanceof HTMLElement) {
+              const tag = cur.tagName.toLowerCase();
+              if (!foundCell && (tag === "td" || tag === "th")) {
+                foundCell = cur as HTMLTableCellElement;
+              }
+              if (!foundRow && tag === "tr") {
+                foundRow = cur as HTMLTableRowElement;
+              }
+              if (!foundTable && tag === "table") {
+                foundTable = cur as HTMLTableElement;
+                break;
+              }
+            }
+            cur = cur.parentNode;
+          }
+
+          setActiveTableCell(foundCell);
+          setActiveTableRow(foundRow);
+          setActiveTable(foundTable);
+        } catch {
+          setActiveTableCell(null);
+          setActiveTableRow(null);
+          setActiveTable(null);
+        }
+      } else {
+        setActiveTableCell(null);
+        setActiveTableRow(null);
+        setActiveTable(null);
       }
     };
 
@@ -354,6 +406,189 @@ export function EnterpriseContentEditor({
         onChange(editorRef.current.innerHTML);
       }
     }, 10);
+  };
+
+  // --- TABLE HANDLING ---
+  const openTableModal = () => {
+    saveSelection();
+    setTableRows(3);
+    setTableCols(3);
+    setTableHasHeader(true);
+    setIsTableModalOpen(true);
+  };
+
+  const insertTableAtCursor = (
+    rows: number = 3,
+    cols: number = 3,
+    hasHeader: boolean = true
+  ) => {
+    const validRows = Math.max(1, Math.min(30, Number(rows) || 3));
+    const validCols = Math.max(1, Math.min(10, Number(cols) || 3));
+
+    let html = `<div class="article-table-wrapper" style="overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);"><table class="article-table" style="width: 100%; border-collapse: collapse; font-size: 15px; text-align: left; background: #fff;">`;
+
+    if (hasHeader) {
+      html += `<thead><tr style="background-color: #f8fafc; border-bottom: 2px solid #cbd5e1;">`;
+      for (let c = 1; c <= validCols; c++) {
+        html += `<th style="padding: 12px 16px; border: 1px solid #e2e8f0; font-weight: 700; color: #0f172a; font-size: 14px;">Tiêu đề ${c}</th>`;
+      }
+      html += `</tr></thead>`;
+    }
+
+    html += `<tbody>`;
+    for (let r = 1; r <= validRows; r++) {
+      const bg = r % 2 === 0 ? "background-color: #f8fafc;" : "background-color: #ffffff;";
+      html += `<tr style="${bg}">`;
+      for (let c = 1; c <= validCols; c++) {
+        html += `<td style="padding: 12px 16px; border: 1px solid #e2e8f0; color: #334155; font-size: 14px;">Nội dung ${r}.${c}</td>`;
+      }
+      html += `</tr>`;
+    }
+    html += `</tbody></table></div><p><br></p>`;
+
+    insertHtmlAtCursor(html);
+    setIsTableModalOpen(false);
+  };
+
+  const handleAddTableRow = (position: "above" | "below" = "below") => {
+    if (!activeTable || !activeTableRow) return;
+    try {
+      const colCount = activeTableRow.children.length || 3;
+      const newRow = document.createElement("tr");
+      for (let i = 0; i < colCount; i++) {
+        const td = document.createElement("td");
+        td.style.padding = "12px 16px";
+        td.style.border = "1px solid #e2e8f0";
+        td.style.color = "#334155";
+        td.style.fontSize = "14px";
+        td.innerHTML = "&nbsp;";
+        newRow.appendChild(td);
+      }
+
+      if (position === "above") {
+        activeTableRow.parentNode?.insertBefore(newRow, activeTableRow);
+      } else {
+        activeTableRow.parentNode?.insertBefore(newRow, activeTableRow.nextSibling);
+      }
+
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.warn("Could not add table row", e);
+    }
+  };
+
+  const handleAddTableCol = (position: "left" | "right" = "right") => {
+    if (!activeTable || !activeTableCell || !activeTableRow) return;
+    try {
+      const cellIndex = Array.from(activeTableRow.children).indexOf(activeTableCell);
+      if (cellIndex === -1) return;
+
+      const rows = activeTable.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const isHeader = row.parentElement?.tagName.toLowerCase() === "thead" || row.querySelector("th");
+        const cell = document.createElement(isHeader ? "th" : "td");
+        cell.style.padding = "12px 16px";
+        cell.style.border = "1px solid #e2e8f0";
+        cell.style.fontSize = "14px";
+        if (isHeader) {
+          cell.style.fontWeight = "700";
+          cell.style.color = "#0f172a";
+          cell.innerHTML = "Cột mới";
+        } else {
+          cell.style.color = "#334155";
+          cell.innerHTML = "&nbsp;";
+        }
+
+        const targetChild = row.children[cellIndex];
+        if (position === "left") {
+          row.insertBefore(cell, targetChild);
+        } else {
+          row.insertBefore(cell, targetChild ? targetChild.nextSibling : null);
+        }
+      });
+
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.warn("Could not add table col", e);
+    }
+  };
+
+  const handleDeleteTableRow = () => {
+    if (!activeTable || !activeTableRow) return;
+    try {
+      const parent = activeTableRow.parentNode;
+      parent?.removeChild(activeTableRow);
+      setActiveTableRow(null);
+      setActiveTableCell(null);
+
+      // If table is now empty, remove table
+      if (activeTable.querySelectorAll("tr").length === 0) {
+        handleDeleteTable();
+        return;
+      }
+
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.warn("Could not delete row", e);
+    }
+  };
+
+  const handleDeleteTableCol = () => {
+    if (!activeTable || !activeTableCell || !activeTableRow) return;
+    try {
+      const cellIndex = Array.from(activeTableRow.children).indexOf(activeTableCell);
+      if (cellIndex === -1) return;
+
+      const rows = activeTable.querySelectorAll("tr");
+      rows.forEach((row) => {
+        if (row.children[cellIndex]) {
+          row.removeChild(row.children[cellIndex]);
+        }
+      });
+
+      setActiveTableCell(null);
+
+      // If rows have no cells left, delete table
+      const remainingCols = activeTable.querySelector("tr")?.children.length || 0;
+      if (remainingCols === 0) {
+        handleDeleteTable();
+        return;
+      }
+
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.warn("Could not delete col", e);
+    }
+  };
+
+  const handleDeleteTable = () => {
+    if (!activeTable) return;
+    try {
+      // If wrapper exists, delete wrapper
+      const wrapper = activeTable.closest(".article-table-wrapper");
+      if (wrapper && wrapper.parentNode) {
+        wrapper.parentNode.removeChild(wrapper);
+      } else if (activeTable.parentNode) {
+        activeTable.parentNode.removeChild(activeTable);
+      }
+      setActiveTable(null);
+      setActiveTableRow(null);
+      setActiveTableCell(null);
+
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
+    } catch (e) {
+      console.warn("Could not delete table", e);
+    }
   };
 
   // --- IMAGE HANDLING ---
@@ -1199,6 +1434,24 @@ export function EnterpriseContentEditor({
               <FileUp size={15} /> Nhập từ Word (.docx)
             </button>
 
+            {/* ACTION: CHÈN BẢNG (TABLE) */}
+            <button
+              type="button"
+              title="Chèn bảng mới vào vị trí con trỏ chuột"
+              onMouseDown={saveSelection}
+              onClick={openTableModal}
+              style={{
+                ...btnStyle,
+                background: "#faf5ff",
+                color: "#7e22ce",
+                fontWeight: 700,
+                padding: "5px 11px",
+                border: "1px solid #e9d5ff",
+              }}
+            >
+              <Table size={15} /> Chèn bảng
+            </button>
+
             <button
               type="button"
               title="Chèn liên kết (Link)"
@@ -1229,6 +1482,168 @@ export function EnterpriseContentEditor({
               style={btnStyle}
             >
               <RotateCcw size={14} />
+            </button>
+          </div>
+        )}
+
+        {/* BARS: CÔNG CỤ THAO TÁC BẢNG (HIỂN THỊ KHI CON TRỎ Ở TRONG BẢNG) */}
+        {activeTab === "visual" && activeTable && (
+          <div
+            style={{
+              padding: "6px 12px",
+              background: "#faf5ff",
+              borderTop: "1px dashed #e9d5ff",
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: "12px",
+            }}
+          >
+            <span style={{ color: "#7e22ce", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: "4px" }}>
+              <Table size={13} /> Thao tác bảng:
+            </span>
+
+            <button
+              type="button"
+              onClick={() => handleAddTableRow("above")}
+              title="Thêm một dòng mới phía trên dòng hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fff",
+                border: "1px solid #d8b4fe",
+                color: "#6b21a8",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Rows size={12} /> + Hàng trên
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleAddTableRow("below")}
+              title="Thêm một dòng mới phía dưới dòng hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fff",
+                border: "1px solid #d8b4fe",
+                color: "#6b21a8",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Rows size={12} /> + Hàng dưới
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleAddTableCol("left")}
+              title="Thêm một cột mới bên trái cột hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fff",
+                border: "1px solid #d8b4fe",
+                color: "#6b21a8",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Columns size={12} /> + Cột trái
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleAddTableCol("right")}
+              title="Thêm một cột mới bên phải cột hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fff",
+                border: "1px solid #d8b4fe",
+                color: "#6b21a8",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Columns size={12} /> + Cột phải
+            </button>
+
+            <div style={{ width: "1px", height: "14px", background: "#d8b4fe", margin: "0 2px" }} />
+
+            <button
+              type="button"
+              onClick={handleDeleteTableRow}
+              title="Xóa dòng hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                color: "#b91c1c",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Trash2 size={12} /> Xóa hàng
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteTableCol}
+              title="Xóa cột hiện tại"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#fef2f2",
+                border: "1px solid #fecaca",
+                color: "#b91c1c",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Trash2 size={12} /> Xóa cột
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDeleteTable}
+              title="Xóa toàn bộ bảng này"
+              style={{
+                padding: "3px 8px",
+                borderRadius: "4px",
+                background: "#dc2626",
+                border: "1px solid #b91c1c",
+                color: "#fff",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "3px",
+              }}
+            >
+              <Trash2 size={12} /> Xóa toàn bộ bảng
             </button>
           </div>
         )}
@@ -2437,6 +2852,275 @@ export function EnterpriseContentEditor({
               >
                 {isConvertingWord && <Loader2 size={14} className="animate-spin" />}
                 {isConvertingWord ? "Đang chuyển đổi..." : "Chuyển đổi & Đưa vào bài viết"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL 4: CHÈN BẢNG BIỂU (TABLE) */}
+      {isTableModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(15, 23, 42, 0.65)",
+            backdropFilter: "blur(4px)",
+            zIndex: 99999,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "16px",
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsTableModalOpen(false);
+          }}
+        >
+          <div
+            style={{
+              background: "#ffffff",
+              borderRadius: "16px",
+              width: "100%",
+              maxWidth: "520px",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+              overflow: "hidden",
+            }}
+          >
+            {/* Modal Header */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px 20px",
+                borderBottom: "1px solid #e2e8f0",
+                background: "#f8fafc",
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "#0f172a", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Table size={18} style={{ color: "#7e22ce" }} />
+                  Chèn bảng mới vào bài viết
+                </h3>
+                <p style={{ margin: "2px 0 0", fontSize: "12px", color: "#64748b" }}>
+                  Tùy chỉnh số cột, số hàng và dòng tiêu đề cho bảng
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsTableModalOpen(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  cursor: "pointer",
+                  color: "#64748b",
+                  padding: "6px",
+                  borderRadius: "8px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
+                    Số Cột (Columns)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={tableCols}
+                    onChange={(e) => setTableCols(Math.max(1, Math.min(10, parseInt(e.target.value) || 1)))}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      outline: "none",
+                    }}
+                  />
+                  <span style={{ fontSize: "11px", color: "#64748b", marginTop: "4px", display: "block" }}>
+                    Khuyên dùng 2 - 6 cột
+                  </span>
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
+                    Số Hàng (Rows)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="30"
+                    value={tableRows}
+                    onChange={(e) => setTableRows(Math.max(1, Math.min(30, parseInt(e.target.value) || 1)))}
+                    style={{
+                      width: "100%",
+                      padding: "8px 12px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                      outline: "none",
+                    }}
+                  />
+                  <span style={{ fontSize: "11px", color: "#64748b", marginTop: "4px", display: "block" }}>
+                    Chưa tính hàng tiêu đề
+                  </span>
+                </div>
+              </div>
+
+              {/* Header Toggle */}
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "12px 14px",
+                  borderRadius: "8px",
+                  background: "#f1f5f9",
+                  cursor: "pointer",
+                  userSelect: "none",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={tableHasHeader}
+                  onChange={(e) => setTableHasHeader(e.target.checked)}
+                  style={{ width: "16px", height: "16px", accentColor: "#7e22ce" }}
+                />
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b" }}>
+                    Tạo hàng tiêu đề nổi bật (Header Row)
+                  </div>
+                  <div style={{ fontSize: "12px", color: "#64748b" }}>
+                    Hàng đầu tiên sẽ có nền xám nhẹ, chữ in đậm chuyên nghiệp
+                  </div>
+                </div>
+              </label>
+
+              {/* Visual Mini Preview */}
+              <div>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Mô phỏng kích thước: {tableCols} cột × {tableRows} hàng {tableHasHeader ? "(+ 1 hàng tiêu đề)" : ""}
+                </div>
+                <div
+                  style={{
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "8px",
+                    padding: "8px",
+                    background: "#f8fafc",
+                    maxHeight: "140px",
+                    overflow: "hidden",
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${tableCols}, 1fr)`,
+                    gap: "4px",
+                  }}
+                >
+                  {tableHasHeader &&
+                    Array.from({ length: tableCols }).map((_, c) => (
+                      <div
+                        key={`h-${c}`}
+                        style={{
+                          height: "22px",
+                          background: "#e2e8f0",
+                          borderRadius: "4px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "10px",
+                          fontWeight: 700,
+                          color: "#475569",
+                        }}
+                      >
+                        Th{c + 1}
+                      </div>
+                    ))}
+                  {Array.from({ length: Math.min(tableRows, 4) }).map((_, r) =>
+                    Array.from({ length: tableCols }).map((_, c) => (
+                      <div
+                        key={`c-${r}-${c}`}
+                        style={{
+                          height: "18px",
+                          background: "#fff",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "4px",
+                          fontSize: "9px",
+                          color: "#94a3b8",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {r + 1}.{c + 1}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                padding: "14px 20px",
+                borderTop: "1px solid #e2e8f0",
+                background: "#f8fafc",
+              }}
+            >
+              <button
+                type="button"
+                onClick={() => setIsTableModalOpen(false)}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  border: "1px solid #cbd5e1",
+                  background: "#fff",
+                  color: "#475569",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Hủy bỏ
+              </button>
+
+              <button
+                type="button"
+                onClick={() => insertTableAtCursor(tableRows, tableCols, tableHasHeader)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 20px",
+                  borderRadius: "8px",
+                  border: "none",
+                  background: "#7e22ce",
+                  color: "#fff",
+                  fontSize: "13px",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(126, 34, 206, 0.25)",
+                }}
+              >
+                <Plus size={15} /> Chèn bảng vào bài
               </button>
             </div>
           </div>

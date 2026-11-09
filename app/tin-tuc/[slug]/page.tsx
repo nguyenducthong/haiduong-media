@@ -80,7 +80,7 @@ export default async function NewsDetailPage({
               <span>
                 <User size={15} /> {article.author || "Ban Biên Tập"}
               </span>
-              <ViewCounter slug={article.slug || slug} initialViews={article.views} iconSize={15} />
+              <ViewCounter slug={article.slug || slug} initialViews={(article as any).views} iconSize={15} />
             </div>
           </div>
         </section>

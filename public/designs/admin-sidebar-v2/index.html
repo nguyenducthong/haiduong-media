@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard Prototype - Menu Dọc & Từng Màn Hình Độc Lập | Hải Dương Media</title>
+  <!-- Google Fonts Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --sidebar-width-expanded: 268px;
+      --sidebar-width-collapsed: 72px;
+      --topbar-height: 64px;
+      --bg-sidebar: #0f172a;
+      --bg-sidebar-hover: #1e293b;
+      --bg-sidebar-active: #2563eb;
+      --sidebar-border: #1e293b;
+      --text-sidebar: #94a3b8;
+      --text-sidebar-bright: #f8fafc;
+      
+      --bg-main: #f8fafc;
+      --bg-surface: #ffffff;
+      --border-color: #e2e8f0;
+      --text-primary: #0f172a;
+      --text-muted: #64748b;
+      --brand-red: #d42027;
+      --brand-blue: #1877f2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      height: 100vh;
+      display: flex;
+    }
+
+    /* ========================================================
+       SIDEBAR DỌC (LEFT SIDEBAR)
+       ======================================================== */
+    .admin-sidebar {
+      width: var(--sidebar-width-expanded);
+      height: 100vh;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--sidebar-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      z-index: 50;
+      user-select: none;
+    }
+
+    .admin-sidebar.collapsed {
+      width: var(--sidebar-width-collapsed);
+    }
+
+    /* Sidebar Header */
+    .sidebar-header {
+      height: var(--topbar-height);
+      display: flex;
+      align-items: center;
+      justifyContent: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--sidebar-border);
+      gap: 10px;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+
+    .brand-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #d42027 0%, #b91c1c 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(212, 32, 39, 0.35);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.2s ease;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .admin-sidebar.collapsed .brand-text {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+    }
+
+    .btn-toggle-sidebar {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-toggle-sidebar:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+    }
+
+    /* Sidebar Navigation Menu */
+    .sidebar-menu-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 14px 10px;
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent;
+    }
+
+    .menu-group-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748b;
+      padding: 12px 10px 6px;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .admin-sidebar.collapsed .menu-group-label {
+      opacity: 0;
+      height: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .nav-item {
+      position: relative;
+      margin-bottom: 4px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: var(--text-sidebar);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      background-color: var(--bg-sidebar-hover);
+      color: var(--text-sidebar-bright);
+    }
+
+    .nav-link.active-parent {
+      color: #fff;
+      background-color: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-link.active-item {
+      background-color: var(--bg-sidebar-active);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .nav-link-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover .nav-icon,
+    .nav-link.active-parent .nav-icon,
+    .nav-link.active-item .nav-icon {
+      color: #fff;
+    }
+
+    .nav-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity 0.2s ease;
+    }
+
+    .admin-sidebar.collapsed .nav-label {
+      opacity: 0;
+      width: 0;
+      pointer-events: none;
+    }
+
+    .chevron-icon {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .admin-sidebar.collapsed .chevron-icon {
+      display: none;
+    }
+
+    .nav-item.open > .nav-link .chevron-icon {
+      transform: rotate(90deg);
+      opacity: 1;
+    }
+
+    /* Submenu (Accordion) */
+    .submenu-list {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      padding-left: 20px;
+      margin-top: 2px;
+    }
+
+    .nav-item.open > .submenu-list {
+      max-height: 800px;
+    }
+
+    .admin-sidebar.collapsed .submenu-list {
+      display: none;
+    }
+
+    .submenu-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      margin-bottom: 2px;
+      cursor: pointer;
+    }
+
+    .submenu-link:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+      padding-left: 15px;
+    }
+
+    .submenu-link.active {
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+      font-weight: 700;
+      border-left: 2px solid #3b82f6;
+      border-radius: 4px 8px 8px 4px;
+    }
+
+    .submenu-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      margin-left: auto;
+    }
+
+    /* Flyout popup when collapsed */
+    .flyout-menu {
+      position: absolute;
+      left: calc(100% + 8px);
+      top: 0;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 8px;
+      min-width: 210px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      display: none;
+      z-index: 100;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateX(-6px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .admin-sidebar.collapsed .nav-item:hover .flyout-menu {
+      display: block;
+    }
+
+    .flyout-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: #f87171;
+      text-transform: uppercase;
+      padding: 6px 10px 4px;
+      border-bottom: 1px solid #334155;
+      margin-bottom: 6px;
+    }
+
+    .flyout-menu .submenu-link {
+      padding: 8px 10px;
+    }
+
+    /* Sidebar Footer (User info) */
+    .sidebar-footer {
+      padding: 12px 14px;
+      border-top: 1px solid var(--sidebar-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: #2563eb;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .user-meta {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: #38bdf8;
+    }
+
+    .admin-sidebar.collapsed .user-meta {
+      display: none;
+    }
+
+    /* ========================================================
+       MAIN WORKSPACE (TOPBAR + CONTENT SCREEN)
+       ======================================================== */
+    .admin-workspace {
+      flex: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    /* Topbar */
+    .admin-topbar {
+      height: var(--topbar-height);
+      background: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13.5px;
+      color: var(--text-muted);
+    }
+
+    .breadcrumb a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--brand-blue);
+    }
+
+    .breadcrumb .separator {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+
+    .breadcrumb .current {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #16a34a;
+      background: #f0fdf4;
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1px solid #bbf7d0;
+    }
+
+    .sync-status i {
+      width: 7px;
+      height: 7px;
+      background: #16a34a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+    }
+
+    .btn-preview {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-preview:hover {
+      background: #f1f5f9;
+      color: var(--brand-blue);
+      border-color: #94a3b8;
+    }
+
+    .btn-save {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: #1877f2;
+      border: none;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .btn-save:hover {
+      background: #0d65d9;
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4);
+    }
+
+    /* Content Area: Single Screen Container */
+    .admin-screen-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen-wrapper {
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      animation: screenFadeIn 0.25s ease-out;
+    }
+
+    @keyframes screenFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Screen Card */
+    .screen-card {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+
+    .screen-card-header {
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .screen-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #d42027;
+      margin-bottom: 6px;
+    }
+
+    .screen-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .screen-desc {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 6px;
+      line-height: 1.6;
+    }
+
+    /* Form Fields Demo */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.15s ease;
+      background: #fff;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .form-textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    /* Mock Editor */
+    .mock-editor-box {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .mock-editor-toolbar {
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .mock-tool-btn {
+      padding: 5px 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      color: #475569;
+      font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+
+    .mock-tool-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .mock-tool-table {
+      background: #faf5ff;
+      border-color: #e9d5ff;
+      color: #7e22ce;
+      font-weight: 700;
+    }
+
+    .mock-editor-body {
+      padding: 20px;
+      min-height: 200px;
+      font-size: 14.5px;
+      line-height: 1.8;
+      color: #334155;
+      outline: none;
+    }
+
+    /* Screen Footer Navigation (Prev / Next) */
+    .screen-footer-nav {
+      margin-top: auto;
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .btn-nav-prev, .btn-nav-next {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .btn-nav-prev:hover, .btn-nav-next:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    .btn-nav-next {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #fff;
+      margin-left: auto;
+    }
+
+    .btn-nav-next:hover {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    /* Toast Notification */
+    .toast-alert {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 22px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      z-index: 99999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast-alert.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================
+       1. SIDEBAR DỌC (COLLAPSIBLE + ACCORDION)
+       ======================================================== -->
+  <aside class="admin-sidebar" id="sidebar">
+    <!-- Header -->
+    <div class="sidebar-header">
+      <a href="#" class="brand-box">
+        <div class="brand-logo-icon">HD</div>
+        <div class="brand-text">
+          <span class="brand-title">HẢI DƯƠNG MEDIA</span>
+          <span class="brand-sub">Hệ thống CMS Quản Trị</span>
+        </div>
+      </a>
+      <button type="button" class="btn-toggle-sidebar" id="toggleSidebarBtn" title="Thu gọn / Mở rộng Menu">
+        <i data-lucide="panel-left-close" id="toggleIcon"></i>
+      </button>
+    </div>
+
+    <!-- Scrollable Menu -->
+    <div class="sidebar-menu-scroll">
+      
+      <!-- NHÓM 1: TRANG CHỦ -->
+      <div class="menu-group-label">Nội dung trang</div>
+      <div class="nav-item open" id="group-trang-chu">
+        <div class="nav-link active-parent" onclick="toggleGroup('group-trang-chu')">
+          <div class="nav-link-content">
+            <span class="nav-icon"><i data-lucide="home"></i></span>
+            <span class="nav-label">Trang Chủ</span>
+          </div>
+          <i data-lucide="chevron-right" class="chevron-icon"></i>
+        </div>
+        
+        <!-- Accordion Submenu -->
+        <div class="submenu-list">
+          <div class="submenu-link" onclick="switchScreen('homepage-sections', 'Trang Chủ', '01. Bật/Tắt & Thứ tự khối')">
+            <span>01. Bật/Tắt & Thứ tự</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('banner-slider', 'Trang Chủ', '02. Banner Slider')">
+            <span>02. Banner Slider</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('vtv-commercials', 'Trang Chủ', '03. Phóng sự & TVC VTV')">
+            <span>03. Phim/TVC VTV</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('su-kien-admin', 'Trang Chủ', '04. Sự Kiện Sắp Diễn Ra')">
+            <span>04. Sự kiện sắp diễn ra</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('dich-vu-chinh', 'Trang Chủ', '05. Dịch Vụ Chủ Lực')">
+            <span>05. Dịch vụ chủ lực</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('gioi-thieu-chung', 'Trang Chủ', '06. Giới Thiệu & Niềm Tin')">
+            <span>06. Giới thiệu & Niềm tin</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('bao-chi', 'Trang Chủ', '07. Báo Chí Đưa Tin')">
+            <span>07. Báo chí đưa tin</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('he-sinh-thai', 'Trang Chủ', '08. Hệ Sinh Thái Đa Kênh')">
+            <span>08. Hệ sinh thái</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('danh-gia', 'Trang Chủ', '09. Đánh Giá Khách Hàng')">
+            <span>09. Đánh giá khách hàng</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('doi-tac', 'Trang Chủ', '10. Đối Tác & Khách Hàng')">
+            <span>10. Đối tác doanh nghiệp</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('quy-trinh-cta', 'Trang Chủ', '11. Quy Trình & Kêu Gọi Hợp Tác')">
+            <span>11. Quy trình & CTA</span>
+          </div>
+        </div>
+
+        <!-- Flyout menu khi sidebar thu gọn -->
+        <div class="flyout-menu">
+          <div class="flyout-title">Trang Chủ (11 mục)</div>
+          <div class="submenu-link" onclick="switchScreen('homepage-sections', 'Trang Chủ', '01. Bật/Tắt & Thứ tự khối')">01. Bật/Tắt & Thứ tự</div>
+          <div class="submenu-link" onclick="switchScreen('banner-slider', 'Trang Chủ', '02. Banner Slider')">02. Banner Slider</div>
+          <div class="submenu-link" onclick="switchScreen('vtv-commercials', 'Trang Chủ', '03. Phim/TVC VTV')">03. Phim/TVC VTV</div>
+          <div class="submenu-link" onclick="switchScreen('dich-vu-chinh', 'Trang Chủ', '05. Dịch Vụ Chủ Lực')">05. Dịch vụ chủ lực</div>
+          <div class="submenu-link" onclick="switchScreen('quy-trinh-cta', 'Trang Chủ', '11. Quy Trình & CTA')">11. Quy trình & CTA</div>
+        </div>
+      </div>
+
+      <!-- NHÓM 2: TRANG MENU -->
+      <div class="nav-item open" id="group-trang-menu">
+        <div class="nav-link active-parent" onclick="toggleGroup('group-trang-menu')">
+          <div class="nav-link-content">
+            <span class="nav-icon"><i data-lucide="layers"></i></span>
+            <span class="nav-label">Trang Menu</span>
+          </div>
+          <i data-lucide="chevron-right" class="chevron-icon"></i>
+        </div>
+
+        <div class="submenu-list">
+          <div class="submenu-link" onclick="switchScreen('menu-gioi-thieu', 'Trang Menu', '01. Trang Giới Thiệu')">
+            <span>01. Giới thiệu</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-tin-tuc', 'Trang Menu', '02. Trang Tin Tức')">
+            <span>02. Tin tức</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-doanh-nghiep', 'Trang Menu', '03. Trang Doanh Nghiệp')">
+            <span>03. Doanh nghiệp</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-doanh-nhan', 'Trang Menu', '04. Trang Doanh Nhân')">
+            <span>04. Doanh nhân</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-san-pham', 'Trang Menu', '05. Trang Sản Phẩm')">
+            <span>05. Sản phẩm</span>
+          </div>
+          <div class="submenu-link active" onclick="switchScreen('menu-iso', 'Trang Menu', '06. Tư Vấn ISO')">
+            <span>06. Tư vấn ISO</span>
+            <span class="submenu-badge">Mới</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-nhan-hieu', 'Trang Menu', '07. Đăng Ký Nhãn Hiệu')">
+            <span>07. Đăng ký nhãn hiệu</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-shtt', 'Trang Menu', '08. Sở Hữu Trí Tuệ')">
+            <span>08. Sở hữu trí tuệ</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('menu-fb', 'Trang Menu', '09. Dịch Vụ Facebook')">
+            <span>09. Dịch vụ Facebook</span>
+            <span class="submenu-badge" style="background:#1877f2;color:#fff;">10 bài</span>
+          </div>
+        </div>
+
+        <div class="flyout-menu">
+          <div class="flyout-title">Trang Menu (9 trang)</div>
+          <div class="submenu-link" onclick="switchScreen('menu-gioi-thieu', 'Trang Menu', '01. Giới thiệu')">01. Giới thiệu</div>
+          <div class="submenu-link" onclick="switchScreen('menu-iso', 'Trang Menu', '06. Tư Vấn ISO')">06. Tư vấn ISO</div>
+          <div class="submenu-link" onclick="switchScreen('menu-nhan-hieu', 'Trang Menu', '07. Đăng ký nhãn hiệu')">07. Đăng ký nhãn hiệu</div>
+          <div class="submenu-link" onclick="switchScreen('menu-shtt', 'Trang Menu', '08. Sở hữu trí tuệ')">08. Sở hữu trí tuệ</div>
+          <div class="submenu-link" onclick="switchScreen('menu-fb', 'Trang Menu', '09. Dịch vụ Facebook')">09. Dịch vụ Facebook</div>
+        </div>
+      </div>
+
+      <!-- NHÓM 3: BÀI VIẾT (SINGLE CLICK) -->
+      <div class="menu-group-label">Nội dung bài viết</div>
+      <div class="nav-item">
+        <div class="nav-link" onclick="switchScreen('screen-bai-viet', 'Quản trị', 'Quản Lý Bài Viết')">
+          <div class="nav-link-content">
+            <span class="nav-icon"><i data-lucide="book-open"></i></span>
+            <span class="nav-label">Quản Lý Bài Viết</span>
+          </div>
+          <span class="submenu-badge" style="background:rgba(212,32,39,0.2);color:#f87171;">16 bài</span>
+        </div>
+      </div>
+
+      <!-- NHÓM 4: CẤU HÌNH HỆ THỐNG -->
+      <div class="menu-group-label">Hệ thống</div>
+      <div class="nav-item" id="group-cau-hinh">
+        <div class="nav-link" onclick="toggleGroup('group-cau-hinh')">
+          <div class="nav-link-content">
+            <span class="nav-icon"><i data-lucide="sliders"></i></span>
+            <span class="nav-label">Cấu Hình Chung</span>
+          </div>
+          <i data-lucide="chevron-right" class="chevron-icon"></i>
+        </div>
+
+        <div class="submenu-list">
+          <div class="submenu-link" onclick="switchScreen('conf-brand', 'Cấu Hình', '01. Thông Tin Thương Hiệu')">
+            <span>01. Thương hiệu & Logo</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('conf-seo', 'Cấu Hình', '02. SEO & Thẻ Chia Sẻ Link')">
+            <span>02. SEO & Zalo/FB Card</span>
+          </div>
+          <div class="submenu-link" onclick="switchScreen('conf-contact', 'Cấu Hình', '03. Thông Tin Liên Hệ')">
+            <span>03. Hotline & Địa chỉ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NHÓM 5: TÀI KHOẢN -->
+      <div class="nav-item">
+        <div class="nav-link" onclick="switchScreen('screen-tai-khoan', 'Hệ thống', 'Tài Khoản & Phân Quyền')">
+          <div class="nav-link-content">
+            <span class="nav-icon"><i data-lucide="users"></i></span>
+            <span class="nav-label">Tài Khoản Quản Trị</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Profile -->
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">AD</div>
+        <div class="user-meta">
+          <span class="user-name">Ban Biên Tập</span>
+          <span class="user-role">Quản trị tối cao</span>
+        </div>
+      </div>
+      <a href="/" target="_blank" title="Về trang chủ website" style="color:#64748b;text-decoration:none;display:flex;">
+        <i data-lucide="external-link" size="16"></i>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ========================================================
+       2. WORKSPACE BÊN PHẢI (MỖI MENU 1 MÀN HÌNH ĐỘC LẬP)
+       ======================================================== -->
+  <main class="admin-workspace">
+    <!-- Topbar Header -->
+    <header class="admin-topbar">
+      <div class="topbar-left">
+        <div class="breadcrumb">
+          <a href="#">Admin</a>
+          <span class="separator">/</span>
+          <span id="bc-group">Trang Menu</span>
+          <span class="separator">/</span>
+          <span class="current" id="bc-item">06. Tư Vấn ISO</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="sync-status">
+          <i></i> Đã đồng bộ máy chủ
+        </div>
+        <a href="/dich-vu/chung-nhan-iso" target="_blank" class="btn-preview" id="btnLivePreview">
+          <i data-lucide="eye" size="14"></i> Xem trang thực tế
+        </a>
+        <button type="button" class="btn-save" onclick="triggerSave()">
+          <i data-lucide="save" size="15"></i> Lưu thay đổi
+        </button>
+      </div>
+    </header>
+
+    <!-- Screen Viewport (Chỉ hiển thị 1 màn hình của mục đang chọn) -->
+    <div class="admin-screen-viewport">
+      <div class="screen-wrapper" id="screenContent">
+        
+        <!-- CARD MÀN HÌNH ĐANG CHỌN -->
+        <div class="screen-card">
+          <div class="screen-card-header">
+            <div>
+              <span class="screen-badge" id="scBadge">MỤC 06 • TRANG MENU</span>
+              <h1 class="screen-title" id="scTitle">Trang Tư Vấn & Cấp Chứng Nhận ISO (/dich-vu/chung-nhan-iso)</h1>
+              <p class="screen-desc" id="scDesc">
+                Chỉnh sửa dòng tiêu đề in hoa nhỏ, thông điệp chính đầu trang và nội dung bài viết chi tiết về tiêu chuẩn ISO 9001, 14001, 22000, HACCP.
+              </p>
+            </div>
+          </div>
+
+          <!-- Form Fields của màn hình này -->
+          <div class="form-group">
+            <label class="form-label">Dòng chữ in hoa nhỏ phía trên (Eyebrow)</label>
+            <input type="text" class="form-input" value="TIÊU CHUẨN QUỐC TẾ & NÂNG TẦM CHẤT LƯỢNG">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tiêu đề chính đầu trang (H1)</label>
+            <input type="text" class="form-input" value="Tư Vấn & Cấp Chứng Nhận ISO Chuyên Nghiệp">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mô tả tóm tắt đầu trang</label>
+            <textarea class="form-textarea">Tư vấn đào tạo, xây dựng hệ thống quản lý chất lượng và đại diện cấp chứng chỉ ISO 9001, ISO 14001, ISO 22000, HACCP, GMP uy tín hàng đầu cho doanh nghiệp trên toàn quốc.</textarea>
+          </div>
+
+          <!-- Rich Editor với tính năng Chèn Bảng vừa hoàn thiện -->
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between;">
+              <span>Nội dung chi tiết bài viết (Trình soạn thảo chuẩn)</span>
+              <span style="color:#7e22ce;font-weight:700;">Hỗ trợ chèn Bảng biểu & Hình ảnh</span>
+            </label>
+            <div class="mock-editor-box">
+              <div class="mock-editor-toolbar">
+                <button type="button" class="mock-tool-btn"><strong>B</strong> In đậm</button>
+                <button type="button" class="mock-tool-btn"><em>I</em> In nghiêng</button>
+                <button type="button" class="mock-tool-btn">H2</button>
+                <button type="button" class="mock-tool-btn">H3</button>
+                <button type="button" class="mock-tool-btn">Danh sách</button>
+                <button type="button" class="mock-tool-btn">Chèn ảnh</button>
+                <button type="button" class="mock-tool-btn mock-tool-table" onclick="alert('Đã tích hợp công cụ Chèn Bảng vào Editor!')">
+                  <i data-lucide="table" size="14"></i> Chèn bảng
+                </button>
+                <button type="button" class="mock-tool-btn">Link</button>
+              </div>
+              <div class="mock-editor-body" contenteditable="true">
+                <h2>1. Tầm quan trọng của Chứng chỉ ISO đối với doanh nghiệp</h2>
+                <p>Chứng nhận ISO là bằng chứng khẳng định năng lực quản lý chất lượng và nâng cao uy tín thương hiệu trong mắt đối tác trong nước và quốc tế.</p>
+                <br>
+                <div style="overflow-x:auto;margin:12px 0;">
+                  <table style="width:100%;border-collapse:collapse;font-size:14px;border:1px solid #e2e8f0;">
+                    <thead>
+                      <tr style="background:#f8fafc;border-bottom:2px solid #cbd5e1;">
+                        <th style="padding:10px 14px;border:1px solid #e2e8f0;text-align:left;">Tiêu chuẩn ISO</th>
+                        <th style="padding:10px 14px;border:1px solid #e2e8f0;text-align:left;">Lĩnh vực áp dụng</th>
+                        <th style="padding:10px 14px;border:1px solid #e2e8f0;text-align:left;">Thời gian thực hiện</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;font-weight:700;color:#0f172a;">ISO 9001:2015</td>
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;">Hệ thống quản lý chất lượng chung cho mọi ngành</td>
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;">15 - 30 ngày</td>
+                      </tr>
+                      <tr style="background:#f8fafc;">
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;font-weight:700;color:#0f172a;">ISO 22000:2018</td>
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;">An toàn thực phẩm, chuỗi cung ứng thực phẩm</td>
+                        <td style="padding:8px 14px;border:1px solid #e2e8f0;">20 - 45 ngày</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chân trang điều hướng Mục Trước / Mục Tiếp Theo -->
+        <div class="screen-footer-nav">
+          <button type="button" class="btn-nav-prev" id="btnPrevScreen" onclick="goPrevScreen()">
+            <i data-lucide="arrow-left" size="16"></i> Mục trước: 05. Trang Sản phẩm
+          </button>
+          <button type="button" class="btn-nav-next" id="btnNextScreen" onclick="goNextScreen()">
+            Mục tiếp theo: 07. Đăng ký nhãn hiệu <i data-lucide="arrow-right" size="16"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Toast Demo -->
+  <div class="toast-alert" id="toastBox">
+    <i data-lucide="check-circle" size="18" style="color:#22c55e;"></i>
+    <span id="toastText">Đã lưu thay đổi mục thành công!</span>
+  </div>
+
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Toggle Sidebar State
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      toggleIcon.setAttribute('data-lucide', isCollapsed ? 'panel-left-open' : 'panel-left-close');
+      lucide.createIcons();
+    });
+
+    // Toggle Group Accordion
+    function toggleGroup(groupId) {
+      if (sidebar.classList.contains('collapsed')) {
+        sidebar.classList.remove('collapsed');
+        toggleIcon.setAttribute('data-lucide', 'panel-left-close');
+        lucide.createIcons();
+      }
+      const el = document.getElementById(groupId);
+      if (el) {
+        el.classList.toggle('open');
+      }
+    }
+
+    // Screens Data Dictionary
+    const screensData = {
+      'homepage-sections': {
+        group: 'Trang Chủ',
+        badge: 'MỤC 01 • TRANG CHỦ',
+        title: 'Cấu hình Bật/Tắt & Sắp xếp các mục trên Trang chủ',
+        desc: 'Tùy chỉnh bật/tắt các khối hiển thị như Banner, Phim VTV, Sự kiện, Báo chí, Đối tác...',
+        liveUrl: '/',
+        prev: null,
+        next: { id: 'banner-slider', name: '02. Banner Slider' }
+      },
+      'banner-slider': {
+        group: 'Trang Chủ',
+        badge: 'MỤC 02 • TRANG CHỦ',
+        title: 'Quản lý Banner Slider Trang Chủ',
+        desc: 'Thêm, xóa và chỉnh sửa tiêu đề, mô tả, nút bấm và ảnh nền cho từng slide banner lớn.',
+        liveUrl: '/',
+        prev: { id: 'homepage-sections', name: '01. Bật/Tắt khối' },
+        next: { id: 'vtv-commercials', name: '03. Phim/TVC VTV' }
+      },
+      'menu-iso': {
+        group: 'Trang Menu',
+        badge: 'MỤC 06 • TRANG MENU',
+        title: 'Trang Tư Vấn & Cấp Chứng Nhận ISO (/dich-vu/chung-nhan-iso)',
+        desc: 'Chỉnh sửa thông điệp đầu trang và nội dung bài viết chi tiết về chứng nhận ISO 9001, 14001, 22000.',
+        liveUrl: '/dich-vu/chung-nhan-iso',
+        prev: { id: 'menu-san-pham', name: '05. Trang Sản phẩm' },
+        next: { id: 'menu-nhan-hieu', name: '07. Đăng ký nhãn hiệu' }
+      },
+      'menu-nhan-hieu': {
+        group: 'Trang Menu',
+        badge: 'MỤC 07 • TRANG MENU',
+        title: 'Trang Đăng Ký Nhãn Hiệu Độc Quyền (/dich-vu/dang-ky-nhan-hieu)',
+        desc: 'Chỉnh sửa tiêu đề, quy trình 5 bước và nội dung bảo hộ logo, nhãn hiệu tại Cục Sở hữu trí tuệ.',
+        liveUrl: '/dich-vu/dang-ky-nhan-hieu',
+        prev: { id: 'menu-iso', name: '06. Tư vấn ISO' },
+        next: { id: 'menu-shtt', name: '08. Sở hữu trí tuệ' }
+      },
+      'menu-shtt': {
+        group: 'Trang Menu',
+        badge: 'MỤC 08 • TRANG MENU',
+        title: 'Trang Đăng Ký Sở Hữu Trí Tuệ (/dich-vu/so-huu-tri-tue)',
+        desc: 'Chỉnh sửa nội dung bản quyền tác giả, kiểu dáng công nghiệp, sáng chế và xử lý tranh chấp bản quyền.',
+        liveUrl: '/dich-vu/so-huu-tri-tue',
+        prev: { id: 'menu-nhan-hieu', name: '07. Đăng ký nhãn hiệu' },
+        next: { id: 'menu-fb', name: '09. Dịch vụ Facebook' }
+      },
+      'menu-fb': {
+        group: 'Trang Menu',
+        badge: 'MỤC 09 • TRANG MENU',
+        title: 'Trang Dịch Vụ Facebook Toàn Diện & Quản Lý 10 Dịch Vụ Con (/dich-vu-facebook)',
+        desc: 'Chỉnh sửa bài viết Hub giới thiệu Facebook và mở Editor soạn thảo trực tiếp cho toàn bộ 10 dịch vụ Facebook con.',
+        liveUrl: '/dich-vu-facebook',
+        prev: { id: 'menu-shtt', name: '08. Sở hữu trí tuệ' },
+        next: { id: 'screen-bai-viet', name: 'Quản lý Bài Viết' }
+      },
+      'screen-bai-viet': {
+        group: 'Bài Viết',
+        badge: 'QUẢN TRỊ BÀI VIẾT',
+        title: 'Quản Lý Bài Viết Doanh Nghiệp, Doanh Nhân & Sự Kiện',
+        desc: 'Danh sách toàn bộ bài viết, bộ lọc theo danh mục, thêm mới, sửa và xóa bài viết.',
+        liveUrl: '/tin-tuc',
+        prev: { id: 'menu-fb', name: '09. Dịch vụ Facebook' },
+        next: { id: 'conf-brand', name: 'Cấu hình thương hiệu' }
+      }
+    };
+
+    let currentScreenId = 'menu-iso';
+
+    // Switch Screen Handler
+    function switchScreen(screenId, groupName, itemName) {
+      currentScreenId = screenId;
+      const data = screensData[screenId] || {
+        group: groupName,
+        badge: `MỤC • ${groupName.toUpperCase()}`,
+        title: itemName,
+        desc: `Chỉnh sửa nội dung cho ${itemName}. Mỗi menu là một màn hình làm việc riêng biệt.`,
+        liveUrl: '/',
+        prev: null,
+        next: null
+      };
+
+      // Update Breadcrumbs
+      document.getElementById('bc-group').innerText = data.group;
+      document.getElementById('bc-item').innerText = itemName;
+
+      // Update Screen Card Header
+      document.getElementById('scBadge').innerText = data.badge;
+      document.getElementById('scTitle').innerText = data.title;
+      document.getElementById('scDesc').innerText = data.desc;
+
+      // Update Live URL
+      document.getElementById('btnLivePreview').href = data.liveUrl;
+
+      // Update Submenu Active State
+      document.querySelectorAll('.submenu-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.innerText.includes(itemName) || link.innerText.includes(itemName.split('. ')[1] || '---')) {
+          link.classList.add('active');
+        }
+      });
+
+      // Update Footer Prev/Next Buttons
+      const btnPrev = document.getElementById('btnPrevScreen');
+      const btnNext = document.getElementById('btnNextScreen');
+
+      if (data.prev) {
+        btnPrev.style.display = 'inline-flex';
+        btnPrev.innerHTML = `<i data-lucide="arrow-left" size="16"></i> Mục trước: ${data.prev.name}`;
+        btnPrev.onclick = () => switchScreen(data.prev.id, '', data.prev.name);
+      } else {
+        btnPrev.style.display = 'none';
+      }
+
+      if (data.next) {
+        btnNext.style.display = 'inline-flex';
+        btnNext.innerHTML = `Mục tiếp theo: ${data.next.name} <i data-lucide="arrow-right" size="16"></i>`;
+        btnNext.onclick = () => switchScreen(data.next.id, '', data.next.name);
+      } else {
+        btnNext.style.display = 'none';
+      }
+
+      lucide.createIcons();
+    }
+
+    // Trigger Save Notification
+    function triggerSave() {
+      const toast = document.getElementById('toastBox');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
+

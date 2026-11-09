@@ -220,6 +220,40 @@ export type SiteContent = {
   productsPageTitle?: string;
   productsPageDescription?: string;
   productsPageListTitle?: string;
+
+  // 1. Tư vấn và chứng nhận ISO
+  isoEyebrow?: string;
+  isoTitle?: string;
+  isoDescription?: string;
+  isoContent?: string;
+  isoCtaText?: string;
+  isoCtaHref?: string;
+
+  // 2. Đăng ký nhãn hiệu độc quyền
+  trademarkEyebrow?: string;
+  trademarkTitle?: string;
+  trademarkDescription?: string;
+  trademarkContent?: string;
+  trademarkCtaText?: string;
+  trademarkCtaHref?: string;
+
+  // 3. Đăng ký sở hữu trí tuệ
+  ipEyebrow?: string;
+  ipTitle?: string;
+  ipDescription?: string;
+  ipContent?: string;
+  ipCtaText?: string;
+  ipCtaHref?: string;
+
+  // 4. Dịch vụ Facebook Toàn Diện (Hub)
+  facebookHubEyebrow?: string;
+  facebookHubTitle?: string;
+  facebookHubDescription?: string;
+  facebookHubContent?: string;
+  facebookHubCtaText?: string;
+  facebookHubCtaHref?: string;
+  facebookHubPolicyTitle?: string;
+  facebookHubPolicyContent?: string;
 };
 
 export const defaultSiteContent: SiteContent = {
@@ -593,6 +627,95 @@ export const defaultSiteContent: SiteContent = {
   productsPageTitle: "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện",
   productsPageDescription: "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ từ sản xuất phim TVC, booking báo đài, tư vấn nhận diện đến tổ chức sự kiện quốc tế.",
   productsPageListTitle: "Danh sách sản phẩm & dịch vụ",
+
+  // 1. Tư vấn và chứng nhận ISO
+  isoEyebrow: "TIÊU CHUẨN QUỐC TẾ & NĂNG LỰC DOANH NGHIỆP",
+  isoTitle: "Tư Vấn & Cấp Chứng Nhận ISO Chuyên Nghiệp",
+  isoDescription: "Hải Dương Media đồng hành cùng doanh nghiệp tư vấn xây dựng hệ thống quản lý, đào tạo và chứng nhận đạt chuẩn ISO 9001, ISO 14001, ISO 22000, HACCP, ISO 45001 với thời gian nhanh chóng, chi phí tối ưu và cam kết đạt chứng chỉ 100%.",
+  isoContent: `## 1. Tầm quan trọng của Chứng chỉ ISO đối với doanh nghiệp
+[justify]Trong thời kỳ hội nhập kinh tế quốc tế và chuyển đổi số, việc sở hữu chứng chỉ ISO không chỉ là lời khẳng định vững chắc về chất lượng sản phẩm dịch vụ, mà còn là chiếc chìa khóa vàng giúp doanh nghiệp trúng thầu dự án lớn, mở rộng kênh phân phối siêu thị và xuất khẩu sang các thị trường khó tính như Mỹ, EU, Nhật Bản, Hàn Quốc.[/justify]
+
+## 2. Các tiêu chuẩn ISO phổ biến nhất hiện nay
+- **ISO 9001:2015:** Hệ thống quản lý chất lượng (Áp dụng cho mọi ngành nghề sản xuất, thương mại, dịch vụ).
+- **ISO 14001:2015:** Hệ thống quản lý môi trường (Giảm thiểu rủi ro pháp lý môi trường, phát triển bền vững).
+- **ISO 22000 / HACCP:** Hệ thống quản lý an toàn thực phẩm (Bắt buộc với nhà máy chế biến, đóng gói, phân phối thực phẩm).
+- **ISO 45001:2018:** Hệ thống quản lý an toàn và sức khỏe nghề nghiệp.
+- **ISO 27001:2022:** Hệ thống quản lý an ninh thông tin cho doanh nghiệp công nghệ, tài chính.
+
+## 3. Quy trình tư vấn & cấp chứng nhận ISO 5 bước tinh gọn
+1. **Khảo sát hiện trạng & Lập kế hoạch:** Đội ngũ chuyên gia tiến hành khảo sát thực tế quy trình vận hành và xây dựng lộ trình triển khai chi tiết.
+2. **Đào tạo nhận thức & Soạn thảo tài liệu:** Hướng dẫn cán bộ nhân viên nắm vững tiêu chuẩn; biên soạn bộ quy trình, biểu mẫu đạt chuẩn ISO.
+3. **Áp dụng thử nghiệm & Vận hành:** Doanh nghiệp áp dụng quy trình vào hoạt động hàng ngày, thu thập hồ sơ bằng chứng.
+4. **Đánh giá nội bộ & Khắc phục:** Tổ chức đánh giá thử để phát hiện các điểm chưa phù hợp và hoàn thiện trước kỳ đánh giá chính thức.
+5. **Đánh giá chứng nhận & Cấp chứng chỉ:** Tổ chức chứng nhận quốc tế độc lập đánh giá và cấp Giấy chứng nhận ISO có hiệu lực toàn cầu (thời hạn 3 năm).
+
+## 4. Cam kết từ Hải Dương Media
+> "Chi phí trọn gói minh bạch – Thời gian cấp chứng chỉ nhanh nhất – Hỗ trợ trọn đời trong các kỳ đánh giá giám sát hàng năm."
+
+- Cam kết hỗ trợ doanh nghiệp đạt chứng chỉ ISO 100%.
+- Giấy chứng nhận có mã QR tra cứu tính pháp lý trên cổng thông tin quốc gia và quốc tế (IAF).
+- Hỗ trợ xây dựng hồ sơ năng lực (Profile), phát sóng phóng sự truyền hình VTV/HTV và bài PR báo chí sau khi đạt chứng nhận.`,
+  isoCtaText: "Nhận báo giá & tư vấn ISO ngay",
+  isoCtaHref: "/lien-he",
+
+  // 2. Đăng ký nhãn hiệu độc quyền
+  trademarkEyebrow: "BẢO HỘ TÀI SẢN TRÍ TUỆ & ĐỊNH VỊ THƯƠNG HIỆU",
+  trademarkTitle: "Dịch Vụ Đăng Ký Nhãn Hiệu Độc Quyền Trọn Gói",
+  trademarkDescription: "Bảo vệ tên thương hiệu, logo và nhãn hiệu độc quyền tại Cục Sở Hữu Trí Tuệ. Tra cứu khả năng bảo hộ miễn phí, nộp đơn nhanh chóng, theo dõi tiến độ và xử lý tranh chấp bản quyền trọn gói.",
+  trademarkContent: `## 1. Vì sao doanh nghiệp bắt buộc phải đăng ký nhãn hiệu sớm?
+[justify]Tại Việt Nam, pháp luật sở hữu trí tuệ áp dụng nguyên tắc **"Nộp đơn đầu tiên" (First to file)**. Nghĩa là ai nộp đơn đăng ký trước sẽ được ưu tiên cấp văn bằng bảo hộ. Nếu bạn chậm trễ, đối thủ hoặc bên thứ ba có thể đăng ký trước tên thương hiệu của bạn, buộc bạn phải đổi tên, hủy bỏ bao bì hoặc đối mặt với các vụ kiện tụng xâm phạm nhãn hiệu vô cùng tốn kém.[/justify]
+
+## 2. Quyền lợi vượt trội khi sở hữu Văn bằng bảo hộ nhãn hiệu
+- **Độc quyền sử dụng:** Toàn quyền khai thác thương mại tên gọi, logo tại Việt Nam trong 10 năm (gia hạn liên tục không giới hạn).
+- **Ngăn chặn hàng giả, hàng nhái:** Là cơ sở pháp lý duy nhất để yêu cầu Quản lý thị trường, Công an kinh tế xử lý các cơ sở sản xuất, buôn bán hàng nhái.
+- **Đủ điều kiện kinh doanh online:** Bắt buộc phải có để lên sàn thương mại điện tử Shopee Mall, LazMall, TikTok Shop Mall và bảo vệ tài khoản quảng cáo.
+- **Nhượng quyền & Định giá:** Dễ dàng nhượng quyền thương hiệu (Franchise) hoặc thế chấp vay vốn ngân hàng bằng tài sản vô hình.
+
+## 3. Quy trình thực hiện đăng ký nhãn hiệu tại Hải Dương Media
+1. **Tra cứu sơ bộ & Nâng cao (Miễn phí):** Đánh giá xác suất thành công của nhãn hiệu trước khi nộp đơn, tư vấn phương án chỉnh sửa nếu có trùng lặp.
+2. **Hoàn thiện hồ sơ chuẩn pháp lý trong 24h:** Soạn thảo tờ khai, phân nhóm sản phẩm dịch vụ chuẩn theo Bảng phân loại Ni-xơ quốc tế.
+3. **Nộp đơn lấy Quyết định chấp nhận đơn hợp lệ:** Nộp đơn trực tiếp tại Cục SHTT, bàn giao Giấy biên nhận có số đơn và ngày ưu tiên ngay trong ngày.
+4. **Theo dõi thẩm định & Phản hồi công văn:** Đại diện theo dõi sát sao quá trình thẩm định hình thức, công bố đơn trên Công báo và thẩm định nội dung.
+5. **Bàn giao Giấy chứng nhận đăng ký nhãn hiệu:** Nhận văn bằng gốc từ Cục SHTT và bàn giao tận tay doanh nghiệp.`,
+  trademarkCtaText: "Tra cứu nhãn hiệu miễn phí",
+  trademarkCtaHref: "/lien-he",
+
+  // 3. Đăng ký sở hữu trí tuệ
+  ipEyebrow: "BẢN QUYỀN TÁC GIẢ & SỞ HỮU CÔNG NGHIỆP",
+  ipTitle: "Dịch Vụ Đăng Ký Sở Hữu Trí Tuệ Toàn Diện",
+  ipDescription: "Tư vấn và đại diện đăng ký bản quyền tác giả, sáng chế, giải pháp hữu ích, kiểu dáng công nghiệp. Đảm bảo quyền độc quyền hợp pháp, chống sao chép và gia tăng giá trị định giá doanh nghiệp.",
+  ipContent: `## 1. Bảo vệ tài sản vô hình – Gia tăng giá trị định giá doanh nghiệp
+[justify]Tài sản trí tuệ (IP) là giá trị lớn nhất của nhiều tập đoàn công nghệ và thương hiệu lớn. Việc đăng ký sở hữu trí tuệ kịp thời giúp bạn xác lập quyền sở hữu hợp pháp đối với các tác phẩm sáng tạo, phần mềm, kiểu dáng bao bì và công nghệ độc quyền, không để các đối thủ sao chép trục lợi.[/justify]
+
+## 2. Các lĩnh vực sở hữu trí tuệ Hải Dương Media đảm nhận
+- **Đăng ký bản quyền tác giả:**
+  - Phần mềm máy tính, ứng dụng di động, mã nguồn (Source Code).
+  - Tác phẩm mỹ thuật ứng dụng (Logo, bộ nhận diện thương hiệu, bao bì sản phẩm).
+  - Bài viết, tài liệu đào tạo, sách, kịch bản, ấn phẩm truyền thông.
+- **Đăng ký kiểu dáng công nghiệp:**
+  - Hình dáng bên ngoài của sản phẩm (chai lọ, vỏ hộp, thiết bị, thời trang...).
+- **Đăng ký sáng chế & Giải pháp hữu ích:**
+  - Quy trình công nghệ, giải pháp kỹ thuật mới có tính sáng tạo và ứng dụng công nghiệp.
+- **Xử lý vi phạm & Tranh chấp:**
+  - Giám định sở hữu trí tuệ tại Viện Khoa học Sở hữu trí tuệ.
+  - Gửi thư cảnh báo vi phạm, phối hợp cơ quan chức năng gỡ bỏ sản phẩm vi phạm.
+
+## 3. Lý do khách hàng lựa chọn dịch vụ của Hải Dương Media
+- **Tốc độ:** Soạn hồ sơ và nộp ngay trong 24 giờ làm việc.
+- **Chuyên gia:** Đội ngũ luật sư và chuyên gia sở hữu trí tuệ hơn 11 năm kinh nghiệm.
+- **Hệ sinh thái:** Kết nối bảo trợ truyền thông VTV, báo chí điện tử để truyền thông lan tỏa thương hiệu sau khi xác lập quyền bảo hộ.`,
+  ipCtaText: "Tư vấn hồ sơ sở hữu trí tuệ",
+  ipCtaHref: "/lien-he",
+
+  // 4. Dịch vụ Facebook Toàn Diện (Hub)
+  facebookHubEyebrow: "GIẢI PHÁP MẠNG XÃ HỘI CHUYÊN NGHIỆP 24/7",
+  facebookHubTitle: "Dịch Vụ Facebook Toàn Diện - Uy Tín Hàng Đầu",
+  facebookHubDescription: "Hải Dương Media cung cấp hệ sinh thái 10 dịch vụ Facebook chuyên sâu: lấy lại tài khoản bị hack, mở khóa 956, mở treo 282, bảo mật đa tầng, cấp tích xanh, bảo vệ bản quyền và xử lý khủng hoảng. Cam kết làm trước nghiệm thu, hài lòng mới thanh toán.",
+  facebookHubContent: "",
+  facebookHubCtaText: "Yêu cầu hỗ trợ khẩn cấp 24/7",
+  facebookHubCtaHref: "tel:0931538666",
+  facebookHubPolicyTitle: "CHÍNH SÁCH VÀNG: LÀM TRƯỚC - TRẢ TIỀN SAU (KHÔNG CỌC)",
+  facebookHubPolicyContent: "Để bảo vệ quyền lợi tuyệt đối của quý khách hàng và khẳng định uy tín năng lực chuyên môn, Hải Dương Media KHÔNG THU BẤT KỲ KHOẢN CỌC NÀO trước khi tiến hành xử lý. Chỉ khi tài khoản Facebook của bạn đã được mở khóa/khôi phục thành công, bạn tự tay đăng nhập đổi mật khẩu an toàn và hài lòng 100% thì mới tiến hành thanh toán phí dịch vụ.",
 };
 
 let tableEnsured = false;
@@ -611,6 +734,7 @@ async function ensureDbTable() {
   }
 }
 
+export const getSiteContent = loadSiteContent;
 export async function loadSiteContent(): Promise<SiteContent> {
   try {
     await ensureDbTable();
@@ -932,5 +1056,39 @@ function normalizeContent(value: Partial<SiteContent>): SiteContent {
     productsPageTitle: value.productsPageTitle !== undefined ? cleanBrandText(value.productsPageTitle) : (defaultSiteContent.productsPageTitle || "Giải Pháp Truyền Thông & Xây Dựng Thương Hiệu Toàn Diện"),
     productsPageDescription: value.productsPageDescription !== undefined ? cleanBrandText(value.productsPageDescription) : (defaultSiteContent.productsPageDescription || "Hải Dương Media cung cấp hệ sinh thái sản phẩm và dịch vụ đồng bộ từ sản xuất phim TVC, booking báo đài, tư vấn nhận diện đến tổ chức sự kiện quốc tế."),
     productsPageListTitle: value.productsPageListTitle !== undefined ? cleanBrandText(value.productsPageListTitle) : (defaultSiteContent.productsPageListTitle || "Danh sách sản phẩm & dịch vụ"),
+
+    // 1. Tư vấn và chứng nhận ISO
+    isoEyebrow: value.isoEyebrow !== undefined ? cleanBrandText(value.isoEyebrow) : (defaultSiteContent.isoEyebrow || "TIÊU CHUẨN QUỐC TẾ & NĂNG LỰC DOANH NGHIỆP"),
+    isoTitle: value.isoTitle !== undefined ? cleanBrandText(value.isoTitle) : (defaultSiteContent.isoTitle || "Tư Vấn & Cấp Chứng Nhận ISO Chuyên Nghiệp"),
+    isoDescription: value.isoDescription !== undefined ? cleanBrandText(value.isoDescription) : (defaultSiteContent.isoDescription || ""),
+    isoContent: value.isoContent !== undefined ? cleanBrandText(value.isoContent) : (defaultSiteContent.isoContent || ""),
+    isoCtaText: value.isoCtaText?.trim() || defaultSiteContent.isoCtaText || "Nhận báo giá & tư vấn ISO ngay",
+    isoCtaHref: value.isoCtaHref?.trim() || defaultSiteContent.isoCtaHref || "/lien-he",
+
+    // 2. Đăng ký nhãn hiệu độc quyền
+    trademarkEyebrow: value.trademarkEyebrow !== undefined ? cleanBrandText(value.trademarkEyebrow) : (defaultSiteContent.trademarkEyebrow || "BẢO HỘ TÀI SẢN TRÍ TUỆ & ĐỊNH VỊ THƯƠNG HIỆU"),
+    trademarkTitle: value.trademarkTitle !== undefined ? cleanBrandText(value.trademarkTitle) : (defaultSiteContent.trademarkTitle || "Dịch Vụ Đăng Ký Nhãn Hiệu Độc Quyền Trọn Gói"),
+    trademarkDescription: value.trademarkDescription !== undefined ? cleanBrandText(value.trademarkDescription) : (defaultSiteContent.trademarkDescription || ""),
+    trademarkContent: value.trademarkContent !== undefined ? cleanBrandText(value.trademarkContent) : (defaultSiteContent.trademarkContent || ""),
+    trademarkCtaText: value.trademarkCtaText?.trim() || defaultSiteContent.trademarkCtaText || "Tra cứu nhãn hiệu miễn phí",
+    trademarkCtaHref: value.trademarkCtaHref?.trim() || defaultSiteContent.trademarkCtaHref || "/lien-he",
+
+    // 3. Đăng ký sở hữu trí tuệ
+    ipEyebrow: value.ipEyebrow !== undefined ? cleanBrandText(value.ipEyebrow) : (defaultSiteContent.ipEyebrow || "BẢN QUYỀN TÁC GIẢ & SỞ HỮU CÔNG NGHIỆP"),
+    ipTitle: value.ipTitle !== undefined ? cleanBrandText(value.ipTitle) : (defaultSiteContent.ipTitle || "Dịch Vụ Đăng Ký Sở Hữu Trí Tuệ Toàn Diện"),
+    ipDescription: value.ipDescription !== undefined ? cleanBrandText(value.ipDescription) : (defaultSiteContent.ipDescription || ""),
+    ipContent: value.ipContent !== undefined ? cleanBrandText(value.ipContent) : (defaultSiteContent.ipContent || ""),
+    ipCtaText: value.ipCtaText?.trim() || defaultSiteContent.ipCtaText || "Tư vấn hồ sơ sở hữu trí tuệ",
+    ipCtaHref: value.ipCtaHref?.trim() || defaultSiteContent.ipCtaHref || "/lien-he",
+
+    // 4. Dịch vụ Facebook Toàn Diện (Hub)
+    facebookHubEyebrow: value.facebookHubEyebrow !== undefined ? cleanBrandText(value.facebookHubEyebrow) : (defaultSiteContent.facebookHubEyebrow || "GIẢI PHÁP MẠNG XÃ HỘI CHUYÊN NGHIỆP 24/7"),
+    facebookHubTitle: value.facebookHubTitle !== undefined ? cleanBrandText(value.facebookHubTitle) : (defaultSiteContent.facebookHubTitle || "Dịch Vụ Facebook Toàn Diện - Uy Tín Hàng Đầu"),
+    facebookHubDescription: value.facebookHubDescription !== undefined ? cleanBrandText(value.facebookHubDescription) : (defaultSiteContent.facebookHubDescription || ""),
+    facebookHubContent: value.facebookHubContent !== undefined ? cleanBrandText(value.facebookHubContent) : (defaultSiteContent.facebookHubContent || ""),
+    facebookHubCtaText: value.facebookHubCtaText?.trim() || defaultSiteContent.facebookHubCtaText || "Yêu cầu hỗ trợ khẩn cấp 24/7",
+    facebookHubCtaHref: value.facebookHubCtaHref?.trim() || defaultSiteContent.facebookHubCtaHref || "tel:0931538666",
+    facebookHubPolicyTitle: value.facebookHubPolicyTitle !== undefined ? cleanBrandText(value.facebookHubPolicyTitle) : (defaultSiteContent.facebookHubPolicyTitle || "CHÍNH SÁCH VÀNG: LÀM TRƯỚC - TRẢ TIỀN SAU (KHÔNG CỌC)"),
+    facebookHubPolicyContent: value.facebookHubPolicyContent !== undefined ? cleanBrandText(value.facebookHubPolicyContent) : (defaultSiteContent.facebookHubPolicyContent || ""),
   };
 }

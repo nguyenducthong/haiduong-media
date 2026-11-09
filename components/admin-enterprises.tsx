@@ -38,6 +38,7 @@ import {
   Handshake,
   Megaphone,
   Flame,
+  Share2,
 } from "lucide-react";
 import type { EnterpriseArticle } from "@/lib/enterprises-types";
 import { getArticleTypes, getArticleViewUrl } from "@/lib/enterprises-types";
@@ -50,6 +51,7 @@ export const ARTICLE_TYPES = [
   { id: "san-pham", label: "Sản phẩm", icon: Package, color: "#16a34a", bg: "rgba(22,163,74,0.08)", border: "rgba(22,163,74,0.2)" },
   { id: "tin-tuc", label: "Tin tức", icon: Newspaper, color: "#9333ea", bg: "rgba(147,51,234,0.08)", border: "rgba(147,51,234,0.2)" },
   { id: "su-kien", label: "Sự kiện", icon: Calendar, color: "#ea580c", bg: "rgba(234,88,12,0.08)", border: "rgba(234,88,12,0.2)" },
+  { id: "dich-vu-facebook", label: "Dịch vụ Facebook", icon: Share2, color: "#1877f2", bg: "rgba(24,119,242,0.08)", border: "rgba(24,119,242,0.2)" },
   { id: "popup", label: "Popup Nổi Bật (Duy nhất 1 bài)", icon: Megaphone, color: "#e11d48", bg: "rgba(225,29,72,0.08)", border: "rgba(225,29,72,0.2)" },
 ];
 
@@ -61,6 +63,7 @@ const CATEGORIES = [
   "Du lịch & Khách sạn",
   "Doanh nghiệp tiêu biểu",
   "Lãnh đạo & Doanh nhân",
+  "Dịch vụ Facebook",
   "Sản phẩm & Dịch vụ",
   "Sự kiện & Diễn đàn",
   "Tin hoạt động",

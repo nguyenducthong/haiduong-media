@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json().catch(() => ({}));
+    const body = ((await req.json().catch(() => ({}))) || {}) as any;
     const { action = "scan-list", url, article, articles, mode = "merge" } = body;
 
     // 1. Quét danh sách bài viết từ link

@@ -1,16 +1,25 @@
 import Link from "@/components/link";
 import { ArrowUpRight, Globe2, MapPin, MessageCircle, Phone, Search, Tv } from "lucide-react";
 import type { SiteContent } from "@/lib/site-content";
-import { HeaderNav } from "@/components/header-nav";
+import { HeaderNav, type NavItem } from "@/components/header-nav";
 
-const links = [
-  ["Trang chủ", "/"],
-  ["Giới thiệu", "/gioi-thieu"],
-  ["Tin tức", "/tin-tuc"],
-  ["Doanh nghiệp", "/doanh-nghiep"],
-  ["Doanh nhân", "/doanh-nhan"],
-  ["Sản phẩm", "/san-pham"],
-  ["Liên hệ", "/lien-he"],
+export const headerNavLinks: readonly NavItem[] = [
+  { label: "Trang chủ", href: "/" },
+  { label: "Giới thiệu", href: "/gioi-thieu" },
+  { label: "Tin tức", href: "/tin-tuc" },
+  { label: "Doanh nghiệp", href: "/doanh-nghiep" },
+  { label: "Doanh nhân", href: "/doanh-nhan" },
+  {
+    label: "Sản phẩm",
+    href: "/dich-vu-facebook",
+    children: [
+      { label: "Tư vấn và chứng nhận ISO", href: "/dich-vu/chung-nhan-iso" },
+      { label: "Đăng ký nhãn hiệu độc quyền", href: "/dich-vu/dang-ky-nhan-hieu" },
+      { label: "Đăng ký sở hữu trí tuệ", href: "/dich-vu/so-huu-tri-tue" },
+      { label: "Dịch vụ Facebook Toàn Diện", href: "/dich-vu-facebook", badge: "HOT" },
+    ],
+  },
+  { label: "Liên hệ", href: "/lien-he" },
 ] as const;
 
 export function SiteHeader({ content }: { content: SiteContent }) {
@@ -29,7 +38,7 @@ export function SiteHeader({ content }: { content: SiteContent }) {
           </span>
         </Link>
 
-        <HeaderNav links={links} />
+        <HeaderNav links={headerNavLinks} />
 
         <div className="header-actions">
           <form action="/tin-tuc" method="GET" className="header-search">
@@ -62,12 +71,32 @@ export function SiteHeader({ content }: { content: SiteContent }) {
                 <Search size={15} />
               </button>
             </form>
-            <nav>
-              {links.map(([label, href]) => (
-                <Link key={href} href={href}>
-                  {label}
-                </Link>
-              ))}
+            <nav className="mobile-nav-list">
+              {headerNavLinks.map((item) => {
+                if (item.children && item.children.length > 0) {
+                  return (
+                    <div key={item.label} className="mobile-nav-group">
+                      <div className="mobile-nav-group-title">
+                        <span>{item.label}</span>
+                      </div>
+                      <div className="mobile-nav-sublist">
+                        {item.children.map((child) => (
+                          <Link key={child.href} href={child.href} className="mobile-sublink">
+                            <span>{child.label}</span>
+                            {child.badge && <span className="mobile-badge-hot">{child.badge}</span>}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link key={item.href} href={item.href}>
+                    {item.label}
+                  </Link>
+                );
+              })}
             </nav>
           </div>
         </details>
@@ -125,11 +154,11 @@ export function SiteFooter({ content }: { content: SiteContent }) {
             <div className="footer-col-nav">
               <h4 className="footer-col-title">DỊCH VỤ</h4>
               <nav className="footer-links-list" aria-label="Dịch vụ">
-                <Link href="/#vtv-commercials">Truyền thông VTV</Link>
-                <Link href="/#press-coverage">Báo chí & PR</Link>
-                <Link href="/#vtv-commercials">Sản xuất phim quảng cáo</Link>
-                <Link href="/su-kien">Vinh danh thương hiệu</Link>
-                <Link href="/lien-he">Tư vấn hợp tác</Link>
+                <Link href="/dich-vu/chung-nhan-iso">Tư vấn chứng nhận ISO</Link>
+                <Link href="/dich-vu/dang-ky-nhan-hieu">Đăng ký nhãn hiệu độc quyền</Link>
+                <Link href="/dich-vu/so-huu-tri-tue">Đăng ký sở hữu trí tuệ</Link>
+                <Link href="/dich-vu-facebook">Dịch vụ Facebook Toàn Diện</Link>
+                <Link href="/#vtv-commercials">Truyền thông VTV & Báo chí</Link>
               </nav>
             </div>
 

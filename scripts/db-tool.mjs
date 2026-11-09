@@ -78,7 +78,7 @@ if (action === "export-local") {
   console.log(`   📄 File JSON: ${jsonOut} (${(fs.statSync(jsonOut).size / 1024).toFixed(1)} KB)`);
 } else if (action === "export-remote") {
   console.log("🌐 Dang xuat du lieu tu Cloudflare D1 Remote...");
-  const res = spawnSync("npx", ["wrangler", "d1", "export", "haiduong-media-db", "--remote", "--output=./backup_data.sql"], {
+  const res = spawnSync("npx", ["wrangler", "d1", "export", "haiduong-media-db", "--config=dist/server/wrangler.json", "--remote", "--output=./backup_data.sql"], {
     cwd: projectRoot,
     stdio: "inherit",
     shell: true,
@@ -89,7 +89,7 @@ if (action === "export-local") {
 } else if (action === "import-remote") {
   const sqlFile = process.argv[3] || "./backup_data.sql";
   console.log(`🌐 Dang nap file ${sqlFile} len Cloudflare D1 Remote...`);
-  spawnSync("npx", ["wrangler", "d1", "execute", "haiduong-media-db", "--remote", `--file=${sqlFile}`], {
+  spawnSync("npx", ["wrangler", "d1", "execute", "haiduong-media-db", "--config=dist/server/wrangler.json", "--remote", `--file=${sqlFile}`], {
     cwd: projectRoot,
     stdio: "inherit",
     shell: true,

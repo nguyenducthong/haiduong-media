@@ -15,8 +15,11 @@ import {
   Trash2,
   AlertCircle,
   FileText,
+  Sparkles,
+  RefreshCw,
 } from "lucide-react";
 import { EnterpriseContentEditor } from "@/components/enterprise-content-editor";
+import { DEFAULT_FACEBOOK_ARTICLES } from "@/lib/default-facebook-articles";
 
 interface FacebookArticle {
   id: string;
@@ -54,11 +57,14 @@ export function AdminFacebookManager() {
       if (!res.ok) throw new Error("Không thể tải danh sách bài viết");
       const data: any = await res.json();
       const all: FacebookArticle[] = Array.isArray(data) ? data : data.articles || [];
-      const fbList = all.filter(
+      let fbList = all.filter(
         (a) =>
           a.category === "Dịch vụ Facebook" ||
           (Array.isArray((a as any).type) && (a as any).type.includes("dich-vu-facebook"))
       );
+      if (fbList.length === 0) {
+        fbList = DEFAULT_FACEBOOK_ARTICLES as any[];
+      }
       setArticles(fbList);
     } catch (err: any) {
       setError(err?.message || "Lỗi kết nối máy chủ");
@@ -102,6 +108,31 @@ export function AdminFacebookManager() {
       author: "Hải Dương Media",
       active: true,
     });
+  };
+
+  const handleSyncDefaultArticles = async () => {
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/crawl-doanh-nghiep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "save",
+          articles: DEFAULT_FACEBOOK_ARTICLES,
+          mode: "merge",
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Không thể đồng bộ dữ liệu");
+      }
+      showToast("success", "Đã lưu 10 bài dịch vụ Facebook vào Database online thành công!");
+      await fetchArticles();
+    } catch (err: any) {
+      showToast("error", err.message || "Lỗi khi đồng bộ dữ liệu");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -193,6 +224,29 @@ export function AdminFacebookManager() {
           </p>
         </div>
 
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+        <button
+          type="button"
+          onClick={handleSyncDefaultArticles}
+          disabled={isSaving}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "6px",
+            padding: "8px 14px",
+            borderRadius: "8px",
+            background: "#059669",
+            color: "#fff",
+            border: "none",
+            fontSize: "13px",
+            fontWeight: 700,
+            cursor: "pointer",
+            boxShadow: "0 2px 6px rgba(5,150,105,0.25)",
+          }}
+        >
+          <Sparkles size={15} /> Đồng bộ 10 bài mẫu vào DB
+        </button>
+
         <button
           type="button"
           onClick={handleCreateNew}
@@ -213,6 +267,7 @@ export function AdminFacebookManager() {
         >
           <Plus size={15} /> Thêm dịch vụ mới
         </button>
+        </div>
       </div>
 
       {loading ? (
@@ -226,7 +281,7 @@ export function AdminFacebookManager() {
         </div>
       ) : articles.length === 0 ? (
         <div style={{ padding: "24px", textAlign: "center", color: "var(--muted)", background: "var(--surface)", borderRadius: "10px" }}>
-          Chưa tìm thấy dịch vụ Facebook nào trong hệ thống.
+          Hệ thống chưa nạp dữ liệu vào DB. Bấm "Đồng bộ 10 bài mẫu vào DB" ở trên để lưu vào hệ thống!
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>

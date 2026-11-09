@@ -3,6 +3,7 @@ import path from "node:path";
 import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { siteContent } from "@/db/schema";
+import { DEFAULT_FACEBOOK_ARTICLES } from "./default-facebook-articles";
 
 export type { EnterpriseArticle } from "./enterprises-types";
 export { getArticleTypes, balanceHtmlTags } from "./enterprises-types";
@@ -289,6 +290,9 @@ export async function getEnterprises(): Promise<EnterpriseArticle[]> {
     if (row && row.data) {
       const parsed = JSON.parse(row.data);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        const existingSlugs = new Set(parsed.map((a: any) => a.slug));
+        const missingFb = (DEFAULT_FACEBOOK_ARTICLES as any[]).filter((fb) => !existingSlugs.has(fb.slug));
+        if (missingFb.length > 0) { parsed.push(...missingFb); }
         return sortArticlesByDateDescending(parsed);
       }
     }

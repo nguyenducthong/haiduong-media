@@ -41,6 +41,13 @@ export function getArticleTypes(article: any): string[] {
 export function balanceHtmlTags(html: string): string {
   if (!html) return "";
   let balanced = html;
+
+  // 1. Strip bỏ các class / thẻ layout Flatsome WordPress rác gây lồng thẻ / position absolute
+  balanced = balanced.replace(/<div\b[^>]*\b(col|col-inner|row|gap-element|banner-inner|banner-bg|bg-fill|banner-layers|fill|icon-box|icon-inner|icon)\b[^>]*>/gi, "");
+  balanced = balanced.replace(/<\/svg>/gi, "");
+  balanced = balanced.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, "");
+
+  // 2. Cân bằng thẻ
   const tagsToCheck = ["div", "p", "span", "em", "strong", "b", "i", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "h6"];
   for (const tag of tagsToCheck) {
     const openRegex = new RegExp(`<${tag}\\b[^>]*>`, "gi");

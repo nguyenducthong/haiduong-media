@@ -21,6 +21,11 @@ import { FACEBOOK_SERVICES } from "@/lib/facebook-services";
 
 export const dynamic = "force-dynamic";
 
+function cleanServiceTitle(title: string): string {
+  if (!title) return "";
+  return title.replace(/^\s*\d+[\.\:\-\)]\s*/, "").trim();
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -335,7 +340,7 @@ export default async function FacebookServiceDetailPage({
                   gap: "20px",
                 }}
               >
-                {otherServices.map((srv) => (
+                {otherServices.map((srv, idx) => (
                   <Link
                     key={srv.id}
                     href={`/dich-vu-facebook/${srv.slug}`}
@@ -356,7 +361,7 @@ export default async function FacebookServiceDetailPage({
                     <div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
                         <span style={{ fontSize: "11px", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>
-                          Dịch vụ #{srv.number}
+                          Dịch vụ #{idx + 1}
                         </span>
                         {srv.isHot && (
                           <span
@@ -378,7 +383,7 @@ export default async function FacebookServiceDetailPage({
                       </div>
 
                       <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a", margin: "0 0 6px 0", lineHeight: 1.4 }}>
-                        {srv.number}. {srv.title}
+                        {cleanServiceTitle(srv.title)}
                       </h3>
 
                       <p style={{ fontSize: "13px", color: "#64748b", margin: 0, lineHeight: 1.5 }}>

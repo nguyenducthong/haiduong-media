@@ -50,6 +50,12 @@ const ICON_MAP: Record<string, any> = {
   Share2,
 };
 
+function cleanServiceTitle(title: string): string {
+  if (!title) return "";
+  // Xóa tiền tố số nếu có: ví dụ "1. Dịch vụ...", "10 - Dịch vụ...", "03: Dịch vụ..."
+  return title.replace(/^\s*\d+[\.\:\-\)]\s*/, "").trim();
+}
+
 export default async function FacebookServicesHubPage() {
   const content = await loadSiteContent();
 
@@ -182,7 +188,7 @@ export default async function FacebookServicesHubPage() {
             >
               {servicesList.map((srv, index) => {
                 const Icon = ICON_MAP[srv.iconName] || ShieldCheck;
-                const displayNumber = srv.number || index + 1;
+                const displayNumber = index + 1;
                 return (
                   <div
                     key={srv.id}
@@ -247,7 +253,7 @@ export default async function FacebookServicesHubPage() {
                               Dịch vụ #{displayNumber}
                             </span>
                             <h3 style={{ fontSize: "16px", fontWeight: 800, color: "#0f172a", margin: 0, lineHeight: 1.35 }}>
-                              {displayNumber}. {srv.title}
+                              {cleanServiceTitle(srv.title)}
                             </h3>
                           </div>
                         </div>

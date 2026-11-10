@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { FloatingContact, SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { loadSiteContent } from "@/lib/site-content";
-import { getArticleBySlug } from "@/lib/enterprises";
+import { getArticleBySlug, getEnterprises, getArticleTypes } from "@/lib/enterprises";
 import { ArticleContentRenderer } from "@/components/article-content-renderer";
 import { ViewCounter } from "@/components/view-counter";
 import { FACEBOOK_SERVICES } from "@/lib/facebook-services";
@@ -73,7 +73,31 @@ export default async function FacebookServiceDetailPage({
   const hotline = content.hotline || "0931.538.666";
   const hotlineHref = content.hotlineHref || "0931538666";
 
-  const otherServices = FACEBOOK_SERVICES.filter((s) => s.slug !== slug);
+  const allArticles = await getEnterprises();
+  const allFbArticles = allArticles.filter((art) => {
+    const types = getArticleTypes(art);
+    const cat = (art.category || "").toLowerCase();
+    return (
+      types.includes("dich-vu-facebook") ||
+      cat.includes("facebook") ||
+      cat.includes("dịch vụ facebook")
+    );
+  });
+
+  const otherServices = allFbArticles
+    .filter((s) => s.slug !== slug)
+    .map((s, idx) => {
+      const fbMeta = FACEBOOK_SERVICES.find((m) => m.slug === s.slug || m.id === s.id);
+      return {
+        id: s.id || `fb-${idx + 1}`,
+        slug: s.slug,
+        number: fbMeta?.number || idx + 1,
+        title: s.title || fbMeta?.title || "Dịch vụ Facebook",
+        shortDesc: s.excerpt || fbMeta?.shortDesc || "Hỗ trợ xử lý nhanh chóng - Cam kết bảo mật tuyệt đối.",
+        isHot: fbMeta?.isHot ?? false,
+        image: s.image || fbMeta?.image,
+      };
+    });
 
   return (
     <>
@@ -300,7 +324,7 @@ export default async function FacebookServiceDetailPage({
                     gap: "6px",
                   }}
                 >
-                  Xem toàn bộ 10 dịch vụ Facebook <ArrowRight size={16} />
+                  Xem toàn bộ {allFbArticles.length} dịch vụ Facebook <ArrowRight size={16} />
                 </Link>
               </div>
 

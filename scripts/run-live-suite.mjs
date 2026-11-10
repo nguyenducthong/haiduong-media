@@ -121,3 +121,4 @@ runSuite().catch(err => {
   proc.kill();
   process.exit(1);
 });
+

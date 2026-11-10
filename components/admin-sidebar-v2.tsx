@@ -136,7 +136,7 @@ export function AdminSidebarV2({
         { id: "menu-iso", label: "06. Tư Vấn ISO", badge: "Mới", badgeColor: "#10b981" },
         { id: "menu-nhan-hieu", label: "07. Đăng Ký Nhãn Hiệu" },
         { id: "menu-shtt", label: "08. Sở Hữu Trí Tuệ" },
-        { id: "menu-fb", label: "09. Dịch Vụ Facebook", badge: "10 bài", badgeColor: "#1877f2" },
+        { id: "menu-fb", label: "09. Dịch Vụ Facebook", badge: "HOT", badgeColor: "#1877f2" },
       ],
     },
     {

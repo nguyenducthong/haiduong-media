@@ -190,6 +190,31 @@ export function AdminFacebookManager() {
     });
   };
 
+  const handleDelete = async (art: FacebookArticle) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa dịch vụ "${art.title || art.name}" không?`)) {
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/crawl-doanh-nghiep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "delete", slug: art.slug }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast("success", "Đã xóa dịch vụ Facebook thành công!");
+        await fetchArticles();
+      } else {
+        showToast("error", data.error || "Lỗi khi xóa bài viết.");
+      }
+    } catch (err: any) {
+      showToast("error", err?.message || "Lỗi kết nối khi xóa.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const handleSyncDefaultArticles = async () => {
     setIsSaving(true);
     try {
@@ -240,7 +265,7 @@ export function AdminFacebookManager() {
         name: editingArticle.title,
         excerpt: editingArticle.summary,
         category: "Dịch vụ Facebook",
-        type: ["dich-vu-facebook"],
+        type: ["dich-vu-facebook", "san-pham"],
       };
 
       const res = await fetch("/api/crawl-doanh-nghiep", {
@@ -293,14 +318,14 @@ export function AdminFacebookManager() {
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px", flexWrap: "wrap", gap: "12px" }}>
         <div>
           <h4 style={{ margin: 0, fontSize: "16px", fontWeight: 800, color: "var(--ink)", display: "flex", alignItems: "center", gap: "8px" }}>
             <Share2 size={18} style={{ color: "#1877f2" }} />
-            Danh Sách & Soạn Thảo Nội Dung 10 Dịch Vụ Facebook Con
+            Danh Sách & Soạn Thảo ({articles.length}) Dịch Vụ Facebook
           </h4>
           <p style={{ margin: "4px 0 0", fontSize: "13px", color: "var(--muted)" }}>
-            Bấm "Chỉnh sửa bài viết" để mở trình soạn thảo chuyên nghiệp (định dạng chữ, ảnh, BẢNG BIỂU).
+            Bấm "Thêm dịch vụ mới" để tạo bài viết mới hoặc "Chỉnh sửa bài viết" để cập nhật nội dung, hình ảnh, bảng biểu.
           </p>
         </div>
 
@@ -456,7 +481,29 @@ export function AdminFacebookManager() {
                       boxShadow: "0 1px 3px rgba(24,119,242,0.25)",
                     }}
                   >
-                    <Edit3 size={13} /> Chỉnh sửa bài viết
+                    <Edit3 size={13} /> Sửa
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(art)}
+                    disabled={isSaving}
+                    title="Xóa dịch vụ này"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "6px",
+                      border: "1px solid #fee2e2",
+                      background: "#fff",
+                      color: "#dc2626",
+                      cursor: isSaving ? "not-allowed" : "pointer",
+                      transition: "all 0.2s ease",
+                    }}
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </div>
               </div>

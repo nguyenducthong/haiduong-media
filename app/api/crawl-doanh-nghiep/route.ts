@@ -126,7 +126,7 @@ export async function POST(req: Request) {
       const { slug } = body;
       const current = await loadCurrentEnterprises();
       const updated = current.filter((a: any) => a.slug !== slug && a.id !== slug);
-      await saveEnterprises(updated, "overwrite");
+      await saveEnterprises(updated, "replace_all");
       return NextResponse.json({
         success: true,
         message: "Đã xóa bài viết thành công khỏi database.",
@@ -147,7 +147,7 @@ export async function POST(req: Request) {
       const current = await loadCurrentEnterprises();
       const updated = current.filter((a: any) => !slugSet.has(a.slug) && !slugSet.has(a.id));
       const deletedCount = current.length - updated.length;
-      await saveEnterprises(updated, "overwrite");
+      await saveEnterprises(updated, "replace_all");
       return NextResponse.json({
         success: true,
         message: `Đã xóa thành công ${deletedCount} bài viết khỏi database.`,
@@ -247,7 +247,7 @@ export async function POST(req: Request) {
         });
       }
 
-      await saveEnterprises(updatedList, "overwrite");
+      await saveEnterprises(updatedList, "replace_all");
       return NextResponse.json({
         success: true,
         message: existingIndex >= 0 ? "Đã cập nhật bài viết thành công!" : "Đã tạo bài viết mới thành công!",
@@ -280,7 +280,7 @@ export async function POST(req: Request) {
         }
       });
 
-      await saveEnterprises(updatedList, "overwrite");
+      await saveEnterprises(updatedList, "replace_all");
       return NextResponse.json({
         success: true,
         isPopup: !isCurrentlyPopup,

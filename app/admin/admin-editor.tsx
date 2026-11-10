@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   ArrowDown,
+  Menu,
   ArrowUp,
   ArrowLeft,
   ArrowRight,
@@ -140,6 +141,7 @@ export default function AdminEditor({
   const [activeScreenId, setActiveScreenId] = useState<string>("menu-iso");
   const [activeParentLabel, setActiveParentLabel] = useState<string>("Trang Menu");
   const [activeItemLabel, setActiveItemLabel] = useState<string>("06. Tư Vấn ISO");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -932,25 +934,47 @@ export default function AdminEditor({
         {/* 1. SIDEBAR DỌC */}
         <AdminSidebarV2
           activeScreenId={activeScreenId}
-          onSelectScreen={handleSelectScreen}
+          onSelectScreen={(screenId, pLabel, iLabel) => {
+            handleSelectScreen(screenId, pLabel, iLabel);
+            setMobileMenuOpen(false);
+          }}
           currentUser={currentUser}
+          mobileOpen={mobileMenuOpen}
+          onCloseMobile={() => setMobileMenuOpen(false)}
         />
+        {mobileMenuOpen && (
+          <div
+            className="admin-sidebar-backdrop"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-label="Đóng menu"
+          />
+        )}
 
         {/* 2. WORKSPACE BÊN PHẢI */}
         <main className="admin-workspace-v2" style={{ flex: 1, display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden", background: "#f8fafc" }}>
           {/* Topbar Header */}
-          <header className="admin-topbar-v2" style={{ height: "64px", background: "#ffffff", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 28px", flexShrink: 0, zIndex: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13.5px", color: "#64748b" }}>
-                <a href="/" style={{ color: "#64748b", textDecoration: "none", fontWeight: 500 }}>Website</a>
-                <span style={{ color: "#cbd5e1" }}>/</span>
-                <span>{activeParentLabel}</span>
-                <span style={{ color: "#cbd5e1" }}>/</span>
-                <span style={{ color: "#0f172a", fontWeight: 700 }}>{activeItemLabel}</span>
+          <header className="admin-topbar-v2">
+            <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+              <button
+                type="button"
+                className="admin-mobile-menu-trigger"
+                onClick={() => setMobileMenuOpen(true)}
+                title="Mở Menu danh mục"
+                aria-label="Mở menu"
+              >
+                <Menu size={22} />
+              </button>
+
+              <div className="admin-breadcrumb" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13.5px", color: "#64748b", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <a href="/" className="admin-breadcrumb-root" style={{ color: "#64748b", textDecoration: "none", fontWeight: 500 }}>Website</a>
+                <span className="admin-breadcrumb-sep" style={{ color: "#cbd5e1" }}>/</span>
+                <span className="admin-breadcrumb-parent">{activeParentLabel}</span>
+                <span className="admin-breadcrumb-sep" style={{ color: "#cbd5e1" }}>/</span>
+                <span className="admin-breadcrumb-current" style={{ color: "#0f172a", fontWeight: 800 }}>{activeItemLabel}</span>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+            <div className="admin-topbar-actions" style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
               {message && (
                 <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12.5px", fontWeight: 600, color: message.type === "success" ? "#16a34a" : "#dc2626", background: message.type === "success" ? "#f0fdf4" : "#fef2f2", padding: "5px 12px", borderRadius: "20px", border: `1px solid ${message.type === "success" ? "#bbf7d0" : "#fecaca"}` }}>
                   <CheckCircle2 size={14} />
@@ -960,7 +984,7 @@ export default function AdminEditor({
 
               {/* User info & Logout */}
               {currentUser && (
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", paddingRight: "12px", borderRight: "1px solid #e2e8f0" }}>
+                <div className="admin-user-info-box" style={{ display: "flex", alignItems: "center", gap: "10px", paddingRight: "12px", borderRight: "1px solid #e2e8f0" }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
                     <span style={{ fontSize: "13px", fontWeight: 700, color: "#0f172a" }}>
                       {currentUser.fullName || currentUser.username}

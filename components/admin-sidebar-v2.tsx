@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Home,
+  X,
   Layers,
   BookOpen,
   Sliders,
@@ -51,12 +52,16 @@ interface AdminSidebarV2Props {
     fullName?: string;
     role?: string;
   } | null;
+  mobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export function AdminSidebarV2({
   activeScreenId,
   onSelectScreen,
   currentUser,
+  mobileOpen,
+  onCloseMobile,
 }: AdminSidebarV2Props) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
@@ -162,7 +167,7 @@ export function AdminSidebarV2({
 
   return (
     <aside
-      className={`admin-sidebar-v2 ${isCollapsed ? "collapsed" : ""}`}
+      className={`admin-sidebar-v2 ${isCollapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}
       style={{
         width: isCollapsed ? "72px" : "268px",
         height: "100vh",
@@ -227,10 +232,35 @@ export function AdminSidebarV2({
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          title={isCollapsed ? "Mở rộng Menu" : "Thu gọn Menu"}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {onCloseMobile && (
+            <button
+              type="button"
+              className="admin-sidebar-mobile-close-btn"
+              onClick={onCloseMobile}
+              title="Đóng Menu"
+              style={{
+                background: "rgba(255, 255, 255, 0.1)",
+                border: "none",
+                color: "#cbd5e1",
+                borderRadius: "8px",
+                width: "32px",
+                height: "32px",
+                display: "none",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+              }}
+            >
+              <X size={18} />
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="admin-sidebar-toggle-desktop"
+            onClick={toggleSidebar}
+            title={isCollapsed ? "Mở rộng Menu" : "Thu gọn Menu"}
           style={{
             background: "rgba(255, 255, 255, 0.06)",
             border: "1px solid rgba(255, 255, 255, 0.1)",
@@ -247,6 +277,7 @@ export function AdminSidebarV2({
         >
           {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
         </button>
+        </div>
       </div>
 
       {/* Sidebar Menu Scroll */}

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   Share2,
+  UploadCloud,
   Edit3,
   Eye,
   Plus,
@@ -47,6 +48,85 @@ export function AdminFacebookManager() {
   const [editingArticle, setEditingArticle] = useState<FacebookArticle | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [toastMsg, setToastMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  // Client-side image compress fallback (khi upload lỗi hoặc file lớn)
+  const compressClientImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const raw = e.target?.result as string;
+        if (!raw) return reject(new Error("Không thể đọc file"));
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1200;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW) {
+            h = Math.round((h * maxW) / w);
+            w = maxW;
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext("2d");
+          if (!ctx) return resolve(raw);
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", 0.85));
+        };
+        img.onerror = () => resolve(raw);
+        img.src = raw;
+      };
+      reader.onerror = () => reject(new Error("Lỗi đọc file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleUploadImage = async (file: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      showToast("error", "Vui lòng chọn đúng tệp hình ảnh (.jpg, .png, .webp...).");
+      return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+      showToast("error", "Dung lượng ảnh tối đa cho phép là 15MB.");
+      return;
+    }
+
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        const data = await res.json().catch(() => null) as any;
+        if (data && data.url) {
+          if (editingArticle) {
+            setEditingArticle({ ...editingArticle, image: data.url });
+          }
+          showToast("success", "Đã tải ảnh đại diện lên thành công!");
+          return;
+        }
+      }
+
+      // Fallback nén ảnh client-side sang Data URL
+      const dataUrl = await compressClientImage(file);
+      if (editingArticle) {
+        setEditingArticle({ ...editingArticle, image: dataUrl });
+      }
+      showToast("success", "Đã nén và chọn ảnh đại diện từ thiết bị thành công!");
+    } catch (err: any) {
+      showToast("error", err?.message || "Không thể tải ảnh lên. Hãy thử lại!");
+    } finally {
+      setUploadingImage(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   // Fetch Facebook articles
   const fetchArticles = async () => {
@@ -291,6 +371,7 @@ export function AdminFacebookManager() {
             return (
               <div
                 key={art.id || art.slug || index}
+                className="fb-article-row"
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -335,7 +416,7 @@ export function AdminFacebookManager() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                <div className="fb-article-actions" style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
                   <a
                     href={`/dich-vu-facebook/${art.slug}`}
                     target="_blank"
@@ -478,7 +559,7 @@ export function AdminFacebookManager() {
             {/* Modal Form Body */}
             <form onSubmit={handleSave} style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: "20px" }}>
               {/* Row 1: Title & Slug */}
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px" }}>
+              <div className="fb-modal-row-title" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px" }}>
                 <div>
                   <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
                     Tiêu đề dịch vụ Facebook *
@@ -525,35 +606,151 @@ export function AdminFacebookManager() {
               </div>
 
               {/* Row 2: Image & Excerpt */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "16px" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
-                    Đường dẫn ảnh đại diện (Image URL)
-                  </label>
+              <div className="fb-modal-row-image" style={{ display: "grid", gridTemplateColumns: "1.2fr 1.8fr", gap: "16px" }}>
+                <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "14px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+                    <label style={{ fontSize: "13px", fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: "6px" }}>
+                      <ImageIcon size={16} color="#1877f2" /> Ảnh đại diện bài viết
+                    </label>
+                    {uploadingImage && (
+                      <span style={{ fontSize: "12px", color: "#1877f2", display: "flex", alignItems: "center", gap: "4px", fontWeight: 600 }}>
+                        <Loader2 size={13} className="animate-spin" /> Đang tải lên...
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Nút bấm tải từ máy tính + dán link */}
+                  <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/*"
+                      style={{ display: "none" }}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUploadImage(f);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        padding: "8px 14px",
+                        borderRadius: "8px",
+                        background: "#1877f2",
+                        color: "#fff",
+                        border: "none",
+                        fontSize: "12.5px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      <UploadCloud size={15} /> Tải ảnh từ máy tính
+                    </button>
+
+                    {editingArticle.image && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingArticle({ ...editingArticle, image: "" })}
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          padding: "8px 12px",
+                          borderRadius: "8px",
+                          background: "#fee2e2",
+                          color: "#dc2626",
+                          border: "1px solid #fecaca",
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        <Trash2 size={13} /> Gỡ ảnh
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Input nhập URL thủ công */}
                   <input
                     type="text"
                     value={editingArticle.image || ""}
                     onChange={(e) => setEditingArticle({ ...editingArticle, image: e.target.value })}
-                    placeholder="/uploads/facebook/..."
+                    placeholder="Hoặc dán URL ảnh: /uploads/facebook/... hoặc https://..."
                     style={{
                       width: "100%",
-                      padding: "10px 14px",
-                      borderRadius: "8px",
+                      padding: "8px 12px",
+                      borderRadius: "6px",
                       border: "1px solid #cbd5e1",
-                      fontSize: "13px",
-                      outline: "none",
-                      marginBottom: "8px",
+                      fontSize: "12.5px",
+                      background: "#fff",
+                      marginBottom: "10px",
                     }}
                   />
-                  {editingArticle.image && (
-                    <div style={{ borderRadius: "8px", overflow: "hidden", border: "1px solid #e2e8f0", maxHeight: "90px" }}>
+
+                  {/* Khung Preview Ảnh */}
+                  {editingArticle.image ? (
+                    <div style={{ position: "relative", borderRadius: "10px", overflow: "hidden", border: "1px solid #cbd5e1", maxHeight: "150px", background: "#e2e8f0" }}>
                       <img
                         src={editingArticle.image}
                         alt="Preview"
-                        style={{ width: "100%", height: "90px", objectFit: "cover" }}
+                        style={{ width: "100%", height: "130px", objectFit: "cover", display: "block" }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = "/uploads/facebook/lay-lai-facebook.jpg";
+                        }}
                       />
+                      <div style={{ position: "absolute", bottom: "6px", left: "8px", background: "rgba(15,23,42,0.8)", color: "#fff", fontSize: "11px", padding: "2px 8px", borderRadius: "4px" }}>
+                        ✓ Ảnh đang chọn
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ height: "64px", borderRadius: "8px", border: "1px dashed #cbd5e1", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: "12px" }}>
+                      Chưa có ảnh đại diện (bấm nút trên để tải ảnh)
                     </div>
                   )}
+
+                  {/* Gợi ý ảnh Facebook có sẵn trong hệ thống */}
+                  <div style={{ marginTop: "10px" }}>
+                    <div style={{ fontSize: "11px", fontWeight: 700, color: "#64748b", marginBottom: "6px" }}>
+                      Chọn nhanh ảnh Facebook chuẩn có sẵn:
+                    </div>
+                    <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "4px" }}>
+                      {[
+                        { label: "Lấy lại nick", src: "/uploads/facebook/lay-lai-facebook.jpg" },
+                        { label: "Bị Hack", src: "/uploads/facebook/lay-lai-facebook-bi-hack.jpg" },
+                        { label: "Két sắt 956", src: "/uploads/facebook/facebook-khoa-956.jpg" },
+                        { label: "Treo 282", src: "/uploads/facebook/vo-hieu-hoa-282.jpg" },
+                        { label: "Lỗi 2FA", src: "/uploads/facebook/ma-dang-nhap-2fa.jpg" },
+                        { label: "Tích xanh", src: "/uploads/facebook/dich-vu-len-tich-xanh.png" },
+                        { label: "Bảo mật", src: "/uploads/facebook/bao-mat-facebook.jpg" },
+                        { label: "Bản quyền", src: "/uploads/facebook/bao-ve-ban-quyen.jpg" },
+                        { label: "Khủng hoảng", src: "/uploads/facebook/xu-ly-khung-hoang.jpg" },
+                      ].map((item) => (
+                        <button
+                          key={item.src}
+                          type="button"
+                          onClick={() => setEditingArticle({ ...editingArticle, image: item.src })}
+                          style={{
+                            flexShrink: 0,
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            border: editingArticle.image === item.src ? "2px solid #1877f2" : "1px solid #cbd5e1",
+                            background: editingArticle.image === item.src ? "#eff6ff" : "#fff",
+                            color: editingArticle.image === item.src ? "#1877f2" : "#475569",
+                            fontSize: "11px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 <div>

@@ -1030,6 +1030,7 @@ export function EnterpriseContentEditor({
       >
         {/* Top Header: Tabs & Mode Switcher */}
         <div
+          className="editor-top-bar"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -1149,6 +1150,7 @@ export function EnterpriseContentEditor({
         {/* Formatting Toolbar (Only in visual mode) */}
         {activeTab === "visual" && (
           <div
+            className="content-editor-toolbar"
             style={{
               display: "flex",
               alignItems: "center",

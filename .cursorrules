@@ -1,0 +1,7 @@
+# PROJECT RULES - HAI DUONG MEDIA
+1. REGRESSION TESTING: Always verify that existing features and legacy flows are not broken by any new changes. Test previous endpoints, navigation, and persistence before declaring done.
+2. RESPONSIVE DESIGN: Every UI feature must be fully responsive and tested for:
+   - Mobile: 360px - 414px (No horizontal overflow, collapsible drawers, responsive modals, wrapped button groups).
+   - Tablet: 768px - 1024px.
+   - Desktop: 1200px+.
+3. DATA SAFETY: Respect Cloudflare D1 database and fallback architectures. Ensure uploads and image assets load reliably on both local and production.

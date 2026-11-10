@@ -97,9 +97,10 @@ export default async function FacebookServicesHubPage() {
             </div>
 
             <div
+              className="fb-services-grid"
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
                 gap: "24px",
                 marginBottom: "48px",
               }}
@@ -240,10 +241,11 @@ export default async function FacebookServicesHubPage() {
 
             {/* Bottom Emergency Card */}
             <div
+              className="fb-emergency-card"
               style={{
                 background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
                 borderRadius: "20px",
-                padding: "40px",
+                padding: "36px",
                 color: "#fff",
                 display: "flex",
                 flexWrap: "wrap",

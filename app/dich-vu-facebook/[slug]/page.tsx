@@ -149,7 +149,7 @@ export default async function FacebookServiceDetailPage({
         <section className="section news-detail-body" style={{ paddingTop: "40px" }}>
           <div className="site-container">
             <article
-              className="news-main-article"
+              className="news-main-article fb-detail-card"
               style={{
                 width: "100%",
                 maxWidth: "100%",

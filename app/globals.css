@@ -4120,3 +4120,266 @@ table.article-table tbody tr:hover {
 
 
 
+
+
+/* =========================================================================
+   RESPONSIVE DESIGN CHO ADMIN V2 & CÁC MÀN HÌNH (MOBILE & TABLET)
+   ========================================================================= */
+
+/* Nút trigger mở menu mobile */
+.admin-mobile-menu-trigger {
+  display: none !important;
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #334155 !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 8px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-mobile-menu-trigger:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+@media (max-width: 900px) {
+  .admin-mobile-menu-trigger {
+    display: inline-flex !important;
+  }
+
+  /* Sidebar chuyển thành Drawer trượt từ bên trái */
+  .admin-sidebar-v2 {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    z-index: 99999 !important;
+    width: 280px !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 6px 0 30px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .admin-sidebar-v2.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .admin-sidebar-mobile-close-btn {
+    display: inline-flex !important;
+  }
+
+  .admin-sidebar-toggle-desktop {
+    display: none !important;
+  }
+
+  /* Backdrop khi mở sidebar trên mobile */
+  .admin-sidebar-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(4px) !important;
+    z-index: 99998 !important;
+  }
+
+  /* Topbar trên mobile */
+  .admin-topbar-v2 {
+    padding: 0 12px !important;
+    height: 56px !important;
+  }
+
+  .admin-breadcrumb-root,
+  .admin-breadcrumb-parent,
+  .admin-breadcrumb-sep {
+    display: none !important;
+  }
+
+  .admin-breadcrumb-current {
+    font-size: 13.5px !important;
+    max-width: 140px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .admin-user-info-box {
+    display: none !important;
+  }
+
+  /* Viewport & Card */
+  .admin-screen-viewport-v2 {
+    padding: 12px 10px !important;
+  }
+
+  .admin-screen-card-v2 {
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .admin-screen-footer-v2 {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding-top: 8px !important;
+  }
+
+  .admin-screen-footer-v2 > div {
+    width: 100% !important;
+  }
+
+  .admin-screen-footer-v2 button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* Quản lý dịch vụ Facebook trên mobile */
+@media (max-width: 768px) {
+  .fb-admin-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .fb-admin-header > div:last-child {
+    width: 100% !important;
+    flex-direction: column !important;
+  }
+
+  .fb-admin-header button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .fb-article-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  .fb-article-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .fb-article-actions a,
+  .fb-article-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 9px 0 !important;
+  }
+
+  /* Modal soạn thảo bài viết Facebook */
+  .fb-modal-row-title,
+  .fb-modal-row-image {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* Trình soạn thảo EnterpriseContentEditor và Bảng biểu trên Mobile */
+.article-table-wrapper {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  width: 100% !important;
+  margin: 18px 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+table.article-table {
+  width: 100% !important;
+  min-width: 520px !important;
+  border-collapse: collapse !important;
+}
+
+@media (max-width: 640px) {
+  .editor-top-bar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+  }
+
+  .editor-top-bar > div {
+    flex-shrink: 0 !important;
+  }
+
+  .content-editor-toolbar {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 6px 8px !important;
+    gap: 4px !important;
+  }
+
+  .content-editor-toolbar > div {
+    flex-shrink: 0 !important;
+  }
+
+  .editor-tabs-container {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* Responsive cho trang công khai chi tiết dịch vụ Facebook */
+@media (max-width: 768px) {
+  .fb-services-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .fb-emergency-card {
+    padding: 24px 18px !important;
+    border-radius: 14px !important;
+  }
+
+  .fb-emergency-card a {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .fb-detail-card {
+    padding: 20px 16px !important;
+    border-radius: 14px !important;
+  }
+
+  .news-detail-page {
+    padding: 0 12px !important;
+  }
+
+  .news-detail-hero {
+    padding: 24px 0 16px 0 !important;
+  }
+
+  .news-detail-content {
+    font-size: 15px !important;
+    line-height: 1.7 !important;
+  }
+
+  .news-detail-content h2 {
+    font-size: 20px !important;
+  }
+
+  .news-detail-content h3 {
+    font-size: 17px !important;
+  }
+
+  .fb-service-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}

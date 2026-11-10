@@ -28,6 +28,10 @@ export type EnterpriseArticle = {
   coOrganizer?: string;
   agenda?: string[] | string;
   benefits?: string[] | string;
+  // Service-specific fields
+  subtitle?: string;
+  tags?: string[] | string;
+  isHot?: boolean;
 };
 
 export function getArticleTypes(article: any): string[] {

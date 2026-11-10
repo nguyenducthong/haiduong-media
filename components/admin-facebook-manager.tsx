@@ -37,6 +37,9 @@ interface FacebookArticle {
   publishedAt?: string;
   author?: string;
   active?: boolean;
+  subtitle?: string;
+  tags?: string[] | string;
+  isHot?: boolean;
 }
 
 export function AdminFacebookManager() {
@@ -170,6 +173,9 @@ export function AdminFacebookManager() {
       content: art.content || "",
       image: art.image || art.coverImage || "",
       category: "Dịch vụ Facebook",
+      subtitle: art.subtitle || "",
+      tags: Array.isArray(art.tags) ? art.tags.join(", ") : (art.tags || ""),
+      isHot: Boolean(art.isHot),
     });
   };
 
@@ -187,6 +193,9 @@ export function AdminFacebookManager() {
       date: new Date().toISOString().split("T")[0],
       author: "Hải Dương Media",
       active: true,
+      subtitle: "Hỗ trợ 24/7 - Làm trước trả tiền sau",
+      tags: "Facebook, Bảo mật, Không cọc",
+      isHot: false,
     });
   };
 
@@ -259,6 +268,16 @@ export function AdminFacebookManager() {
         .replace(/[^a-z0-9-]/g, "-")
         .replace(/-+/g, "-");
 
+      const tagsArray =
+        typeof editingArticle.tags === "string"
+          ? editingArticle.tags
+              .split(",")
+              .map((t) => t.trim())
+              .filter(Boolean)
+          : Array.isArray(editingArticle.tags)
+          ? editingArticle.tags
+          : ["Facebook", "Bảo mật"];
+
       const payload = {
         ...editingArticle,
         slug: cleanSlug,
@@ -266,6 +285,9 @@ export function AdminFacebookManager() {
         excerpt: editingArticle.summary,
         category: "Dịch vụ Facebook",
         type: ["dich-vu-facebook", "san-pham"],
+        subtitle: editingArticle.subtitle?.trim() || "Dịch vụ Facebook chuyên nghiệp",
+        tags: tagsArray,
+        isHot: Boolean(editingArticle.isHot),
       };
 
       const res = await fetch("/api/crawl-doanh-nghiep", {
@@ -649,6 +671,61 @@ export function AdminFacebookManager() {
                       outline: "none",
                     }}
                   />
+                </div>
+              </div>
+
+              {/* Row 1b: Subtitle, Tags & HOT badge */}
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1.2fr auto", gap: "16px", alignItems: "flex-end" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
+                    Lời khuyên phụ / Dòng chú thích (Subtitle)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingArticle.subtitle || ""}
+                    onChange={(e) => setEditingArticle({ ...editingArticle, subtitle: e.target.value })}
+                    placeholder="vd: Hỗ trợ 24/7 - Xử lý cấp tốc trong 5-10 phút"
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "13px",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: 700, color: "#334155", marginBottom: "6px" }}>
+                    Thẻ phân loại / Tags (cách nhau dấu phẩy)
+                  </label>
+                  <input
+                    type="text"
+                    value={editingArticle.tags || ""}
+                    onChange={(e) => setEditingArticle({ ...editingArticle, tags: e.target.value })}
+                    placeholder="vd: Lấy lại nick, Bảo mật, Không cọc, Fanpage"
+                    style={{
+                      width: "100%",
+                      padding: "10px 14px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      fontSize: "13px",
+                      outline: "none",
+                    }}
+                  />
+                </div>
+
+                <div style={{ paddingBottom: "10px" }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: "6px", cursor: "pointer", fontSize: "13px", fontWeight: 700, color: "#dc2626" }}>
+                    <input
+                      type="checkbox"
+                      checked={Boolean(editingArticle.isHot)}
+                      onChange={(e) => setEditingArticle({ ...editingArticle, isHot: e.target.checked })}
+                      style={{ width: "16px", height: "16px", accentColor: "#dc2626" }}
+                    />
+                    🔥 Dịch vụ HOT
+                  </label>
                 </div>
               </div>
 

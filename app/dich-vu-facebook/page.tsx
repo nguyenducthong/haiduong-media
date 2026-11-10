@@ -93,15 +93,23 @@ export default async function FacebookServicesHubPage() {
   dbFbArticles.forEach((art, idx) => {
     const fbMeta = FACEBOOK_SERVICES.find((s) => s.slug === art.slug || s.id === art.id);
     processedSlugs.add(art.slug);
+
+    const artTags =
+      Array.isArray(art.tags) && art.tags.length > 0
+        ? art.tags
+        : typeof art.tags === "string" && art.tags.trim()
+        ? art.tags.split(",").map((t) => t.trim()).filter(Boolean)
+        : fbMeta?.tags || ["Facebook", "Bảo mật", "Hải Dương Media"];
+
     servicesList.push({
       id: art.id || `fb-${idx + 1}`,
       slug: art.slug,
       number: fbMeta?.number || idx + 1,
       title: art.title || fbMeta?.title || "Dịch vụ Facebook",
-      subtitle: fbMeta?.subtitle || "Dịch vụ Facebook chuyên nghiệp",
+      subtitle: art.subtitle || fbMeta?.subtitle || "Dịch vụ Facebook chuyên nghiệp",
       shortDesc: art.excerpt || fbMeta?.shortDesc || "Hỗ trợ xử lý nhanh chóng - Cam kết bảo mật tuyệt đối.",
-      isHot: fbMeta?.isHot ?? false,
-      tags: fbMeta?.tags || ["Facebook", "Bảo mật", "Hải Dương Media"],
+      isHot: (art.isHot !== undefined ? Boolean(art.isHot) : fbMeta?.isHot) ?? false,
+      tags: artTags,
       iconName: fbMeta?.iconName || "ShieldCheck",
       image: art.image || fbMeta?.image,
     });

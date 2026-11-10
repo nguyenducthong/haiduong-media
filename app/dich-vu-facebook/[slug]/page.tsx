@@ -192,9 +192,9 @@ export default async function FacebookServiceDetailPage({
               )}
 
               {excerpt && (
-                <p className="article-lead-p" style={{ fontSize: "18px", lineHeight: "1.7", marginBottom: "32px" }}>
+                <div className="article-lead-p" style={{ fontSize: "18px", lineHeight: "1.7", marginBottom: "32px" }}>
                   {excerpt}
-                </p>
+                </div>
               )}
 
               {/* Nội dung bài viết to rõ ràng */}

@@ -89,7 +89,7 @@ export const ADMIN_SCREENS: ScreenMeta[] = [
 
   // 2. Nhóm Trang Menu
   { id: "menu-gioi-thieu", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "01. Trang Giới thiệu", liveUrl: "/gioi-thieu" },
-  { id: "menu-tin-tuc", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "02. Trang Tin tức", liveUrl: "/tin-tuc" },
+  { id: "menu-tin-tuc", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "02. Trang Hoạt động & Sự kiện", liveUrl: "/tin-tuc" },
   { id: "menu-doanh-nghiep", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "03. Trang Doanh nghiệp", liveUrl: "/doanh-nghiep" },
   { id: "menu-doanh-nhan", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "04. Trang Doanh nhân", liveUrl: "/doanh-nhan" },
   { id: "menu-san-pham", groupId: "menu-trang", groupLabel: "Trang Menu", itemLabel: "05. Trang Sản phẩm", liveUrl: "/san-pham" },
@@ -1156,12 +1156,12 @@ export default function AdminEditor({
                   </div>
                 </EditorSection>
 
-                {/* 02. TIN TỨC */}
+                {/* 02. HOẠT ĐỘNG & SỰ KIỆN */}
                 <EditorSection
                   id="menu-tin-tuc"
                   number="02"
-                  title="Trang Tin tức (/tin-tuc)"
-                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề và mô tả giới thiệu đầu trang Tin tức (khối Tin Tức & Hoạt Động Doanh Nghiệp)."
+                  title="Trang Hoạt động & Sự kiện (/tin-tuc)"
+                  description="Chỉnh sửa dòng chữ nhấn, tiêu đề và mô tả giới thiệu đầu trang Hoạt động & Sự kiện (khối Hoạt Động & Sự Kiện Nổi Bật)."
                 >
                   <div style={{ marginBottom: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <a
@@ -1185,14 +1185,14 @@ export default function AdminEditor({
                   {/* Live preview */}
                   <div style={{ background: "#faf5ff", border: "1px dashed #d8b4fe", borderRadius: "12px", padding: "16px 20px", marginBottom: "16px" }}>
                     <div style={{ fontSize: "11px", fontWeight: 800, color: "#9333ea", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
-                      👁️ Xem trước tiêu đề đầu trang Tin tức (giống ảnh bạn gửi):
+                      👁️ Xem trước tiêu đề đầu trang Hoạt động & Sự kiện (giống ảnh bạn gửi):
                     </div>
                     <div style={{ background: "#fff", padding: "18px", borderRadius: "10px", border: "1px solid #e9d5ff" }}>
                       <span style={{ color: "#d42027", fontSize: "12px", fontWeight: 800, textTransform: "uppercase", display: "block", marginBottom: "4px" }}>
-                        {content.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN"}
+                        {content.newsPageEyebrow || "HOẠT ĐỘNG & SỰ KIỆN"}
                       </span>
                       <h2 style={{ fontSize: "20px", fontWeight: 800, color: "#0f172a", margin: "0 0 8px 0" }}>
-                        {content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp"}
+                        {content.newsPageTitle || "Hoạt Động & Sự Kiện Nổi Bật"}
                       </h2>
                       <p style={{ color: "#64748b", fontSize: "13px", margin: 0, lineHeight: 1.6 }}>
                         {content.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."}
@@ -1204,13 +1204,13 @@ export default function AdminEditor({
                     label="Dòng chữ in hoa nhỏ phía trên (Eyebrow)"
                     value={content.newsPageEyebrow || ""}
                     onChange={(value) => update("newsPageEyebrow", value)}
-                    placeholder="vd: TIN TỨC & CHUYÊN MÔN"
+                    placeholder="vd: HOẠT ĐỘNG & SỰ KIỆN"
                   />
                   <Field
-                    label="Tiêu đề chính trang Tin tức"
+                    label="Tiêu đề chính trang Hoạt động & Sự kiện"
                     value={content.newsPageTitle || ""}
                     onChange={(value) => update("newsPageTitle", value)}
-                    placeholder="vd: Tin Tức & Hoạt Động Doanh Nghiệp"
+                    placeholder="vd: Hoạt Động & Sự Kiện Nổi Bật"
                   />
                   <Field
                     label="Đoạn văn mô tả / giới thiệu (sửa text trong ô đỏ)"
@@ -1220,10 +1220,10 @@ export default function AdminEditor({
                     placeholder="vd: Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."
                   />
                   <Field
-                    label="Tiêu đề danh sách tin tức & hoạt động"
+                    label="Tiêu đề danh sách hoạt động & sự kiện"
                     value={content.newsPageListTitle || ""}
                     onChange={(value) => update("newsPageListTitle", value)}
-                    placeholder="vd: Danh sách tin tức & hoạt động"
+                    placeholder="vd: Danh sách hoạt động & sự kiện"
                   />
                 </EditorSection>
 
@@ -2694,12 +2694,12 @@ export default function AdminEditor({
         </EditorSection>
 
         {/* ========================================================
-            04. QUẢN LÝ BÀI VIẾT (TIN TỨC)
+            04. QUẢN LÝ BÀI VIẾT (HOẠT ĐỘNG & SỰ KIỆN)
             ======================================================== */}
         <EditorSection
           id="tin-tuc"
           number="04"
-          title="Quản lý & Đăng Bài Viết (Tin tức & Bài đăng)"
+          title="Quản lý & Đăng Bài Viết (Hoạt động & Sự kiện)"
           description="Đăng bài viết mới, căn chỉnh lề nội dung, ảnh minh họa. Mỗi bài có tùy chọn Bật/Tắt hiển thị (Active), Thu gọn/Mở rộng, Sắp xếp thứ tự và Lưu độc lập."
         >
           {/* Action header bar */}

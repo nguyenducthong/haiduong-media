@@ -65,7 +65,7 @@ export default async function NewsDetailPage({
             <nav className="event-breadcrumb" aria-label="Breadcrumb">
               <Link href="/">Trang chủ</Link>
               <span>/</span>
-              <Link href="/tin-tuc">Tin tức & Kiến thức</Link>
+              <Link href="/tin-tuc">Hoạt động & Sự kiện</Link>
               <span>/</span>
               <span className="current">{article.title}</span>
             </nav>
@@ -114,7 +114,7 @@ export default async function NewsDetailPage({
             {/* Sidebar */}
             <aside className="news-sidebar">
               <div className="sidebar-card">
-                <h3>Bài viết mới nhất</h3>
+                <h3>Hoạt động & Sự kiện mới nhất</h3>
                 <div className="recent-posts-list">
                   {relatedNews.slice(0, 4).map((item, idx) => (
                     <article className="recent-post-item" key={idx}>

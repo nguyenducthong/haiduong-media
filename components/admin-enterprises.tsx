@@ -51,7 +51,7 @@ export const ARTICLE_TYPES = [
   { id: "san-pham", label: "Sản phẩm", icon: Package, color: "#16a34a", bg: "rgba(22,163,74,0.08)", border: "rgba(22,163,74,0.2)" },
   { id: "dich-vu", label: "Dịch vụ", icon: ShieldCheck, color: "#059669", bg: "rgba(5,150,105,0.08)", border: "rgba(5,150,105,0.2)" },
   { id: "dich-vu-facebook", label: "Dịch vụ Facebook", icon: Share2, color: "#1877f2", bg: "rgba(24,119,242,0.08)", border: "rgba(24,119,242,0.2)" },
-  { id: "tin-tuc", label: "Tin tức", icon: Newspaper, color: "#9333ea", bg: "rgba(147,51,234,0.08)", border: "rgba(147,51,234,0.2)" },
+  { id: "tin-tuc", label: "Hoạt động & Sự kiện", icon: Newspaper, color: "#9333ea", bg: "rgba(147,51,234,0.08)", border: "rgba(147,51,234,0.2)" },
   { id: "su-kien", label: "Sự kiện", icon: Calendar, color: "#ea580c", bg: "rgba(234,88,12,0.08)", border: "rgba(234,88,12,0.2)" },
   { id: "popup", label: "Popup Nổi Bật (Duy nhất 1 bài)", icon: Megaphone, color: "#e11d48", bg: "rgba(225,29,72,0.08)", border: "rgba(225,29,72,0.2)" },
 ];
@@ -980,8 +980,8 @@ export function AdminEnterprises({
               <Newspaper size={20} />
             </div>
             <div>
-              <div style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 700 }}>Menu Tin tức</div>
-              <div style={{ fontSize: "15px", fontWeight: 900, color: "#0f172a" }}>Tin tức</div>
+              <div style={{ fontSize: "12px", color: "var(--muted)", fontWeight: 700 }}>Menu Hoạt động & Sự kiện</div>
+              <div style={{ fontSize: "15px", fontWeight: 900, color: "#0f172a" }}>Hoạt động & Sự kiện</div>
             </div>
           </div>
           <span
@@ -1166,14 +1166,14 @@ export function AdminEnterprises({
           badgeText: string;
         }> = {
           "tin-tuc": {
-            title: "Cấu hình Tiêu đề & Mô tả Trang Tin Tức (/tin-tuc)",
-            desc: 'Chỉnh sửa dòng chữ nhấn ("TIN TỨC & CHUYÊN MÔN"), tiêu đề chính và đoạn văn giới thiệu đầu trang Tin tức (khối Tin Tức & Hoạt Động Doanh Nghiệp).',
+            title: "Cấu hình Tiêu đề & Mô tả Trang Hoạt động & Sự kiện (/tin-tuc)",
+            desc: 'Chỉnh sửa dòng chữ nhấn ("HOẠT ĐỘNG & SỰ KIỆN"), tiêu đề chính và đoạn văn giới thiệu đầu trang Hoạt động & Sự kiện (khối Hoạt Động & Sự Kiện Nổi Bật).',
             color: "#9333ea",
             bg: "linear-gradient(135deg, #faf5ff 0%, #ffffff 100%)",
             border: "#e9d5ff",
-            btnText: "Sửa tiêu đề & mô tả Tin Tức",
+            btnText: "Sửa tiêu đề & mô tả Hoạt động & Sự kiện",
             icon: Newspaper,
-            badgeText: "Trang Tin tức",
+            badgeText: "Trang Hoạt động & Sự kiện",
           },
           "doanh-nghiep": {
             title: "Cấu hình Tiêu đề & Giới thiệu Trang Doanh Nghiệp (/doanh-nghiep)",
@@ -3418,10 +3418,10 @@ export function AdminEnterprises({
           </div>
         </div>
       )}
-      {/* Modal chỉnh sửa Tiêu đề & Giới thiệu các trang (Tin tức, Doanh nghiệp, Doanh nhân, Sản phẩm, Sự kiện) */}
+      {/* Modal chỉnh sửa Tiêu đề & Giới thiệu các trang (Hoạt động & Sự kiện, Doanh nghiệp, Doanh nhân, Sản phẩm, Sự kiện) */}
       {showPageHeadingModal && (() => {
         const typeLabels: Record<string, { label: string; icon: any; color: string; path: string }> = {
-          "tin-tuc": { label: "Tin Tức & Hoạt Động", icon: Newspaper, color: "#9333ea", path: "/tin-tuc" },
+          "tin-tuc": { label: "Hoạt Động & Sự Kiện", icon: Newspaper, color: "#9333ea", path: "/tin-tuc" },
           "doanh-nghiep": { label: "Doanh Nghiệp & Thương Hiệu", icon: Building2, color: "#d42027", path: "/doanh-nghiep" },
           "doanh-nhan": { label: "Doanh Nhân & Lãnh Đạo", icon: Users, color: "#0284c7", path: "/doanh-nhan" },
           "san-pham": { label: "Sản Phẩm & Dịch Vụ", icon: Package, color: "#16a34a", path: "/san-pham" },

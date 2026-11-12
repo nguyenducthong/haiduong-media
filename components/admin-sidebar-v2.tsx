@@ -129,7 +129,7 @@ export function AdminSidebarV2({
       icon: Layers,
       subItems: [
         { id: "menu-gioi-thieu", label: "01. Trang Giới thiệu" },
-        { id: "menu-tin-tuc", label: "02. Trang Tin tức" },
+        { id: "menu-tin-tuc", label: "02. Trang Hoạt động & Sự kiện" },
         { id: "menu-doanh-nghiep", label: "03. Trang Doanh nghiệp" },
         { id: "menu-doanh-nhan", label: "04. Trang Doanh nhân" },
         { id: "menu-san-pham", label: "05. Trang Sản phẩm" },

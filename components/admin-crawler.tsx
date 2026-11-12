@@ -1078,7 +1078,7 @@ export function AdminCrawler() {
                     { id: "doanh-nghiep", label: "Doanh nghiệp", color: "#d42027" },
                     { id: "doanh-nhan", label: "Doanh nhân", color: "#0284c7" },
                     { id: "san-pham", label: "Sản phẩm", color: "#16a34a" },
-                    { id: "tin-tuc", label: "Tin tức", color: "#9333ea" },
+                    { id: "tin-tuc", label: "Hoạt động & Sự kiện", color: "#9333ea" },
                     { id: "su-kien", label: "Sự kiện", color: "#ea580c" },
                     { id: "popup", label: "Popup Nổi Bật", color: "#e11d48" },
                   ].map((t) => {
@@ -1415,7 +1415,7 @@ export function AdminCrawler() {
                           { id: "doanh-nghiep", label: "Doanh nghiệp", color: "#d42027" },
                           { id: "doanh-nhan", label: "Doanh nhân", color: "#0284c7" },
                           { id: "san-pham", label: "Sản phẩm", color: "#16a34a" },
-                          { id: "tin-tuc", label: "Tin tức", color: "#9333ea" },
+                          { id: "tin-tuc", label: "Hoạt động & Sự kiện", color: "#9333ea" },
                           { id: "su-kien", label: "Sự kiện", color: "#ea580c" },
                           { id: "popup", label: "Popup Nổi Bật", color: "#e11d48" },
                         ].map((t) => {

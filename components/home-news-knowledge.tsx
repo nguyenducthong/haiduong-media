@@ -37,7 +37,7 @@ export function HomeNewsKnowledge({
               className={`tab-filter-btn ${activeTab === "news" ? "active" : ""}`}
               onClick={() => setActiveTab("news")}
             >
-              <Newspaper size={15} /> Tin mới ({visibleNews.length})
+              <Newspaper size={15} /> Hoạt động & Sự kiện ({visibleNews.length})
             </button>
             <button
               type="button"
@@ -55,7 +55,7 @@ export function HomeNewsKnowledge({
             <div className={`content-column ${activeTab === "news" ? "full-width" : ""}`}>
               <div className="column-title-bar">
                 <Newspaper size={20} className="column-icon" />
-                <h3>TIN MỚI & HOẠT ĐỘNG</h3>
+                <h3>HOẠT ĐỘNG & SỰ KIỆN</h3>
                 <Link href="/tin-tuc" className="view-more-link">
                   Xem thêm <ArrowRight size={14} />
                 </Link>

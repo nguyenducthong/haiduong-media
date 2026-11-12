@@ -603,10 +603,10 @@ export const defaultSiteContent: SiteContent = {
     { number: "04", title: "Đồng hành dài hạn", desc: "Mỗi quyết định đều bám sát mục tiêu và trải nghiệm của khách hàng." },
   ],
 
-  newsPageEyebrow: "TIN TỨC & CHUYÊN MÔN",
-  newsPageTitle: "Tin Tức & Hoạt Động Doanh Nghiệp",
+  newsPageEyebrow: "HOẠT ĐỘNG & SỰ KIỆN",
+  newsPageTitle: "Hoạt Động & Sự Kiện Nổi Bật",
   newsPageDescription: "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số.",
-  newsPageListTitle: "Danh sách tin tức & hoạt động",
+  newsPageListTitle: "Danh sách hoạt động & sự kiện",
 
   enterprisesPageEyebrow: "ĐỒNG HÀNH & NÂNG TẦM",
   enterprisesPageTitle: "Doanh Nghiệp & Thương Hiệu Tiêu Biểu",

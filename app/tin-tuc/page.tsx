@@ -9,10 +9,10 @@ export async function generateMetadata() {
   const content = await loadSiteContent();
   return {
     alternates: { canonical: "/tin-tuc" },
-    title: content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp",
+    title: content.newsPageTitle || "Hoạt Động & Sự Kiện Nổi Bật",
     description:
       content.newsPageDescription ||
-      "Cập nhật tin tức kinh tế, hoạt động doanh nghiệp và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
+      "Cập nhật hoạt động doanh nghiệp, sự kiện nổi bật và cẩm nang truyền thông mới nhất từ THƯƠNG HIỆU HÀNG ĐẦU VIỆT NAM (thuonghieuhangdauvn).",
   };
 }
 
@@ -29,8 +29,8 @@ export default async function NewsPage() {
       <SiteHeader content={content} />
       <main>
         <PageHero
-          eyebrow={content.newsPageEyebrow || "TIN TỨC & CHUYÊN MÔN"}
-          title={content.newsPageTitle || "Tin Tức & Hoạt Động Doanh Nghiệp"}
+          eyebrow={content.newsPageEyebrow || "HOẠT ĐỘNG & SỰ KIỆN"}
+          title={content.newsPageTitle || "Hoạt Động & Sự Kiện Nổi Bật"}
           description={content.newsPageDescription || "Nội dung chuyên sâu, cập nhật hoạt động mới nhất cùng kiến thức thực chiến dành cho doanh nghiệp trong kỷ nguyên số."}
         />
 
@@ -39,8 +39,8 @@ export default async function NewsPage() {
             <EnterpriseList
               initialArticles={visibleNews}
               basePath="/tin-tuc"
-              title={content.newsPageListTitle || "Danh sách tin tức & hoạt động"}
-              searchPlaceholder="Tìm kiếm tin tức, sự kiện, thông báo..."
+              title={content.newsPageListTitle || "Danh sách hoạt động & sự kiện"}
+              searchPlaceholder="Tìm kiếm hoạt động, sự kiện, thông báo..."
               pageSize={9}
             />
           </div>

@@ -6,7 +6,7 @@ import { HeaderNav, type NavItem } from "@/components/header-nav";
 export const headerNavLinks: readonly NavItem[] = [
   { label: "Trang chủ", href: "/" },
   { label: "Giới thiệu", href: "/gioi-thieu" },
-  { label: "Tin tức", href: "/tin-tuc" },
+  { label: "Hoạt động & Sự kiện", href: "/tin-tuc" },
   { label: "Doanh nghiệp", href: "/doanh-nghiep" },
   { label: "Doanh nhân", href: "/doanh-nhan" },
   {
@@ -145,7 +145,7 @@ export function SiteFooter({ content }: { content: SiteContent }) {
                 <Link href="/gioi-thieu">Giới thiệu</Link>
                 <Link href="/#vtv-commercials">Năng lực truyền thông</Link>
                 <Link href="/su-kien">Chương trình vinh danh</Link>
-                <Link href="/tin-tuc">Tin tức & hoạt động</Link>
+                <Link href="/tin-tuc">Hoạt động & Sự kiện</Link>
                 <Link href="/doanh-nghiep">Đối tác doanh nghiệp</Link>
               </nav>
             </div>

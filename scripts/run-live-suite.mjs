@@ -25,6 +25,7 @@ function wait(ms) {
 }
 
 const testUrls = [
+  "http://127.0.0.1:5173/tin-tuc",
   "http://127.0.0.1:5173/dich-vu-facebook/dich-vu-len-tich-xanh-facebook",
   "http://127.0.0.1:5173/dich-vu-facebook/lay-lai-facebook-bi-hack",
   "http://127.0.0.1:5173/dich-vu-facebook/bao-ve-ban-quyen-facebook-rights-manager",

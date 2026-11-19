@@ -63,6 +63,25 @@ const FONT_SIZES = [
 
 const FONT_SIZE_STEPS = ["12px", "13px", "14px", "15px", "16px", "18px", "20px", "22px", "24px", "28px", "32px", "36px"];
 
+const SPACING_PRESETS = [
+  { label: "↕ Cách đoạn...", value: "" },
+  { label: "Rất khít (2px)", value: "2px" },
+  { label: "Khít vừa (6px)", value: "6px" },
+  { label: "Chuẩn vừa (10px)", value: "10px" },
+  { label: "Thoáng (16px)", value: "16px" },
+  { label: "Rộng (24px)", value: "24px" },
+  { label: "Rất rộng (32px)", value: "32px" },
+];
+
+const LINE_HEIGHT_PRESETS = [
+  { label: "☰ Dãn dòng...", value: "" },
+  { label: "Dòng sát (1.3)", value: "1.3" },
+  { label: "Dòng vừa (1.5)", value: "1.5" },
+  { label: "Dòng chuẩn (1.7)", value: "1.7" },
+  { label: "Dòng thoáng (1.9)", value: "1.9" },
+  { label: "Dòng rộng (2.1)", value: "2.1" },
+];
+
 interface EnterpriseContentEditorProps {
   value: string;
   onChange: (value: string) => void;
@@ -152,6 +171,7 @@ export function EnterpriseContentEditor({
   const [activeTable, setActiveTable] = useState<HTMLTableElement | null>(null);
   const [activeTableRow, setActiveTableRow] = useState<HTMLTableRowElement | null>(null);
   const [activeTableCell, setActiveTableCell] = useState<HTMLTableCellElement | null>(null);
+  const [selectedImg, setSelectedImg] = useState<HTMLImageElement | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const docFileInputRef = useRef<HTMLInputElement>(null);
@@ -369,6 +389,38 @@ export function EnterpriseContentEditor({
 
   const handleFormatBlock = (tag: string) => {
     exec("formatBlock", tag);
+  };
+
+  const applyParagraphSpacing = (spacingVal: string) => {
+    if (!spacingVal || !editorRef.current) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+
+    let target = sel.anchorNode instanceof HTMLElement ? sel.anchorNode : sel.anchorNode?.parentElement;
+    while (target && target.parentElement !== editorRef.current && target !== editorRef.current) {
+      target = target.parentElement;
+    }
+
+    if (target && target !== editorRef.current) {
+      target.style.marginBottom = spacingVal;
+      handleInput();
+    }
+  };
+
+  const applyLineHeight = (lhVal: string) => {
+    if (!lhVal || !editorRef.current) return;
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+
+    let target = sel.anchorNode instanceof HTMLElement ? sel.anchorNode : sel.anchorNode?.parentElement;
+    while (target && target.parentElement !== editorRef.current && target !== editorRef.current) {
+      target = target.parentElement;
+    }
+
+    if (target && target !== editorRef.current) {
+      target.style.lineHeight = lhVal;
+      handleInput();
+    }
   };
 
   const handleInsertLink = () => {
@@ -1452,6 +1504,57 @@ export function EnterpriseContentEditor({
               <AlignJustify size={14} />
             </button>
 
+            {/* ĐIỀU CHỈNH KHOẢNG CÁCH ĐOẠN & GIÃN DÒNG TRỰC QUAN */}
+            <div style={{ display: "inline-flex", alignItems: "center", gap: "4px", background: "#f8fafc", padding: "2px 6px", borderRadius: "7px", border: "1px solid #e2e8f0" }}>
+              <select
+                title="Điều chỉnh khoảng cách dưới của đoạn văn / tiêu đề đang chọn"
+                onMouseDown={saveSelection}
+                onChange={(e) => {
+                  applyParagraphSpacing(e.target.value);
+                  e.target.value = "";
+                }}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#1e293b",
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "5px",
+                  padding: "3px 6px",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
+              >
+                {SPACING_PRESETS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+
+              <select
+                title="Điều chỉnh khoảng cách giãn dòng (Line height)"
+                onMouseDown={saveSelection}
+                onChange={(e) => {
+                  applyLineHeight(e.target.value);
+                  e.target.value = "";
+                }}
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#1e293b",
+                  background: "#fff",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: "5px",
+                  padding: "3px 6px",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
+              >
+                {LINE_HEIGHT_PRESETS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+
             <div style={separatorStyle} />
 
             {/* ACTION: Chèn ảnh trực quan */}
@@ -1770,7 +1873,164 @@ export function EnterpriseContentEditor({
             color: "#1e293b",
           }}
           className="article-detail-body article-full-text enterprise-content article-rendered-content"
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (target instanceof HTMLImageElement) {
+              setSelectedImg(target);
+            } else if (!target.closest(".image-quick-toolbar")) {
+              setSelectedImg(null);
+            }
+          }}
         >
+          {/* Quick Toolbar khi người dùng bấm vào Ảnh */}
+          {selectedImg && (
+            <div
+              className="image-quick-toolbar"
+              style={{
+                background: "#fffbeb",
+                border: "1px solid #fde68a",
+                padding: "8px 12px",
+                borderRadius: "8px",
+                marginBottom: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                flexWrap: "wrap",
+                fontSize: "12px",
+                boxShadow: "0 2px 8px rgba(217, 119, 6, 0.08)",
+                userSelect: "none",
+              }}
+            >
+              <span style={{ fontWeight: 700, color: "#b45309" }}>🖼 Ảnh đang chọn:</span>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "#78350f" }}>Cỡ:</span>
+                {[
+                  { label: "Nhỏ (40%)", w: "40%" },
+                  { label: "Vừa (70%)", w: "70%" },
+                  { label: "Đầy đủ (100%)", w: "100%" },
+                ].map((size) => (
+                  <button
+                    key={size.w}
+                    type="button"
+                    onClick={() => {
+                      if (selectedImg) {
+                        selectedImg.style.width = size.w;
+                        selectedImg.style.maxWidth = "100%";
+                        selectedImg.style.height = "auto";
+                        handleInput();
+                      }
+                    }}
+                    style={{
+                      padding: "2px 8px",
+                      background: "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {size.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "#78350f" }}>Khoảng cách:</span>
+                {[
+                  { label: "Sát (4px)", m: "4px auto" },
+                  { label: "Vừa (10px)", m: "10px auto" },
+                  { label: "Rộng (20px)", m: "20px auto" },
+                ].map((sp) => (
+                  <button
+                    key={sp.m}
+                    type="button"
+                    onClick={() => {
+                      if (selectedImg) {
+                        selectedImg.style.margin = sp.m;
+                        handleInput();
+                      }
+                    }}
+                    style={{
+                      padding: "2px 8px",
+                      background: "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {sp.label}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span style={{ color: "#78350f" }}>Vị trí:</span>
+                {[
+                  { label: "Trái", ml: "0", mr: "auto" },
+                  { label: "Giữa", ml: "auto", mr: "auto" },
+                  { label: "Phải", ml: "auto", mr: "0" },
+                ].map((pos) => (
+                  <button
+                    key={pos.label}
+                    type="button"
+                    onClick={() => {
+                      if (selectedImg) {
+                        selectedImg.style.display = "block";
+                        selectedImg.style.marginLeft = pos.ml;
+                        selectedImg.style.marginRight = pos.mr;
+                        handleInput();
+                      }
+                    }}
+                    style={{
+                      padding: "2px 8px",
+                      background: "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "11px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {pos.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedImg) {
+                    const parentFig = selectedImg.closest("figure");
+                    if (parentFig) {
+                      parentFig.remove();
+                    } else {
+                      selectedImg.remove();
+                    }
+                    setSelectedImg(null);
+                    handleInput();
+                  }
+                }}
+                style={{
+                  marginLeft: "auto",
+                  padding: "3px 10px",
+                  background: "#fee2e2",
+                  color: "#dc2626",
+                  border: "1px solid #fca5a5",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                }}
+              >
+                ✕ Xóa ảnh
+              </button>
+            </div>
+          )}
+
           <div
             ref={editorRef}
             contentEditable

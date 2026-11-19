@@ -2650,10 +2650,9 @@ button, input, textarea { font: inherit; }
 }
 .article-full-text {
   font-size: 16px;
-  line-height: 1.85;
+  line-height: 1.75;
   color: #334155;
-  display: grid;
-  gap: 20px;
+  display: block; /* Dùng block thay vì grid để các đoạn văn liền mạch, người dùng kiểm soát khoảng cách như Word */
 }
 .article-full-text blockquote {
   margin: 20px 0;
@@ -3396,8 +3395,8 @@ button, input, textarea { font: inherit; }
 .article-full-text p,
 .enterprise-content p,
 .article-rendered-content p {
-  margin-bottom: 14px;
-  line-height: 1.75;
+  margin-bottom: 8px;
+  line-height: 1.7;
 }
 
 /* Ẩn các thẻ p rỗng hoàn toàn ở giao diện đọc bài (ngoài frontend) */
@@ -3409,53 +3408,53 @@ button, input, textarea { font: inherit; }
   padding: 0 !important;
 }
 
-/* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD, KHOẢNG CÁCH GỌN GÀNG */
+/* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD, KHOẢNG CÁCH TỰ DO ĐIỀU CHỈNH */
 [contenteditable="true"] {
   outline: none !important;
 }
 
 [contenteditable="true"] h1,
 [contenteditable="true"] h2 {
-  font-size: 20px !important;
-  font-weight: 800 !important;
-  margin: 14px 0 6px 0 !important;
-  line-height: 1.35 !important;
-  color: #0f172a !important;
+  font-size: 20px;
+  font-weight: 800;
+  margin: 14px 0 6px 0;
+  line-height: 1.35;
+  color: #0f172a;
 }
 
 [contenteditable="true"] h3 {
-  font-size: 17px !important;
-  font-weight: 800 !important;
-  margin: 12px 0 5px 0 !important;
-  line-height: 1.35 !important;
-  color: #0f172a !important;
+  font-size: 17px;
+  font-weight: 800;
+  margin: 12px 0 5px 0;
+  line-height: 1.35;
+  color: #0f172a;
 }
 
 [contenteditable="true"] h4 {
-  font-size: 15px !important;
-  font-weight: 700 !important;
-  margin: 10px 0 4px 0 !important;
-  line-height: 1.35 !important;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 10px 0 4px 0;
+  line-height: 1.35;
 }
 
 [contenteditable="true"] p {
-  min-height: 1.4em !important;
-  margin: 0 0 6px 0 !important;
-  line-height: 1.65 !important;
+  min-height: 1.4em;
+  margin: 0 0 6px 0;
+  line-height: 1.65;
   cursor: text;
 }
 
 [contenteditable="true"] p:empty {
-  display: block !important;
-  min-height: 1.4em !important;
+  display: block;
+  min-height: 1.4em;
 }
 
-/* Khử khoảng cách kép khi thẻ p chứa ảnh hoặc media */
+/* Khử khoảng cách kép khi thẻ p chứa ảnh hoặc media (không dùng !important để cho phép người dùng tùy chỉnh) */
 .article-full-text p:has(> img),
 .enterprise-content p:has(> img),
 .article-rendered-content p:has(> img) {
-  margin-top: 10px !important;
-  margin-bottom: 4px !important;
+  margin-top: 10px;
+  margin-bottom: 4px;
 }
 
 .article-full-text h2,
@@ -3668,10 +3667,10 @@ button, input, textarea { font: inherit; }
 .enterprise-content img,
 .article-rendered-content img,
 .article-figure-block img {
-  max-width: 100% !important;
-  height: auto !important;
+  max-width: 100%;
+  height: auto;
   border-radius: 12px;
-  margin: 10px auto 6px auto !important;
+  margin: 10px auto 6px auto;
   display: block;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
 }
@@ -3690,23 +3689,19 @@ button, input, textarea { font: inherit; }
   font-style: italic;
 }
 
-.article-full-text em,
-.enterprise-content em {
+/* Chú thích ảnh (caption): gọn gàng, tự nhiên dưới ảnh */
+.article-figure-block figcaption,
+.article-full-text p:has(> em:only-child),
+.enterprise-content p:has(> em:only-child),
+.article-rendered-content p:has(> em:only-child) {
   display: block;
   text-align: center;
   color: #64748b;
   font-size: 13.5px;
-  margin-top: 2px !important;
-  margin-bottom: 12px !important;
-  line-height: 1.5;
-}
-
-/* Nếu em nằm trong đoạn văn riêng làm caption */
-.article-full-text p:has(> em:only-child),
-.enterprise-content p:has(> em:only-child),
-.article-rendered-content p:has(> em:only-child) {
-  margin-top: 0 !important;
-  margin-bottom: 14px !important;
+  font-style: italic;
+  margin-top: 4px;
+  margin-bottom: 8px;
+  line-height: 1.45;
 }
 
 .article-table-wrapper {

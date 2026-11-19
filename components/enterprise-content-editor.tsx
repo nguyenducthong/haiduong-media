@@ -624,7 +624,7 @@ export function EnterpriseContentEditor({
       ? `<figcaption style="font-size: 13px; color: #64748b; font-style: italic; margin-top: 8px; text-align: center;">${cleanCaption}</figcaption>`
       : "";
 
-    const figureHtml = `<figure style="margin: 20px auto; text-align: center; display: block; max-width: 100%;"><img src="${imageUrl}" alt="${cleanCaption || "Ảnh bài viết"}" style="max-width: 100%; height: auto; border-radius: 8px; display: inline-block; box-shadow: 0 4px 16px rgba(0,0,0,0.08);" />${captionHtml}</figure><p><br></p>`;
+    const figureHtml = `<figure style="margin: 12px auto; text-align: center; display: block; max-width: 100%;"><img src="${imageUrl}" alt="${cleanCaption || "Ảnh bài viết"}" style="max-width: 100%; height: auto; border-radius: 8px; display: inline-block; box-shadow: 0 4px 16px rgba(0,0,0,0.08);" />${captionHtml}</figure>`;
 
     insertHtmlAtCursor(figureHtml);
     setIsImageModalOpen(false);

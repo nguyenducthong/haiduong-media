@@ -38,9 +38,15 @@ export async function POST(req: Request) {
     const result = await mammoth.convertToHtml({ buffer }, options);
     let html = result.value || "";
 
-    // 1. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / &nbsp; / <br> từ file Word
+    // 1. Loại bỏ các thuộc tính style inline rác từ Word gây dãn khoảng cách (margin, line-height...)
+    html = html.replace(/\s*style="[^"]*margin[^"]*"/gi, "");
+    html = html.replace(/\s*style="[^"]*line-height[^"]*"/gi, "");
+
+    // 2. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / &nbsp; / <br> từ file Word
     // Loại bỏ các thẻ <p> rỗng liên tiếp do người dùng gõ Enter nhiều lần trong Word
     html = html.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    // Loại bỏ thẻ <p> rỗng nằm ngay sau thẻ tiêu đề h1, h2, h3, h4
+    html = html.replace(/(<\/(?:h[1-6]|p|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
     // Loại bỏ thẻ <p> rỗng ở đầu hoặc cuối chuỗi
     html = html.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
     html = html.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");

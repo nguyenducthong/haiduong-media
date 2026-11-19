@@ -3409,49 +3409,78 @@ button, input, textarea { font: inherit; }
   padding: 0 !important;
 }
 
-/* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD */
+/* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD, KHOẢNG CÁCH GỌN GÀNG */
+[contenteditable="true"] {
+  outline: none !important;
+}
+
+[contenteditable="true"] h1,
+[contenteditable="true"] h2 {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  margin: 14px 0 6px 0 !important;
+  line-height: 1.35 !important;
+  color: #0f172a !important;
+}
+
+[contenteditable="true"] h3 {
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  margin: 12px 0 5px 0 !important;
+  line-height: 1.35 !important;
+  color: #0f172a !important;
+}
+
+[contenteditable="true"] h4 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  margin: 10px 0 4px 0 !important;
+  line-height: 1.35 !important;
+}
+
 [contenteditable="true"] p {
-  min-height: 1.5em !important;
-  margin-bottom: 8px !important;
+  min-height: 1.4em !important;
+  margin: 0 0 6px 0 !important;
+  line-height: 1.65 !important;
   cursor: text;
 }
 
 [contenteditable="true"] p:empty {
   display: block !important;
-  min-height: 1.5em !important;
+  min-height: 1.4em !important;
 }
 
 /* Khử khoảng cách kép khi thẻ p chứa ảnh hoặc media */
 .article-full-text p:has(> img),
 .enterprise-content p:has(> img),
 .article-rendered-content p:has(> img) {
-  margin-top: 14px !important;
-  margin-bottom: 6px !important;
+  margin-top: 10px !important;
+  margin-bottom: 4px !important;
 }
 
 .article-full-text h2,
 .enterprise-content h2,
 .article-rendered-content h2 {
-  font-size: 22px;
+  font-size: 21px;
   font-weight: 800;
-  margin: 36px 0 16px;
+  margin: 18px 0 8px;
   color: #0f172a;
 }
 
 .article-full-text h3,
 .enterprise-content h3,
 .article-rendered-content h3 {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 800;
-  margin: 28px 0 12px;
+  margin: 14px 0 6px;
   color: #0f172a;
 }
 
 .article-full-text h4,
 .enterprise-content h4 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
-  margin: 20px 0 10px;
+  margin: 12px 0 4px;
   color: #0f172a;
 }
 
@@ -3842,14 +3871,14 @@ table.article-table tbody tr:hover {
   .article-full-text h2,
   .enterprise-content h2,
   .event-content-section h2 {
-    font-size: 19px !important;
-    margin: 28px 0 14px !important;
+    font-size: 18px !important;
+    margin: 14px 0 6px !important;
   }
 
   .article-full-text h3,
   .enterprise-content h3 {
-    font-size: 17px !important;
-    margin: 22px 0 10px !important;
+    font-size: 16px !important;
+    margin: 12px 0 4px !important;
   }
 
   .article-full-text blockquote,

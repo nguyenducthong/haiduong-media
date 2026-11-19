@@ -908,13 +908,16 @@ export function EnterpriseContentEditor({
   const cleanEmptySpacing = (rawHtml: string): string => {
     if (!rawHtml) return "";
     let s = rawHtml;
-    // Xóa các thẻ <p> rỗng, thẻ <p> chỉ chứa khoảng trắng hoặc <br> hoặc &nbsp;
+    // 1. Loại bỏ các thuộc tính style inline rác từ Word gây dãn khoảng cách
+    s = s.replace(/\s*style="[^"]*margin[^"]*"/gi, "");
+    s = s.replace(/\s*style="[^"]*line-height[^"]*"/gi, "");
+    // 2. Xóa các thẻ <p> rỗng, thẻ <p> chỉ chứa khoảng trắng hoặc <br> hoặc &nbsp;
     s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
-    // Xóa các thẻ <div> rỗng
+    // 3. Xóa các thẻ <div> rỗng
     s = s.replace(/(?:<div\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>\s*)+/gi, "");
-    // Xóa thẻ rỗng nằm ngay sau thẻ đóng khác
+    // 4. Xóa thẻ rỗng nằm ngay sau thẻ đóng khác (đặc biệt là sau h1-h6)
     s = s.replace(/(<\/(?:p|figure|h[1-6]|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
-    // Xóa khoảng trắng đầu/cuối
+    // 5. Xóa khoảng trắng đầu/cuối
     s = s.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
     s = s.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
     return s.trim();

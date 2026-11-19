@@ -68,7 +68,16 @@ export function balanceHtmlTags(html: string): string {
     s = s.replace(/(<\/(?:h[1-6]|ul|ol|li|div|p|table|blockquote)>)\s*<\/p>/gi, "$1");
   }
 
-  // 6. Tokenizer & Stack-based Tag Balancer:
+  // 6. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / <br> / &nbsp; (nguyên nhân gây khoảng trống khổng lồ)
+  // Xóa các thẻ <p> rỗng liên tiếp (từ 2 thẻ trở lên)
+  s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*){2,}/gi, "");
+  // Xóa thẻ <p> rỗng nằm ngay sau thẻ đóng khác
+  s = s.replace(/(<\/(?:p|figure|h[1-6]|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
+  // Xóa thẻ <p> rỗng ở đầu hoặc cuối nội dung
+  s = s.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+  s = s.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
+
+  // 7. Tokenizer & Stack-based Tag Balancer:
   // - BỎ HẲN các thẻ đóng thừa (excess closing tags) để KHÔNG BAO GIỜ đóng nhầm các thẻ cha của trang web
   // - Tự động bổ sung các thẻ đóng còn thiếu ở cuối chuỗi
   const tagRegex = /<\/?([a-z0-9]+)\b([^>]*)>/gi;

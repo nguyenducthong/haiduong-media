@@ -3396,8 +3396,25 @@ button, input, textarea { font: inherit; }
 .article-full-text p,
 .enterprise-content p,
 .article-rendered-content p {
-  margin-bottom: 20px;
-  line-height: 1.8;
+  margin-bottom: 14px;
+  line-height: 1.75;
+}
+
+/* Ẩn triệt để các thẻ p rỗng hoặc chỉ chứa khoảng trắng/br thừa */
+.article-full-text p:empty,
+.enterprise-content p:empty,
+.article-rendered-content p:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Khử khoảng cách kép khi thẻ p chứa ảnh hoặc media */
+.article-full-text p:has(> img),
+.enterprise-content p:has(> img),
+.article-rendered-content p:has(> img) {
+  margin-top: 14px !important;
+  margin-bottom: 6px !important;
 }
 
 .article-full-text h2,
@@ -3613,21 +3630,21 @@ button, input, textarea { font: inherit; }
   max-width: 100% !important;
   height: auto !important;
   border-radius: 12px;
-  margin: 1.5rem auto;
+  margin: 10px auto 6px auto !important;
   display: block;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
 }
 
 .article-figure-block {
-  margin: 1.5rem 0;
+  margin: 14px 0 10px 0;
   width: 100%;
 }
 
 .article-figure-block figcaption {
-  font-size: 13px;
+  font-size: 13.5px;
   color: #64748b;
   text-align: center;
-  margin-top: 8px;
+  margin-top: 6px;
   line-height: 1.5;
   font-style: italic;
 }
@@ -3637,9 +3654,18 @@ button, input, textarea { font: inherit; }
   display: block;
   text-align: center;
   color: #64748b;
-  font-size: 14px;
-  margin-top: -0.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 13.5px;
+  margin-top: 2px !important;
+  margin-bottom: 12px !important;
+  line-height: 1.5;
+}
+
+/* Nếu em nằm trong đoạn văn riêng làm caption */
+.article-full-text p:has(> em:only-child),
+.enterprise-content p:has(> em:only-child),
+.article-rendered-content p:has(> em:only-child) {
+  margin-top: 0 !important;
+  margin-bottom: 14px !important;
 }
 
 .article-table-wrapper {
@@ -3778,6 +3804,27 @@ table.article-table tbody tr:hover {
   .article-rendered-content {
     font-size: 15px !important;
     line-height: 1.7 !important;
+  }
+
+  .article-full-text p,
+  .enterprise-content p,
+  .article-rendered-content p {
+    margin-bottom: 11px !important;
+    line-height: 1.7 !important;
+  }
+
+  .article-full-text img,
+  .enterprise-content img,
+  .article-rendered-content img {
+    margin: 6px auto 4px auto !important;
+    border-radius: 8px !important;
+  }
+
+  .article-full-text em,
+  .enterprise-content em {
+    font-size: 13px !important;
+    margin-top: 2px !important;
+    margin-bottom: 10px !important;
   }
 
   .article-full-text h2,

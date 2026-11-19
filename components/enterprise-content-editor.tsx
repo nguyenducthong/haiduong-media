@@ -1671,10 +1671,10 @@ export function EnterpriseContentEditor({
             padding: "20px 24px",
             outline: "none",
             fontSize: "15px",
-            lineHeight: 1.8,
+            lineHeight: 1.75,
             color: "#1e293b",
           }}
-          className="article-detail-body"
+          className="article-detail-body article-full-text enterprise-content article-rendered-content"
         >
           <div
             ref={editorRef}
@@ -1688,6 +1688,7 @@ export function EnterpriseContentEditor({
             onKeyUp={saveSelection}
             onPaste={handlePaste}
             onDrop={handleDrop}
+            className="article-full-text enterprise-content article-rendered-content"
             style={{
               minHeight: "300px",
               outline: "none",
@@ -1703,10 +1704,10 @@ export function EnterpriseContentEditor({
               minHeight,
               background: "#fafafa",
               fontSize: "15px",
-              lineHeight: 1.8,
+              lineHeight: 1.75,
               color: "#0f172a",
             }}
-            className="article-detail-body"
+            className="article-detail-body article-full-text enterprise-content article-rendered-content"
             dangerouslySetInnerHTML={{
               __html:
                 value ||

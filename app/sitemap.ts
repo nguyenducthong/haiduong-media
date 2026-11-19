@@ -73,10 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       getAllEvents().catch(() => []),
     ]);
 
+    // 2. Các bài viết tin tức (chuẩn hóa đúng chuyên mục /tin-tuc/)
     // 2. Các bài viết tin tức / hoạt động (chuẩn hóa đúng chuyên mục /tin-tuc/)
     const newsSlugs = new Set();
     const allNewsItems = [
       ...(content?.news || []),
+      ...(enterprises || []).filter((item) => item.type === "tin-tuc"),
       ...(enterprises || []).filter((item) => {
         const t = Array.isArray(item.type) ? item.type : [item.type];
         return t.includes("tin-tuc");
@@ -100,6 +102,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const eventSlugs = new Set();
     const allEventItems = [
       ...(events || []),
+      ...(enterprises || []).filter((item) => item.type === "su-kien"),
       ...(enterprises || []).filter((item) => {
         const t = Array.isArray(item.type) ? item.type : [item.type];
         return t.includes("su-kien");
@@ -119,6 +122,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
+    // 4. Các bài viết doanh nghiệp / thương hiệu (chỉ lấy bài doanh nghiệp, loại trừ tin-tuc và su-kien để tránh trùng lặp tuyệt đối)
     // 4. Các dịch vụ Facebook chuyên sâu (/dich-vu-facebook/:slug)
     const fbSlugs = new Set();
     const fbRoutes: MetadataRoute.Sitemap = (enterprises || [])
@@ -147,6 +151,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 5. Các bài viết doanh nghiệp / thương hiệu (/doanh-nghiep/:slug)
     const processedOtherSlugs = new Set([...newsSlugs, ...eventSlugs, ...fbSlugs]);
     const enterpriseRoutes: MetadataRoute.Sitemap = (enterprises || [])
+      .filter(
+        (item) =>
+          item.active !== false &&
+          (item.slug || item.id) &&
+          item.type !== "su-kien" &&
+          item.type !== "tin-tuc"
+      )
       .filter((item) => {
         if (!item || item.active === false) return false;
         const s = item.slug || item.id;
@@ -161,6 +172,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       }));
 
+    return [...staticRoutes, ...newsRoutes, ...enterpriseRoutes, ...eventRoutes];
     return [...staticRoutes, ...newsRoutes, ...enterpriseRoutes, ...eventRoutes, ...fbRoutes];
   } catch (err) {
     console.error("Error generating sitemap:", err);

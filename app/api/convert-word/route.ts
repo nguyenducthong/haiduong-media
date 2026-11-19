@@ -24,9 +24,26 @@ export async function POST(req: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Convert DOCX to clean HTML using mammoth
-    const result = await mammoth.convertToHtml({ buffer });
+    // Convert DOCX to clean HTML using mammoth with inline image support
+    const options = {
+      convertImage: mammoth.images.imgElement((image: any) => {
+        return image.read("base64").then((imageBuffer: string) => {
+          return {
+            src: `data:${image.contentType};base64,${imageBuffer}`,
+          };
+        });
+      }),
+    };
+
+    const result = await mammoth.convertToHtml({ buffer }, options);
     let html = result.value || "";
+
+    // 1. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / &nbsp; / <br> từ file Word
+    // Loại bỏ các thẻ <p> rỗng liên tiếp do người dùng gõ Enter nhiều lần trong Word
+    html = html.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    // Loại bỏ thẻ <p> rỗng ở đầu hoặc cuối chuỗi
+    html = html.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    html = html.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
 
     // Extract suggested title from first heading or first line
     let suggestedTitle = "";

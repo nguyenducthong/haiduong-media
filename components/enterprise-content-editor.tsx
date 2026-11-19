@@ -42,6 +42,7 @@ import {
   Rows,
   Columns,
   Grid,
+  Sparkles,
 } from "lucide-react";
 
 const FONT_SIZES = [
@@ -904,6 +905,30 @@ export function EnterpriseContentEditor({
   };
 
   // --- WORD (.DOCX) IMPORT HANDLER ---
+  const cleanEmptySpacing = (rawHtml: string): string => {
+    if (!rawHtml) return "";
+    let s = rawHtml;
+    // Xóa các thẻ <p> rỗng, thẻ <p> chỉ chứa khoảng trắng hoặc <br> hoặc &nbsp;
+    s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    // Xóa các thẻ <div> rỗng
+    s = s.replace(/(?:<div\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>\s*)+/gi, "");
+    // Xóa thẻ rỗng nằm ngay sau thẻ đóng khác
+    s = s.replace(/(<\/(?:p|figure|h[1-6]|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
+    // Xóa khoảng trắng đầu/cuối
+    s = s.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    s = s.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
+    return s.trim();
+  };
+
+  const handleCleanSpacingClick = () => {
+    const currentHtml = editorRef.current ? editorRef.current.innerHTML : value;
+    const cleaned = cleanEmptySpacing(currentHtml);
+    onChange(cleaned);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = cleaned;
+    }
+  };
+
   const handleConvertWord = async () => {
     if (!selectedWordFile) {
       setWordConvertError("Vui lòng chọn file Word (.docx).");
@@ -938,7 +963,8 @@ export function EnterpriseContentEditor({
         throw new Error(data?.error || "Chuyển đổi file Word thất bại.");
       }
 
-      const importedHtml = data.html || "<p></p>";
+      const rawImportedHtml = data.html || "<p></p>";
+      const importedHtml = cleanEmptySpacing(rawImportedHtml);
 
       if (wordImportMode === "replace") {
         onChange(importedHtml);
@@ -1434,6 +1460,24 @@ export function EnterpriseContentEditor({
               }}
             >
               <FileUp size={15} /> Nhập từ Word (.docx)
+            </button>
+
+            {/* ACTION: DỌN KHOẢNG TRẮNG THỪA */}
+            <button
+              type="button"
+              title="Tự động quét và xóa sạch tất cả các khoảng trắng, dòng trống thừa thãi (đặc biệt sau khi chèn từ Word)"
+              onMouseDown={saveSelection}
+              onClick={handleCleanSpacingClick}
+              style={{
+                ...btnStyle,
+                background: "#fef3c7",
+                color: "#b45309",
+                fontWeight: 700,
+                padding: "5px 11px",
+                border: "1px solid #fde68a",
+              }}
+            >
+              <Sparkles size={14} /> Dọn khoảng trắng
             </button>
 
             {/* ACTION: CHÈN BẢNG (TABLE) */}

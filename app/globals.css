@@ -3399,13 +3399,13 @@ button, input, textarea { font: inherit; }
   line-height: 1.7;
 }
 
-/* Ẩn các thẻ p rỗng hoàn toàn ở giao diện đọc bài (ngoài frontend) */
+/* Trong giao diện đọc bài: Giữ nguyên dòng trống tự nhiên khi người dùng gõ Enter cách dòng như Word */
 .news-detail-body .article-full-text p:empty,
 .news-detail-body .enterprise-content p:empty,
 .news-detail-body .article-rendered-content p:empty {
-  display: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  display: block;
+  min-height: 1.2em;
+  margin: 0 0 6px 0;
 }
 
 /* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD, KHOẢNG CÁCH TỰ DO ĐIỀU CHỈNH */

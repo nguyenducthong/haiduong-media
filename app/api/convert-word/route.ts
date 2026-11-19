@@ -42,11 +42,8 @@ export async function POST(req: Request) {
     html = html.replace(/\s*style="[^"]*margin[^"]*"/gi, "");
     html = html.replace(/\s*style="[^"]*line-height[^"]*"/gi, "");
 
-    // 2. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / &nbsp; / <br> từ file Word
-    // Loại bỏ các thẻ <p> rỗng liên tiếp do người dùng gõ Enter nhiều lần trong Word
-    html = html.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
-    // Loại bỏ thẻ <p> rỗng nằm ngay sau thẻ tiêu đề h1, h2, h3, h4
-    html = html.replace(/(<\/(?:h[1-6]|p|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
+    // 2. Thu gọn các dòng trống liên tiếp do gõ Enter nhiều lần trong Word thành tối đa 1 dòng cách chuẩn
+    html = html.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*){2,}/gi, "<p><br></p>");
     // Loại bỏ thẻ <p> rỗng ở đầu hoặc cuối chuỗi
     html = html.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
     html = html.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");

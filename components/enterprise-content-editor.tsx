@@ -963,13 +963,11 @@ export function EnterpriseContentEditor({
     // 1. Loại bỏ các thuộc tính style inline rác từ Word gây dãn khoảng cách
     s = s.replace(/\s*style="[^"]*margin[^"]*"/gi, "");
     s = s.replace(/\s*style="[^"]*line-height[^"]*"/gi, "");
-    // 2. Xóa các thẻ <p> rỗng, thẻ <p> chỉ chứa khoảng trắng hoặc <br> hoặc &nbsp;
-    s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
+    // 2. Thu gọn các dòng trống liên tiếp do gõ Enter nhiều lần thành tối đa 1 dòng trống để giữ khoảng cách có chủ đích
+    s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*){2,}/gi, "<p><br></p>");
     // 3. Xóa các thẻ <div> rỗng
     s = s.replace(/(?:<div\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/div>\s*)+/gi, "");
-    // 4. Xóa thẻ rỗng nằm ngay sau thẻ đóng khác (đặc biệt là sau h1-h6)
-    s = s.replace(/(<\/(?:p|figure|h[1-6]|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
-    // 5. Xóa khoảng trắng đầu/cuối
+    // 4. Xóa khoảng trắng rỗng ở đầu và cuối bài viết
     s = s.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
     s = s.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
     return s.trim();

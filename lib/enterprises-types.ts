@@ -68,12 +68,10 @@ export function balanceHtmlTags(html: string): string {
     s = s.replace(/(<\/(?:h[1-6]|ul|ol|li|div|p|table|blockquote)>)\s*<\/p>/gi, "$1");
   }
 
-  // 6. Tự động dọn dẹp các thẻ đoạn văn rỗng hoặc chỉ chứa khoảng trắng / <br> / &nbsp; (nguyên nhân gây khoảng trống khổng lồ)
-  // Xóa các thẻ <p> rỗng liên tiếp (từ 2 thẻ trở lên)
-  s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*){2,}/gi, "");
-  // Xóa thẻ <p> rỗng nằm ngay sau thẻ đóng khác
-  s = s.replace(/(<\/(?:p|figure|h[1-6]|div|table|blockquote)>\s*)<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "$1");
-  // Xóa thẻ <p> rỗng ở đầu hoặc cuối nội dung
+  // 6. Giữ lại dòng cách Enter có chủ đích của người dùng (như người dùng Enter trước ảnh hoặc giữa các đoạn)
+  // Chỉ thu gọn khi người dùng Enter liên tiếp quá nhiều lần (từ 2 lần trở lên) thành 1 dòng cách chuẩn
+  s = s.replace(/(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*){2,}/gi, '<p class="article-spacer"><br></p>');
+  // Xóa thẻ rỗng ở đầu hoặc cuối nội dung
   s = s.replace(/^\s*(?:<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+/gi, "");
   s = s.replace(/(?:\s*<p\b[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>\s*)+$/gi, "");
 
@@ -121,8 +119,8 @@ export function balanceHtmlTags(html: string): string {
     result += `</${popped}>`;
   }
 
-  // 7. Dọn dẹp các thẻ rỗng vô nghĩa
-  result = result.replace(/<(?:p|h[1-6]|span)\b[^>]*>\s*(?:&nbsp;|\s)*<\/(?:p|h[1-6]|span)>/gi, "");
+  // 7. Dọn dẹp các thẻ tiêu đề hoặc span rỗng vô nghĩa (không xóa thẻ p có chủ đích)
+  result = result.replace(/<(?:h[1-6]|span)\b[^>]*>\s*(?:&nbsp;|\s)*<\/(?:h[1-6]|span)>/gi, "");
 
   return result;
 }

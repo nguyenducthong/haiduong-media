@@ -3400,12 +3400,16 @@ button, input, textarea { font: inherit; }
 }
 
 /* Trong giao diện đọc bài: Giữ nguyên dòng trống tự nhiên khi người dùng gõ Enter cách dòng như Word */
-.news-detail-body .article-full-text p:empty,
-.news-detail-body .enterprise-content p:empty,
-.news-detail-body .article-rendered-content p:empty {
+.article-full-text p:empty,
+.enterprise-content p:empty,
+.article-rendered-content p:empty,
+.article-full-text p:has(> br:only-child),
+.enterprise-content p:has(> br:only-child),
+.article-rendered-content p:has(> br:only-child),
+.article-spacer {
   display: block;
-  min-height: 1.2em;
-  margin: 0 0 6px 0;
+  min-height: 1.4em;
+  margin: 4px 0 8px 0;
 }
 
 /* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD, KHOẢNG CÁCH TỰ DO ĐIỀU CHỈNH */

@@ -1010,6 +1010,54 @@ export function EnterpriseContentEditor({
     }
   };
 
+  // Xử lý phím di chuyển, xóa dòng trống chuẩn như Microsoft Word
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Khi người dùng bấm Backspace hoặc Delete trên một dòng rỗng
+    if (e.key === "Backspace" || e.key === "Delete") {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0 || !editorRef.current) return;
+
+      const anchorNode = sel.anchorNode;
+      let currentBlock = anchorNode instanceof HTMLElement ? anchorNode : anchorNode?.parentElement;
+      while (currentBlock && currentBlock.parentElement !== editorRef.current) {
+        currentBlock = currentBlock.parentElement;
+      }
+
+      if (currentBlock && currentBlock.parentElement === editorRef.current) {
+        const text = currentBlock.textContent?.trim() || "";
+        const hasMedia = currentBlock.querySelector("img, table, iframe, svg");
+
+        // Nếu khối hiện tại hoàn toàn rỗng
+        if (text === "" && !hasMedia) {
+          const prevBlock = currentBlock.previousElementSibling as HTMLElement | null;
+          const nextBlock = currentBlock.nextElementSibling as HTMLElement | null;
+
+          if (e.key === "Backspace" && prevBlock) {
+            e.preventDefault();
+            currentBlock.remove();
+            const range = document.createRange();
+            range.selectNodeContents(prevBlock);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            handleInput();
+            return;
+          } else if (e.key === "Delete" && nextBlock) {
+            e.preventDefault();
+            currentBlock.remove();
+            const range = document.createRange();
+            range.selectNodeContents(nextBlock);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            handleInput();
+            return;
+          }
+        }
+      }
+    }
+  };
+
   // Drag and drop files
   const handleDrop = (e: React.DragEvent) => {
     const files = e.dataTransfer?.files;
@@ -1724,6 +1772,7 @@ export function EnterpriseContentEditor({
             ref={editorRef}
             contentEditable
             onInput={handleInput}
+            onKeyDown={handleKeyDown}
             onBlur={() => {
               saveSelection();
               handleInput();

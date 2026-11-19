@@ -3400,13 +3400,25 @@ button, input, textarea { font: inherit; }
   line-height: 1.75;
 }
 
-/* Ẩn triệt để các thẻ p rỗng hoặc chỉ chứa khoảng trắng/br thừa */
-.article-full-text p:empty,
-.enterprise-content p:empty,
-.article-rendered-content p:empty {
+/* Ẩn các thẻ p rỗng hoàn toàn ở giao diện đọc bài (ngoài frontend) */
+.news-detail-body .article-full-text p:empty,
+.news-detail-body .enterprise-content p:empty,
+.news-detail-body .article-rendered-content p:empty {
   display: none !important;
   margin: 0 !important;
   padding: 0 !important;
+}
+
+/* Trong khung soạn thảo trực quan (Editor): MỖI DÒNG TRỐNG LÀ 1 DÒNG SOẠN THẢO THẬT SỰ NHƯ WORD */
+[contenteditable="true"] p {
+  min-height: 1.5em !important;
+  margin-bottom: 8px !important;
+  cursor: text;
+}
+
+[contenteditable="true"] p:empty {
+  display: block !important;
+  min-height: 1.5em !important;
 }
 
 /* Khử khoảng cách kép khi thẻ p chứa ảnh hoặc media */
